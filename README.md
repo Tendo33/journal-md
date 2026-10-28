@@ -1,6 +1,6 @@
 <div align="center">
 
-# Journal to Markdown · 期刊全文转 Markdown
+# Journal to Markdown
 
 **把开放获取期刊论文的全文页保存为干净的 Markdown。**
 
@@ -31,7 +31,7 @@
 | P1 | bioRxiv / medRxiv、ScienceDirect、Cell Press、Wiley、Oxford Academic、Taylor & Francis |
 | P2 | SciEngine、中文期刊、PDF 兜底 |
 
-## 原则
+## 计划原则
 
 - **默认只解析开放获取 PDF**。非开放获取的 PDF 会先提示，由你确认后才处理。
 - 不绕过付费墙，只处理你本来就有权限看到的内容。

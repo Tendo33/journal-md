@@ -31,7 +31,7 @@ A sibling of [arXiv to Markdown](https://github.com/Tendo33/arxiv-md) for journa
 | P1 | bioRxiv / medRxiv, ScienceDirect, Cell Press, Wiley, Oxford Academic, Taylor & Francis |
 | P2 | SciEngine, Chinese journals, PDF fallback |
 
-## Principles
+## Planned principles
 
 - **Only open-access PDFs are parsed by default.** For anything else you get a prompt and must confirm.
 - No paywall bypass; only content you can already access.
