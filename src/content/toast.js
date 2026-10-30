@@ -19,7 +19,7 @@ button { all: unset; cursor: pointer; width: 24px; height: 24px; display: inline
 button:focus-visible { outline: 2px solid #0969da; outline-offset: 2px; }
 @media (prefers-color-scheme: dark) {
   .toast { background: #1f2328; color: #e6edf3; border-color: #3d444d; }
-  button:focus-visible { outline-color: #4493f8; }
+  button:focus-visible { outline-color: #79c0ff; }
 }
 @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
 `;

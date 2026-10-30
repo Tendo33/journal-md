@@ -45,4 +45,3 @@ input[type="password"] { height: 36px; padding: 0 var(--space-3); border: 1px so
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .pdf-status[data-state="ok"] { color: var(--success); }
 .pdf-status[data-state="err"] { color: var(--error); }
-.group[data-pdf-off] #pdf-provider, .group[data-pdf-off] .field { opacity: .6; }

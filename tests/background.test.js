@@ -158,3 +158,23 @@ describe('action runner: every failure is visible (QA JM-M2-02)', () => {
     delete global.document;
   });
 });
+
+describe('review N1: PDF start / test only from extension pages', () => {
+  let handleMessage;
+  beforeAll(async () => {
+    global.chrome = { runtime: { id: 'self', getURL: (p) => `chrome-extension://self/${p}` } };
+    ({ handleMessage } = await import('@/background/index'));
+  });
+  afterAll(() => { delete global.chrome; });
+  test('content scripts and other extensions are refused', () => {
+    const msg = { type: 'JMD_PDF_START', request: { consent: true } };
+    expect(handleMessage(msg, { id: 'self', url: 'https://www.nature.com/articles/x', tab: { id: 1, url: 'https://www.nature.com/articles/x' } })).toBeNull();
+    expect(handleMessage({ type: 'JMD_PDF_TEST', provider: 'paddleocr', token: 't' }, { id: 'self', url: 'https://www.nature.com/articles/x', tab: { id: 1 } })).toBeNull();
+    expect(handleMessage(msg, { id: 'evil', url: 'chrome-extension://evil/popup.html' })).toBeNull();
+  });
+  test('the popup is accepted', () => {
+    const p = handleMessage({ type: 'JMD_PDF_START', request: {} }, { id: 'self', url: 'chrome-extension://self/popup.html' });
+    expect(p).not.toBeNull();
+    return Promise.resolve(p).catch(() => {}); // 测试环境没有 storage，只关心有没有被放行
+  });
+});
