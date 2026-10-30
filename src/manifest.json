@@ -25,15 +25,7 @@
     "https://pmc.ncbi.nlm.nih.gov/*",
     "https://pubmed.ncbi.nlm.nih.gov/*",
     "https://europepmc.org/*",
-    "https://www.ebi.ac.uk/europepmc/*",
-    "https://*.biomedcentral.com/*",
-    "https://*.springeropen.com/*",
-    "https://link.springer.com/*",
-    "https://www.nature.com/*",
-    "https://www.frontiersin.org/*",
-    "https://www.mdpi.com/*",
-    "https://journals.plos.org/*",
-    "https://elifesciences.org/*"
+    "https://www.ebi.ac.uk/europepmc/*"
   ],
   "background": {
     "service_worker": "background.js",

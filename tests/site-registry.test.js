@@ -42,9 +42,14 @@ describe('detectSite', () => {
     expect(detectSite('https://evilbiomedcentral.com/x').site).toBeNull();
   });
 
-  test('every registry host is covered by a manifest host permission', () => {
+  test('supported sites are covered by host permissions; planned sites request none in M1', () => {
     const hostPerms = manifest.host_permissions.map((h) => h.replace(/^https:\/\//, '').replace(/\/.*$/, ''));
-    for (const s of SITES) for (const h of s.hosts) expect(hostPerms).toContain(h);
+    for (const s of SITES) {
+      for (const h of s.hosts) {
+        if (s.status === 'supported') expect(hostPerms).toContain(h);
+        else expect(hostPerms).not.toContain(h);
+      }
+    }
   });
 
   test('content scripts only run on M1 supported sites', () => {
