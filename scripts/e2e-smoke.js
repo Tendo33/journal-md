@@ -309,7 +309,9 @@ async function main() {
   const zpStatus = await zp.textContent('#status');
   const zipAfter = (await sw.evaluate(() => chrome.downloads.search({}))).filter((d) => d.state === 'complete' && /application\/zip/.test(d.mime || d.url || ''));
   check('ZIP permission denied: ZIP still saved, visible notice to allow access', zipAfter.length === zipBefore + 1 && /\.zip/.test(zpStatus) && /needs your permission|需要你授权/.test(zpStatus), zpStatus);
-  const nmd = zipAfter.length ? (unzip(fs.readFileSync(zipAfter[zipAfter.length - 1].filename))['article.md'] || '').toString('utf8') : '';
+  // downloads.search 不按时间排序：取最新开始的那一个
+  const newestZip = zipAfter.slice().sort((x, y) => String(x.startTime).localeCompare(String(y.startTime))).pop();
+  const nmd = newestZip ? (unzip(fs.readFileSync(newestZip.filename))['article.md'] || '').toString('utf8') : '';
   check('ZIP permission denied: images keep their remote links in article.md', /\]\(https:\/\/media\.springernature\.com\//.test(nmd) && !/\]\(images\//.test(nmd));
 
   // PDF 解析：打开（直接写 storage.local，不经过浏览器权限弹窗）后，非 OA 文章先确认；拒绝 / 缺权限时不访问后端
