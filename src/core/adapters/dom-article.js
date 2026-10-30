@@ -7,6 +7,7 @@ import { completeDanglingSections } from '../parsers/dangling';
 import { normalizeDoi, normalizePmcid, normalizePmid, extractYear } from '../ids';
 import { normalizeLicense } from '../license';
 import { textOf, resolveUrl } from '../parsers/dom-utils';
+import { isPermissiveLicense } from '../../pdf/oa';
 
 const REF_LINK_NOISE = /^(DOI|PubMed|PMC free article|Google Scholar|CrossRef|Crossref|Article|CAS|PubMed Central|Europe PMC|Free full text|Abstract|Full Text)$/i;
 const DROP_SECTION = /^(references?|literature cited|bibliography|associated data|supplementary (information|materials?|data)|additional files?|electronic supplementary material|citations?( (&|and) impact)?|cited by|similar articles|related articles|articles citing this|author information|authors? and affiliations|ethics declarations|additional information|rights and permissions|about this article|cite this article|share this article|comments|statements|authors[’'] original submitted files for images|peer review( information)?|publisher[’']s note|reprints and permissions|metrics|article and author information|download links|copyright)$/i;
@@ -81,6 +82,30 @@ function metaValues(doc, ...names) {
 function personName(name) {
   const m = String(name).match(/^([^,]+),\s*(.+)$/);
   return m ? `${m[2]} ${m[1]}`.trim() : String(name).trim();
+}
+
+const LICENCE_TEXT = /creative commons|\bCC[ -]BY\b|\bCC0\b/i;
+
+/**
+ * 文章许可（复审 N2）：把所有专门位置的许可都收集起来——许可框里的每一条链接（cfg.license）、版权说明文字（cfg.licenseText）、
+ * citation_license / dc.rights / dcterms.license 元数据——只要**任何一条**是 CC BY / CC0 以外的许可（NC、ND、SA……），
+ * 就用那一条，这样 PDF 的开放获取判断不会因为排在前面的一条 CC BY 而放行。全部都是 CC BY / CC0 时用许可框的第一条。
+ * 只写了版权归属、不像许可的元数据（如 dc.rights「2021 The Author(s)」）不算。
+ */
+export function pickLicense(doc, cfg) {
+  const found = [];
+  for (const el of all(doc, cfg.license)) {
+    const v = normalizeLicense(el.getAttribute('href') || textOf(el));
+    if (v) found.push(v);
+  }
+  for (const tx of all(doc, cfg.licenseText).map(textOf)) {
+    if (LICENCE_TEXT.test(tx)) found.push(normalizeLicense(tx.replace(/^.*?(?=creative commons|\bCC[ -]BY|\bCC0)/i, '')));
+  }
+  for (const v of metaValues(doc, 'citation_license').concat(metaValues(doc, 'dcterms.license'), metaValues(doc, 'dc.rights'))) {
+    if (/creativecommons\.org/i.test(v) || LICENCE_TEXT.test(v)) found.push(normalizeLicense(v));
+  }
+  const list = found.filter(Boolean);
+  return list.find((l) => !isPermissiveLicense(l)) || list[0] || '';
 }
 
 /**
@@ -184,12 +209,7 @@ export function extractDomArticle(doc, url, cfg, ids = {}) {
   // 许可证只从专门的位置取（审查 M-1）：站点自己的版权 / 许可框和 rel="license"（cfg.license，每个站点写死的容器）、
   // 许可 / 版权说明文字（cfg.licenseText）、citation_* / dc.rights 元数据。绝不在整页里找 CC 链接——
   // 参考文献、数据集引用、页脚里都可能有，会把订阅文章误判成开放获取，PDF 解析就不弹确认了
-  const lic = first(doc, cfg.license);
-  const dcRights = metaValues(doc, 'citation_license', 'dc.rights', 'dcterms.license')[0] || '';
-  // 没有许可链接时看版权说明文字（PLOS：「…distributed under the terms of the Creative Commons Attribution License…」）
-  const licText = all(doc, cfg.licenseText).map(textOf).find((tx) => /creative commons|\bCC[ -]BY\b|CC0/i.test(tx)) || '';
-  meta.license = lic ? normalizeLicense(lic.getAttribute('href') || textOf(lic))
-    : (/creativecommons\.org|creative commons/i.test(dcRights) ? normalizeLicense(dcRights) : (licText ? normalizeLicense(licText.replace(/^.*?(?=creative commons|\bCC[ -]BY|CC0)/i, '')) : ''));
+  meta.license = pickLicense(doc, cfg);
   // PDF 地址（L3 PDF 解析用）：citation_pdf_url，没有时按站点配置找下载链接
   const pdfLink = first(root, cfg.pdfLink) || first(doc, cfg.pdfLink);
   meta.pdfUrl = resolveUrl(metaValues(doc, 'citation_pdf_url')[0] || (pdfLink && pdfLink.getAttribute('href')) || '', url);

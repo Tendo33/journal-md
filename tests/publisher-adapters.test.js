@@ -391,3 +391,42 @@ describe('review N1 (fix2b-3): rel=license counts only inside the licence box or
     expect(extractEuropePmc(e, 'https://europepmc.org/article/MED/31862249', { pmid: '31862249' }).meta.license).toBe('');
   });
 });
+
+describe('review N2 (fix2b-4): any restrictive licence entry or meta wins', () => {
+  const { pickLicense } = require('@core/adapters/dom-article');
+  const { SPRINGER_CONFIG, MDPI_CONFIG } = require('@core/adapters/publishers');
+  const doc = (s) => new DOMParser().parseFromString(s, 'text/html');
+  const BOX = (...hrefs) => `<div id="rightslink-content">${hrefs.map((h) => `<a href="${h}">l</a>`).join(' ')}</div>`;
+  const BY = 'https://creativecommons.org/licenses/by/4.0/';
+  const NCND = 'https://creativecommons.org/licenses/by-nc-nd/4.0/';
+
+  test('licence box with BY first and NC-ND second → NC-ND (every entry checked, not just the first)', () => {
+    expect(pickLicense(doc(BOX(BY, NCND)), SPRINGER_CONFIG)).toBe('CC-BY-NC-ND-4.0');
+    expect(pickLicense(doc(BOX(NCND, BY)), SPRINGER_CONFIG)).toBe('CC-BY-NC-ND-4.0');
+  });
+
+  test('licence box BY but citation_license / dcterms.license / dc.rights restrictive → restrictive', () => {
+    expect(pickLicense(doc(`<meta name="citation_license" content="https://creativecommons.org/licenses/by-nc/4.0/">${BOX(BY)}`), SPRINGER_CONFIG)).toBe('CC-BY-NC-4.0');
+    expect(pickLicense(doc(`<meta name="dcterms.license" content="https://creativecommons.org/licenses/by-sa/4.0/">${BOX(BY)}`), SPRINGER_CONFIG)).toBe('CC-BY-SA-4.0');
+    expect(pickLicense(doc(`<meta name="dc.rights" content="CC BY-NC 4.0">${BOX(BY)}`), SPRINGER_CONFIG)).toBe('CC-BY-NC-4.0');
+  });
+
+  test('all permissive → the licence box entry; copyright-only dc.rights is not a licence', () => {
+    expect(pickLicense(doc(`<meta name="dc.rights" content="https://creativecommons.org/licenses/by/3.0/"><section id="html-copyright"><a href="${BY}">x</a></section>`), MDPI_CONFIG)).toBe('CC-BY-4.0');
+    expect(pickLicense(doc(`<meta name="dc.rights" content="2021 The Author(s)">${BOX(BY)}`), SPRINGER_CONFIG)).toBe('CC-BY-4.0');
+    expect(pickLicense(doc('<meta name="dc.rights" content="2014 Love et al.; licensee BioMed Central.">'), SPRINGER_CONFIG)).toBe('');
+  });
+
+  test('citation_license alone is read (mutant from the review)', () => {
+    expect(pickLicense(doc(`<meta name="citation_license" content="${BY}">`), SPRINGER_CONFIG)).toBe('CC-BY-4.0');
+  });
+
+  test('effect on PDF: Nature with an extra NC entry in the licence box is not OA', () => {
+    const url = 'https://www.nature.com/articles/s41586-021-03819-2';
+    const d = html('nature-alphafold.html');
+    const a = d.createElement('a');
+    a.setAttribute('href', NCND);
+    d.querySelector('#rightslink-content').append(a);
+    expect(inspectPage(d, url).pdf).toMatchObject({ openAccess: false, license: 'CC-BY-NC-ND-4.0' });
+  });
+});
