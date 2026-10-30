@@ -99,7 +99,7 @@ export const FRONTIERS_CONFIG = {
 
 export const MDPI_CONFIG = {
   route: SOURCE_ROUTES.DOM_MDPI,
-  root: ['article', 'main'],
+  root: ['article', 'main', 'body'],
   title: ['h1'],
   authors: '',
   journal: '',
@@ -120,8 +120,10 @@ export const MDPI_CONFIG = {
   refLabel: '',
   supp: '',
   suppCaption: '',
-  remove: ['#html-keywords', '#html-graphical', '#html-copyright', '.html-fn_group', '#Tables', '.html-table_show', '.html-fig_show',
-    '.html-media-expand', '.html-tablepopup', '.html-figpopup'],
+  // .html-figpopup 里包着图片本身（<button><img data-large=…></button>），不能删（QA JM-M2-03）；
+  // 文末的 #FiguresandTables（旧版 #Figures / #Tables）是重复的图表汇总
+  remove: ['#html-keywords', '#html-graphical', '#html-copyright', '.html-fn_group', '#Tables', '#Figures', '#FiguresandTables', '.html-table_show', '.html-fig_show',
+    '.html-media-expand'],
   selectors: {
     figure: '.html-fig-wrap, .html-fig_wrap',
     table: '.html-table-wrap, .html-table_wrap',

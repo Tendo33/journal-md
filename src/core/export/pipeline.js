@@ -171,6 +171,21 @@ export function domAssetResolver(doc, url) {
   };
 }
 
+/**
+ * 站点标了 serverHtml 时，用本页服务器 HTML 解析出的文档（有正文才用）；否则、或请求失败时用当前 DOM
+ */
+async function serverDocument(det, doc, url, services) {
+  if (!det.site.serverHtml || !services.fetchPageHtml || typeof DOMParser === 'undefined') return doc;
+  const res = await callService(services.fetchPageHtml, url.split('#')[0]);
+  if (!res.ok || !res.html) return doc;
+  try {
+    const parsed = new DOMParser().parseFromString(res.html, 'text/html');
+    return hasBody(DOM_ADAPTERS[det.site.id](parsed, url, det.ids)) ? parsed : doc;
+  } catch (_) {
+    return doc;
+  }
+}
+
 async function callService(fn, ...args) {
   try {
     return (await fn(...args)) || { ok: false, reason: 'network' };
@@ -236,7 +251,7 @@ async function publisherJats({ det, dom, doc, url, fetchJats, services, notices 
 
 /**
  * @param {{ doc:Document, url:string, settings?:object, fetchJats:(pmcid:string)=>Promise<object>, now?:Date,
- *   services?:{ lookupDoi?:(doi:string)=>Promise<object>, fetchSiteXml?:(url:string)=>Promise<object> },
+ *   services?:{ lookupDoi?:(doi:string)=>Promise<object>, fetchSiteXml?:(url:string)=>Promise<object>, fetchPageHtml?:(url:string)=>Promise<object> },
  *   format?:'md'|'zip' }} args
  */
 export async function exportArticle({ doc, url, settings: rawSettings, fetchJats, services = {}, now, format = 'md' }) {
@@ -248,7 +263,9 @@ export async function exportArticle({ doc, url, settings: rawSettings, fetchJats
   if (!det.isArticle) return fail(ERR.NOT_ARTICLE);
 
   const notices = [];
-  const dom = DOM_ADAPTERS[det.site.id](doc, url, det.ids);
+  const pageDoc = await serverDocument(det, doc, url, services);
+  const dom = DOM_ADAPTERS[det.site.id](pageDoc, url, det.ids);
+  doc = pageDoc;
   // 单页应用换了文章、DOM 还没更新时，URL 里的 ID 和页面上的对不上：不导出旧文章（审查 N-D）
   if (staleDom(det.ids, dom.meta)) return fail(ERR.PAGE_CHANGED);
   const pmcid = dom.meta.pmcid || det.ids.pmcid || '';

@@ -306,3 +306,31 @@ describe('review M-1: the licence comes only from the licence box / rel=license 
     expect(f.meta.license).toBe('CC-BY');
   });
 });
+
+describe('QA JM-M2-02 / M2-03: MDPI after hydration (mathematics 11:2608)', () => {
+  const URL = 'https://www.mdpi.com/2227-7390/11/12/2608';
+  const SERVER = read('html/mdpi-mathematics-11-02608-server.html');
+
+  test('rendered DOM with 4 <article> elements: the one holding the text is used, figures keep their images', async () => {
+    const r = await dom('mdpi-mathematics-11-02608.html', URL);
+    expect(r).toMatchObject({ ok: true, route: 'dom-mdpi', meta: { doi: '10.3390/math11122608' } });
+    expect(r.markdown.match(/^!\[Figure \d/gm)).toHaveLength(8);
+    expect(r.markdown).toContain('![Figure 1 The flow chart of the joint maintenance strategy.](https://mdpi-res.com/mathematics/mathematics-11-02608/article_deploy/html/images/mathematics-11-02608-g001.png)');
+    expect(r.markdown).not.toContain('## Figures and tables');
+  });
+
+  test('server HTML (same-origin re-read) restores the MathJax-lazy formulas', async () => {
+    const fetchPageHtml = jest.fn(async () => ({ ok: true, html: SERVER }));
+    const r = await exportArticle({ doc: html('mdpi-mathematics-11-02608.html'), url: `${URL}#sec1`, fetchJats: noJats, services: { lookupDoi: noLookup, fetchPageHtml }, now: NOW });
+    expect(fetchPageHtml).toHaveBeenCalledWith(URL);
+    expect(r.ok).toBe(true);
+    expect(r.markdown.match(/^\$\$$/gm).length / 2).toBeGreaterThanOrEqual(30);
+    expect(r.markdown).toContain('\\mathrm{d}X(t)=\\mu\\left( t,X(t) \\right)\\mathrm{d}t+\\sigma\\left( t,X(t) \\right)\\mathrm{d}B(t)');
+    expect(r.markdown.match(/^!\[Figure \d/gm)).toHaveLength(8);
+  });
+
+  test('server HTML unavailable → the live DOM is used', async () => {
+    const r = await exportArticle({ doc: html('mdpi-mathematics-11-02608.html'), url: URL, fetchJats: noJats, services: { lookupDoi: noLookup, fetchPageHtml: async () => ({ ok: false, reason: 'http' }) }, now: NOW });
+    expect(r).toMatchObject({ ok: true, route: 'dom-mdpi' });
+  });
+});

@@ -4,6 +4,7 @@
 import { createJatsService, createDoiLookupService } from '../core/europepmc/client';
 import { loadSettings, SETTINGS_KEY } from '../config/settings';
 import { resolveLanguage } from '../config/i18n';
+import { errorText } from '../ui/shared/result-text';
 import { MSG } from '../utils/messages';
 import { downloadMarkdown, downloadZip } from './download';
 import { fetchAsset } from './fetch-asset';
@@ -22,7 +23,10 @@ const jats = createJatsService({ fetchImpl: (...args) => fetch(...args) });
 const doiLookup = createDoiLookupService({ fetchImpl: (...args) => fetch(...args) });
 const getLanguage = async () => resolveLanguage((await loadSettings()).language);
 const menus = createMenuBuilder({ menus: chrome.contextMenus, runtime: chrome.runtime, getLanguage, log });
-const runner = createActionRunner({ tabs: chrome.tabs, scripting: chrome.scripting, action: chrome.action, log });
+const runner = createActionRunner({
+  tabs: chrome.tabs, scripting: chrome.scripting, action: chrome.action, log,
+  describeError: async (error) => errorText(await getLanguage(), error),
+});
 
 function downloadPromise(opts) {
   return new Promise((resolve, reject) => {

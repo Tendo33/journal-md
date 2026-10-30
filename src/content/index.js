@@ -23,6 +23,25 @@ function lookupDoi(doi) {
 }
 
 /** 出版商同站 XML（Frontiers citation_xml_url）：只取和当前页同源的地址，在页面里请求（带用户自己的 Cookie，不经过第三方） */
+/** 本页的服务器 HTML（MDPI）：只取和当前页同源、同路径的地址，不跟着跳到别的站 */
+async function fetchPageHtml(url) {
+  let target;
+  try { target = new URL(url, location.href); } catch (_) { return { ok: false, reason: 'invalid_id' }; }
+  if (target.origin !== location.origin || target.pathname !== location.pathname) return { ok: false, reason: 'invalid_id' };
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), SITE_XML_TIMEOUT_MS);
+  try {
+    const res = await fetch(target.href, { credentials: 'same-origin', signal: controller.signal, headers: { Accept: 'text/html' } });
+    const type = (res.headers.get('content-type') || '').toLowerCase();
+    if (!res.ok || !type.includes('text/html') || new URL(res.url).origin !== location.origin) return { ok: false, reason: 'http', status: res.status };
+    return { ok: true, html: await res.text() };
+  } catch (_) {
+    return { ok: false, reason: controller.signal.aborted ? 'timeout' : 'network' };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function fetchSiteXml(url) {
   let target;
   try { target = new URL(url, location.href); } catch (_) { return { ok: false, reason: 'invalid_id' }; }
@@ -41,17 +60,28 @@ async function fetchSiteXml(url) {
   }
 }
 
-async function runExport(action, withToast) {
-  const settings = await loadSettings();
-  const lang = resolveLanguage(settings.language);
-  if (withToast) showToast(t(lang, 'statusWorking'), 'working', { raised: fabMounted(document) });
-  let result;
-  try {
-    result = await exportArticle({ doc: document, url: location.href, settings, fetchJats, services: { lookupDoi, fetchSiteXml }, format: action === ACTIONS.ZIP ? 'zip' : 'md' });
-  } catch (e) {
-    console.error('[journal-md] export failed', e);
-    result = { ok: false, error: 'unknown' };
-  }
+/**
+ * 单页应用（MDPI 新站、Frontiers）在加载后还会重新渲染：等 DOM 安静下来（400ms 没有变化，最多 maxMs）。
+ * 只在第一次没取到正文时用（QA JM-M2-02）。
+ */
+export function waitForDomSettled(doc, { quietMs = 400, maxMs = 3000 } = {}) {
+  return new Promise((resolve) => {
+    let quiet = null;
+    const done = () => { observer.disconnect(); clearTimeout(quiet); clearTimeout(limit); resolve(); };
+    const observer = new MutationObserver(() => { clearTimeout(quiet); quiet = setTimeout(done, quietMs); });
+    observer.observe(doc.documentElement, { childList: true, subtree: true, characterData: true });
+    quiet = setTimeout(done, quietMs);
+    const limit = setTimeout(done, maxMs);
+  });
+}
+
+const RETRY_ERRORS = ['no_content', 'page_changed'];
+
+async function exportOnce(settings, action) {
+  return exportArticle({ doc: document, url: location.href, settings, fetchJats, services: { lookupDoi, fetchSiteXml, fetchPageHtml }, format: action === ACTIONS.ZIP ? 'zip' : 'md' });
+}
+
+async function deliver(result, action) {
   if (result.ok && action === ACTIONS.ZIP) {
     let zip = null;
     try {
@@ -61,17 +91,38 @@ async function runExport(action, withToast) {
     }
     const filename = zipFilename(result.filename);
     const dl = zip ? await chrome.runtime.sendMessage({ type: MSG.DOWNLOAD_ZIP, base64: base64FromBytes(zip.bytes), filename }) : null;
-    if (!dl || !dl.ok) result = { ...result, ok: false, error: 'download_failed' };
+    if (!dl || !dl.ok) return { ...result, ok: false, error: 'download_failed' };
     // markdown 换成 ZIP 里那份（下载失败的图片已换回原网址），供调用方复制
-    else result = { ...result, saved: true, filename, zip: { packed: zip.packed, total: zip.total, failedHosts: zip.failedHosts } };
-  } else if (result.ok && action === ACTIONS.DOWNLOAD) {
+    return { ...result, saved: true, filename, zip: { packed: zip.packed, total: zip.total, failedHosts: zip.failedHosts } };
+  }
+  if (result.ok && action === ACTIONS.DOWNLOAD) {
     const dl = await chrome.runtime.sendMessage({ type: MSG.DOWNLOAD, markdown: result.markdown, filename: result.filename });
-    if (!dl || !dl.ok) result = { ...result, ok: false, error: 'download_failed' };
-    else result = { ...result, saved: true };
-  } else if (result.ok && action === ACTIONS.COPY) {
+    return !dl || !dl.ok ? { ...result, ok: false, error: 'download_failed' } : { ...result, saved: true };
+  }
+  if (result.ok && action === ACTIONS.COPY) {
     const copied = await writeClipboard(result.markdown);
-    if (!copied) result = { ...result, ok: false, error: 'clipboard_failed' };
-    else result = { ...result, copied: true };
+    return copied ? { ...result, copied: true } : { ...result, ok: false, error: 'clipboard_failed' };
+  }
+  return result;
+}
+
+async function runExport(action, withToast) {
+  let lang = 'en';
+  let result;
+  // 任何一步出错都要落到最后的提示上，不能静默失败（QA JM-M2-02）
+  try {
+    const settings = await loadSettings();
+    lang = resolveLanguage(settings.language);
+    if (withToast) showToast(t(lang, 'statusWorking'), 'working', { raised: fabMounted(document) });
+    result = await exportOnce(settings, action);
+    if (!result.ok && RETRY_ERRORS.includes(result.error)) {
+      await waitForDomSettled(document);
+      result = await exportOnce(settings, action);
+    }
+    result = await deliver(result, action);
+  } catch (e) {
+    console.error('[journal-md] export failed', e);
+    result = { ok: false, error: result && result.ok ? 'download_failed' : 'unknown' };
   }
   if (withToast) {
     const text = describeResult(result, lang, action);

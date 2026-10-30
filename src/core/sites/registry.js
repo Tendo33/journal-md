@@ -93,6 +93,9 @@ export const SITES = [
     publisher: true,
     openAccessHosts: ['www.mdpi.com'],
     hosts: ['www.mdpi.com'],
+    // 新站（Nuxt）加载后会重新渲染，MathJax 3 还会把屏幕外的公式换成空的 <mjx-lazy>：导出时重新读一次本页的
+    // 服务器 HTML（同源请求，和刷新页面一样），拿不到再用当前 DOM（QA JM-M2-02）
+    serverHtml: true,
     // /2076-2615/11/5/1300（可带 /htm）；DOI 不在地址里
     article: (u) => (/^\/\d{4}-\d{3}[\dX]\/\d+\/\d+\/\d+(?:\/htm)?\/?$/i.test(u.pathname) ? {} : null),
     routes: ['jats', 'dom'],

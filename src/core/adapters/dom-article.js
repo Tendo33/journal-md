@@ -80,6 +80,20 @@ function personName(name) {
   return m ? `${m[2]} ${m[1]}`.trim() : String(name).trim();
 }
 
+/**
+ * 文章根元素：配置里的候选按顺序试，有正文白名单（cfg.body）时只要「里面真有正文容器」的那个。
+ * MDPI 页面渲染完后有好几个 <article>（相关文章卡片在前），取第一个就会什么都拿不到（QA JM-M2-02）
+ */
+function pickRoot(doc, cfg) {
+  for (const s of [].concat(cfg.root || [])) {
+    let els = [];
+    try { els = Array.from(doc.querySelectorAll(s)); } catch (_) { els = []; }
+    const hit = cfg.body ? els.find((el) => first(el, cfg.body)) : els[0];
+    if (hit) return hit;
+  }
+  return doc.body;
+}
+
 /** 没有专门类名的摘要：标题正好是「Abstract」的 h2/h3，取它的父元素（Frontiers） */
 function abstractByHeading(root) {
   const h = all(root, 'h2, h3').find((x) => /^\s*abstract\s*$/i.test(x.textContent || ''));
@@ -137,7 +151,7 @@ export function extractDomArticle(doc, url, cfg, ids = {}) {
   const ir = createArticle({ sourceRoute: cfg.route });
   const meta = ir.meta;
   meta.url = url;
-  const root = first(doc, cfg.root) || doc.body;
+  const root = pickRoot(doc, cfg);
 
   // ---- 元数据 ----
   const h1 = first(root, cfg.title) || first(doc, cfg.title);

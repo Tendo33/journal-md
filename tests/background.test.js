@@ -128,3 +128,33 @@ describe('background message router', () => {
     expect(chrome.tabs.create).toHaveBeenCalledWith({ url: 'chrome-extension://self/options.html?welcome=1' });
   });
 });
+
+describe('action runner: every failure is visible (QA JM-M2-02)', () => {
+  test('unreachable content script → an in-page notice is injected', async () => {
+    const tabs = { sendMessage: jest.fn(async () => { throw new Error('no receiver'); }) };
+    const scripting = { executeScript: jest.fn(async (o) => { if (o.files) throw new Error('cannot inject'); }) };
+    const runner = createActionRunner({ tabs, scripting, action: null, describeError: async (e) => `text for ${e}` });
+    await expect(runner.run({ id: 9, url: 'https://www.mdpi.com/2227-7390/11/12/2608' }, 'download')).resolves.toEqual({ ok: false, error: 'content_unreachable' });
+    const call = scripting.executeScript.mock.calls.find(([o]) => o.func);
+    expect(call[0]).toMatchObject({ target: { tabId: 9 }, args: ['text for content_unreachable'] });
+  });
+
+  test('unsupported page → notice too; a failure the content script reported itself is not doubled', async () => {
+    const scripting = { executeScript: jest.fn(async () => {}) };
+    const runner = createActionRunner({ tabs: { sendMessage: jest.fn(async () => ({ ok: false, error: 'no_content' })) }, scripting, action: null, describeError: async (e) => e });
+    await runner.run({ id: 1, url: 'https://example.org/' }, 'download');
+    expect(scripting.executeScript).toHaveBeenLastCalledWith(expect.objectContaining({ args: ['unsupported_page'] }));
+    scripting.executeScript.mockClear();
+    await runner.run({ id: 2, url: 'https://www.mdpi.com/2227-7390/11/12/2608' }, 'download');
+    expect(scripting.executeScript).not.toHaveBeenCalled();
+  });
+
+  test('pageNotice builds an alert in a shadow root', () => {
+    const { pageNotice } = require('@/background/run-action');
+    global.document = new (require('jsdom').JSDOM)('<body></body>').window.document;
+    pageNotice('Hello');
+    const host = document.getElementById('journal-md-notice-host');
+    expect(host.shadowRoot.querySelector('[role=alert]').textContent).toBe('Hello');
+    delete global.document;
+  });
+});
