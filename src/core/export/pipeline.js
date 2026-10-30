@@ -1,23 +1,28 @@
-// 导出流程（PRD §2.2 三级取数，M1 只有 L1 JATS 和 L2 DOM）：
+// 导出流程（PRD §2.2 三级取数；L3 PDF 解析是单独的入口，见 src/background/pdf-task.js）：
 //   PMC / Europe PMC 页：有 PMCID 且开启「优先结构化来源」→ Europe PMC fullTextXML；失败或超时 → 当前页 DOM
 //   PubMed 页：DOM 取题录和摘要；有 PMCID → Europe PMC 全文；否则「仅摘要」
-// 纯函数 + 注入依赖（fetchJats），content script 和测试共用。
+//   出版商页（Springer/BMC、Nature、Frontiers、MDPI、PLOS、eLife），开启「优先结构化来源」时：
+//     同站 XML（目前只有 Frontiers 的 citation_xml_url）→ 按 DOI 查 Europe PMC，开放获取就取 fullTextXML → 当前页 DOM
+// 纯函数 + 注入依赖（fetchJats、services），content script 和测试共用。
 import { hasBody, hasContent } from '../article-ir';
 import { parseJats } from '../parsers/jats';
 import { extractPmc } from '../adapters/pmc';
 import { extractEuropePmc } from '../adapters/europepmc';
 import { extractPubmed } from '../adapters/pubmed';
+import { PUBLISHER_ADAPTERS } from '../adapters/publishers';
 import { detectSite } from '../sites/registry';
 import { renderMarkdown } from '../render/markdown';
 import { buildFilename } from '../filename';
 import { normalizeSettings } from '../../config/settings';
 import { ERR, NOTICE } from '../errors';
 import { normalizePmcid } from '../ids';
+import { planAssets } from './zip-plan';
 
 const DOM_ADAPTERS = {
   pmc: extractPmc,
   europepmc: extractEuropePmc,
   pubmed: extractPubmed,
+  ...PUBLISHER_ADAPTERS,
 };
 
 function fail(error, extra = {}) {
@@ -49,15 +54,19 @@ export function inspectPage(doc, url, rawSettings) {
     ids: { doi: m.doi, pmid: m.pmid, pmcid: m.pmcid },
     routes: {
       // jats：有 PMCID 才可能；是否真的可用（OA）要由后台探测
-      jats: !!m.pmcid && (det.site.id === 'pubmed' || settings.preferJats),
+      jats: det.site.publisher
+        ? settings.preferJats && !!(m.doi || (det.site.siteXml && siteXmlUrl(doc, url)))
+        : !!m.pmcid && (det.site.id === 'pubmed' || settings.preferJats),
       dom: domFull,
       abstract: (ir.abstract || []).length > 0,
     },
   };
 }
 
-function finish(ir, settings, notices, now) {
-  const markdown = renderMarkdown(ir, { includeImages: settings.includeImages, now });
+function finish(ir, settings, notices, now, format = 'md') {
+  // ZIP：图片链接先写成包内路径（images/…），由调用方下载图片并打包
+  const plan = format === 'zip' && settings.includeImages ? planAssets(ir) : null;
+  const markdown = renderMarkdown(ir, { includeImages: settings.includeImages, now, rewriteAsset: plan ? (src) => plan.get(src) : null });
   if (ir.notices.includes(NOTICE.EQUATION_IMAGE)) notices.push({ code: NOTICE.EQUATION_IMAGE });
   if (ir.meta.abstractOnly) notices.push({ code: NOTICE.ABSTRACT_ONLY, fullTextUrl: ir.meta.fullTextUrl });
   return {
@@ -67,7 +76,8 @@ function finish(ir, settings, notices, now) {
     route: ir.sourceRoute,
     abstractOnly: !!ir.meta.abstractOnly,
     notices,
-    meta: { title: ir.meta.title, doi: ir.meta.doi, pmid: ir.meta.pmid, pmcid: ir.meta.pmcid },
+    meta: { title: ir.meta.title, doi: ir.meta.doi, pmid: ir.meta.pmid, pmcid: ir.meta.pmcid, license: ir.meta.license, pdfUrl: ir.meta.pdfUrl || '' },
+    ...(plan ? { assets: [...plan].map(([url, path]) => ({ url, path })) } : {}),
   };
 }
 
@@ -88,6 +98,48 @@ export function jatsMatchesPage(jatsMeta, pageMeta, urlIds = {}) {
 /** URL 和页面都给出了同一种 ID 却不相同 */
 export function staleDom(urlIds = {}, pageMeta = {}) {
   return ['pmcid', 'pmid', 'doi'].some((k) => urlIds[k] && pageMeta[k] && !same(urlIds[k], pageMeta[k]));
+}
+
+/** 页面声明的同站 XML（citation_xml_url）；跨站的不用 */
+export function siteXmlUrl(doc, url) {
+  const meta = doc.querySelector('meta[name="citation_xml_url"]');
+  const href = meta && meta.getAttribute('content');
+  if (!href) return '';
+  try {
+    const x = new URL(href, url);
+    const page = new URL(url);
+    return x.protocol === 'https:' && x.host === page.host ? x.href : '';
+  } catch (_) {
+    return '';
+  }
+}
+
+/**
+ * 出版商 XML 里的图片是相对文件名（fpsyg-04-00863-g001.tif）：到当前页面上找同名的图片 / 文件链接，找不到就不给地址
+ */
+export function domAssetResolver(doc, url) {
+  const urls = [];
+  for (const img of Array.from(doc.querySelectorAll('img'))) {
+    for (const a of ['data-large', 'data-original', 'data-src', 'src']) {
+      const v = img.getAttribute(a);
+      if (v) { try { urls.push(new URL(v, url).href); } catch (_) { /* 忽略 */ } }
+    }
+  }
+  const links = Array.from(doc.querySelectorAll('a[href]')).map((a) => { try { return new URL(a.getAttribute('href'), url).href; } catch (_) { return ''; } }).filter(Boolean);
+  return (href, kind) => {
+    const base = String(href || '').split(/[?#]/)[0].split('/').pop().replace(/\.[a-z0-9]{2,5}$/i, '').toLowerCase();
+    if (!base || base.length < 4) return '';
+    const pool = kind === 'image' ? urls : links;
+    return pool.find((u) => u.toLowerCase().includes(base)) || '';
+  };
+}
+
+async function callService(fn, ...args) {
+  try {
+    return (await fn(...args)) || { ok: false, reason: 'network' };
+  } catch (_) {
+    return { ok: false, reason: 'network' };
+  }
 }
 
 async function tryJats(pmcid, url, fetchJats, notices, verify) {
@@ -119,7 +171,38 @@ async function tryJats(pmcid, url, fetchJats, notices, verify) {
 /**
  * @param {{ doc:Document, url:string, settings?:object, fetchJats:(pmcid:string)=>Promise<object>, now?:Date }} args
  */
-export async function exportArticle({ doc, url, settings: rawSettings, fetchJats, now }) {
+/** 出版商页面：同站 XML → Europe PMC（按 DOI）→ 返回 JATS 的 IR，失败返回 null（原因记进 notices） */
+async function publisherJats({ det, dom, doc, url, fetchJats, services, notices }) {
+  const sameDoi = (jatsMeta) => !dom.meta.doi || !jatsMeta.doi || same(jatsMeta.doi, dom.meta.doi);
+  const xmlUrl = det.site.siteXml ? siteXmlUrl(doc, url) : '';
+  if (xmlUrl && services.fetchSiteXml) {
+    const res = await callService(services.fetchSiteXml, xmlUrl);
+    if (res.ok) {
+      try {
+        const ir = parseJats(res.xml, { url, sourceRoute: det.site.xmlRoute, assetUrl: domAssetResolver(doc, url) });
+        if (hasContent(ir) && sameDoi(ir.meta)) return ir;
+        notices.push({ code: NOTICE.JATS_FALLBACK, reason: hasContent(ir) ? 'mismatch' : 'parse' });
+      } catch (_) {
+        notices.push({ code: NOTICE.JATS_FALLBACK, reason: 'parse' });
+      }
+    }
+  }
+  if (!dom.meta.doi || !services.lookupDoi) return null;
+  const look = await callService(services.lookupDoi, dom.meta.doi);
+  if (!look.ok) {
+    notices.push({ code: NOTICE.JATS_FALLBACK, reason: look.reason || 'network' });
+    return null;
+  }
+  // 查到的 PMCID 来自 DOI 检索：JATS 里的 DOI 必须和页面一致
+  return tryJats(look.pmcid, url, fetchJats, notices, (jatsMeta) => !!jatsMeta.doi && same(jatsMeta.doi, dom.meta.doi));
+}
+
+/**
+ * @param {{ doc:Document, url:string, settings?:object, fetchJats:(pmcid:string)=>Promise<object>, now?:Date,
+ *   services?:{ lookupDoi?:(doi:string)=>Promise<object>, fetchSiteXml?:(url:string)=>Promise<object> },
+ *   format?:'md'|'zip' }} args
+ */
+export async function exportArticle({ doc, url, settings: rawSettings, fetchJats, services = {}, now, format = 'md' }) {
   const settings = normalizeSettings(rawSettings);
   const det = detectSite(url);
   if (!det.site) return fail(ERR.UNSUPPORTED_PAGE);
@@ -144,19 +227,27 @@ export async function exportArticle({ doc, url, settings: rawSettings, fetchJats
         if (!ir.meta.pmid) ir.meta.pmid = dom.meta.pmid;
         if (!ir.meta.keywords.length) ir.meta.keywords = dom.meta.keywords;
         notices.push({ code: NOTICE.PUBMED_FULLTEXT });
-        return finish(ir, settings, notices, now);
+        return finish(ir, settings, notices, now, format);
       }
     }
     if (!dom.meta.title) return fail(ERR.NO_CONTENT);
-    return finish(dom, settings, notices, now);
+    return finish(dom, settings, notices, now, format);
   }
 
-  if (pmcid && settings.preferJats) {
+  if (det.site.publisher && settings.preferJats) {
+    const ir = await publisherJats({ det, dom, doc, url, fetchJats, services, notices });
+    if (ir) {
+      ir.meta.url = url;
+      if (!ir.meta.license) ir.meta.license = dom.meta.license;
+      if (!ir.meta.keywords.length) ir.meta.keywords = dom.meta.keywords;
+      return finish(ir, settings, notices, now, format);
+    }
+  } else if (pmcid && settings.preferJats) {
     const ir = await tryJats(pmcid, url, fetchJats, notices, verify);
     if (ir) {
       ir.meta.url = url;
       if (!ir.meta.pmid) ir.meta.pmid = dom.meta.pmid;
-      return finish(ir, settings, notices, now);
+      return finish(ir, settings, notices, now, format);
     }
   }
   if (!dom.meta.title) return fail(ERR.NO_CONTENT);
@@ -165,5 +256,5 @@ export async function exportArticle({ doc, url, settings: rawSettings, fetchJats
     dom.meta.abstractOnly = true;
     dom.meta.fullTextUrl = dom.meta.doi ? `https://doi.org/${dom.meta.doi}` : '';
   }
-  return finish(dom, settings, notices, now);
+  return finish(dom, settings, notices, now, format);
 }

@@ -126,7 +126,7 @@
     "message": "Some equations only exist as images and were kept as image links."
   },
   "err_unsupported_page": {
-    "message": "This page is not supported. Open an article on PMC, Europe PMC or PubMed."
+    "message": "This page is not supported. Open an article on PMC, Europe PMC, PubMed, Springer/BMC, Nature, Frontiers, MDPI, PLOS or eLife."
   },
   "err_site_planned": {
     "message": "{site} is not supported yet; it is planned for a later version."
@@ -159,7 +159,7 @@
     "message": "Thanks for installing"
   },
   "optWelcomeBody": {
-    "message": "Open an article on PMC, Europe PMC or PubMed, then click the toolbar icon, press Alt+Shift+J, or right-click the page."
+    "message": "Open an article on PMC, Europe PMC, PubMed, Springer/BMC, Nature, Frontiers, MDPI, PLOS or eLife, then click the Markdown button at the bottom right of the page, click the toolbar icon, press Alt+Shift+J, or right-click the page."
   },
   "optSectionOutput": {
     "message": "Output"
@@ -183,7 +183,7 @@
     "message": "Prefer structured full text"
   },
   "optPreferJatsHelp": {
-    "message": "On PMC and Europe PMC pages, fetch the open-access article XML from Europe PMC first. If it fails or times out, the page itself is used."
+    "message": "Fetch structured full text (JATS XML) first: from Europe PMC for open-access articles (on publisher pages it is looked up by DOI), or from the publisher's own XML on Frontiers. If that fails or times out, the page itself is used."
   },
   "optSectionLanguage": {
     "message": "Language"
@@ -213,12 +213,18 @@
     "message": "Version {version}"
   },
   "optPrivacy": {
-    "message": "Articles are converted inside your browser. Only when you export or copy an article does the extension ask Europe PMC (EMBL-EBI) for its open-access full text, using the article's PMCID. No cookies or page address are sent. Opening the popup sends nothing."
+    "message": "Articles are converted inside your browser. Only when you export or copy an article does the extension ask Europe PMC (EMBL-EBI) for its open-access full text, sending only the PMCID or DOI — no cookies or page address. Opening the popup sends nothing."
   },
   "btnClose": {
     "message": "Close"
   },
   "err_page_changed": {
     "message": "The page is still switching to another article. Wait until it finishes loading, then try again."
+  },
+  "routeUsedSiteXml": {
+    "message": "Source: the publisher's XML (structured full text)."
+  },
+  "noticeJats_not_found": {
+    "message": "Europe PMC has no full text for this DOI."
   }
 }

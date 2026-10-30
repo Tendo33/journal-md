@@ -19,6 +19,8 @@ const HEADINGS = {
   refs: 'References',
 };
 
+const SUPP_TITLE = /^(supplementary|supporting) (material|materials|information|data)s?$/i;
+
 function heading(level, textMd) {
   return `${'#'.repeat(Math.min(6, Math.max(1, level)))} ${textMd}`;
 }
@@ -46,10 +48,16 @@ class Renderer {
     this.tables = new Map(ir.tables.map((t) => [t.id, t]));
     this.placed = new Set();
     this.refIndex = new Map();
-    ir.refs.forEach((r, i) => { if (r.id) this.refIndex.set(r.id, i + 1); });
+    this.refByLabel = new Map();
+    ir.refs.forEach((r, i) => {
+      if (r.id) this.refIndex.set(r.id, i + 1);
+      const lab = String(r.label || '').replace(/[.\s[\]]/g, '');
+      if (lab && !this.refByLabel.has(lab)) this.refByLabel.set(lab, i + 1);
+    });
     this.cited = new Set();
     this.ctx = {
       citeNumber: (rid) => this.refIndex.get(rid) || null,
+      citeNumberByLabel: (label) => this.refByLabel.get(label) || null,
       cited: this.cited,
       asset: (src) => this.asset(src),
     };
@@ -125,6 +133,7 @@ class Renderer {
     const body = renderTableBody(t, this.ctx);
     if (body) parts.push(body);
     else if (this.asset(t.src)) parts.push(`![${shortCaption(t.label, t.caption) || 'Table'}](${this.asset(t.src)})`);
+    else if (safeUrl(t.href)) parts.push(`*Table content is on a separate page: [full table](${safeUrl(t.href)})*`);
     const foot = this.blocks(t.foot);
     if (foot) parts.push(prefixLines(foot, '> '));
     return parts.join('\n\n');
@@ -191,18 +200,27 @@ class Renderer {
 
   supp() {
     const items = this.ir.supp;
-    if (!items.length) return '';
+    // 文末「Supplementary material」说明节（只有一句「见网站」）和附件列表合成一节，不出现两个同名标题
+    const notes = (this.ir.back.other || []).filter((x) => SUPP_TITLE.test(inlinesToPlain(x.title || []).trim()));
+    const intro = notes.map((x) => this.blocks([...x.blocks, ...(x.children || []).flatMap((c) => c.blocks)])).filter(Boolean).join('\n\n');
+    if (!items.length) return intro ? `${heading(2, HEADINGS.supp)}\n\n${intro}` : '';
     const lines = items.map((s) => {
       const label = s.label || 'Supplementary file';
       const name = s.href ? `[${this.inl([{ t: 'text', v: label }])}](${encodeLinkTarget(s.href)})` : `**${this.inl([{ t: 'text', v: label }])}**`;
       const caption = oneLine(this.blocks(s.caption));
       return `- ${name}${caption ? ` — ${caption}` : ''}`;
     });
-    return `${heading(2, HEADINGS.supp)}\n\n${lines.join('\n')}`;
+    return `${heading(2, HEADINGS.supp)}\n\n${intro ? `${intro}\n\n` : ''}${lines.join('\n')}`;
   }
 
   refText(r) {
     let md = oneLine(this.inl(r.text));
+    // 文本里裸写的 DOI（Springer：「… 2881-2887. 10.1093/bioinformatics/btm453.」）换成链接，不再在末尾重复一遍
+    if (r.doi && !md.toLowerCase().includes(`doi.org/${r.doi.toLowerCase()}`)) {
+      const escaped = this.inl([{ t: 'text', v: r.doi }]);
+      const at = md.toLowerCase().lastIndexOf(escaped.toLowerCase());
+      if (at >= 0) md = `${md.slice(0, at)}https://doi.org/${r.doi}${md.slice(at + escaped.length)}`;
+    }
     if (r.doi && !md.toLowerCase().includes(`doi.org/${r.doi.toLowerCase()}`)) {
       md = `${md.replace(/\s*\.?$/, '.')} https://doi.org/${r.doi}`;
     } else if (!r.doi && r.pmid && !md.includes('pubmed.ncbi.nlm.nih.gov')) {
@@ -250,6 +268,7 @@ class Renderer {
       if (md) out.push(md);
     }
     for (const s of back.other || []) {
+      if (SUPP_TITLE.test(inlinesToPlain(s.title || []).trim())) continue; // 并进附件一节
       const md = this.section(s, 2);
       if (md) out.push(md);
     }

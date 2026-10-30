@@ -1,0 +1,62 @@
+{
+ "version": "6.9",
+ "hitCount": 1,
+ "request": {
+  "queryString": "DOI:\"10.1186/s13059-014-0550-8\"",
+  "resultType": "lite",
+  "cursorMark": "*",
+  "pageSize": 2,
+  "sort": "",
+  "synonym": false
+ },
+ "resultList": {
+  "result": [
+   {
+    "id": "25516281",
+    "source": "MED",
+    "pmid": "25516281",
+    "pmcid": "PMC4302049",
+    "fullTextIdList": {
+     "fullTextId": [
+      "PMC4302049"
+     ]
+    },
+    "doi": "10.1186/s13059-014-0550-8",
+    "title": "Moderated estimation of fold change and  dispersion for RNA-seq data with DESeq2.",
+    "authorString": "Love MI, Huber W, Anders S.",
+    "journalTitle": "Genome Biol",
+    "issue": "12",
+    "journalVolume": "15",
+    "pubYear": "2014",
+    "journalIssn": "1474-7596; 1474-760x; 1465-6906; ",
+    "pageInfo": "550",
+    "pubType": "research support, non-u.s. gov't; research-article; journal article; research support, n.i.h., extramural",
+    "isOpenAccess": "Y",
+    "inEPMC": "Y",
+    "inPMC": "Y",
+    "citedByCount": 83888,
+    "hasReferences": "Y",
+    "hasTextMinedTerms": "Y",
+    "hasDbCrossReferences": "Y",
+    "dbCrossReferenceList": {
+     "dbName": [
+      "ARXPR",
+      "EMBL"
+     ]
+    },
+    "hasPDF": "Y",
+    "hasBook": "N",
+    "hasSuppl": "N",
+    "hasLabsLinks": "Y",
+    "hasTMAccessionNumbers": "Y",
+    "tmAccessionTypeList": {
+     "accessionType": [
+      "gen"
+     ]
+    },
+    "firstPublicationDate": "2014-01-01",
+    "firstIndexDate": "2014-12-25"
+   }
+  ]
+ }
+}

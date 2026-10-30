@@ -1,6 +1,6 @@
 // 后台：Chrome/Edge 是 service worker，Firefox 是 event page（同一份产物，见 scripts/manifest-target.js）。
 // 职责：代 content script 请求 Europe PMC（跨域 + 超时）、下载 .md、右键菜单和快捷键、安装后打开引导页。
-import { createJatsService } from '../core/europepmc/client';
+import { createJatsService, createDoiLookupService } from '../core/europepmc/client';
 import { loadSettings, SETTINGS_KEY } from '../config/settings';
 import { resolveLanguage } from '../config/i18n';
 import { MSG } from '../utils/messages';
@@ -12,6 +12,7 @@ import { isTrustedSender } from './message-guards';
 const log = (...args) => console.warn('[journal-md]', ...args);
 
 const jats = createJatsService({ fetchImpl: (...args) => fetch(...args) });
+const doiLookup = createDoiLookupService({ fetchImpl: (...args) => fetch(...args) });
 const getLanguage = async () => resolveLanguage((await loadSettings()).language);
 const menus = createMenuBuilder({ menus: chrome.contextMenus, runtime: chrome.runtime, getLanguage, log });
 const runner = createActionRunner({ tabs: chrome.tabs, scripting: chrome.scripting, action: chrome.action, log });
@@ -22,6 +23,8 @@ export function handleMessage(message, sender) {
   switch (message.type) {
   case MSG.FETCH_JATS:
     return jats.get(message.pmcid);
+  case MSG.LOOKUP_DOI:
+    return doiLookup.get(message.doi);
   case MSG.DOWNLOAD:
     return downloadMarkdown({ markdown: message.markdown, filename: message.filename });
   default:

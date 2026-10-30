@@ -9,13 +9,20 @@ const ALLOWED_PERMISSIONS = [
   'scripting',
 ];
 
-// M1 只保留实际用到的 4 个 host（审查 M-3）。PRD §2.6 的其余 P0 出版商域名（biomedcentral、springeropen、
-// link.springer、nature、frontiersin、mdpi、plos、elife）在 M2 随对应适配器一起加回，见 docs/permissions.md。
+// 安装时授予的 host：PRD §2.6 的 P0 列表里、代码真正用到的（M1 的 4 个 + M2 随出版商适配器加回的 8 个），见 docs/permissions.md。
 const ALLOWED_HOST_PERMISSIONS = [
   'https://pmc.ncbi.nlm.nih.gov/*',
   'https://pubmed.ncbi.nlm.nih.gov/*',
   'https://europepmc.org/*',
   'https://www.ebi.ac.uk/europepmc/*',
+  'https://link.springer.com/*',
+  'https://*.biomedcentral.com/*',
+  'https://*.springeropen.com/*',
+  'https://www.nature.com/*',
+  'https://www.frontiersin.org/*',
+  'https://www.mdpi.com/*',
+  'https://journals.plos.org/*',
+  'https://elifesciences.org/*',
 ];
 
 // 明确禁止的写法（任何字段里出现都算失败）

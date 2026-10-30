@@ -31,9 +31,9 @@ describe('i18n', () => {
 
 describe('settings', () => {
   test('defaults and validation', () => {
-    expect(normalizeSettings(null)).toEqual({ ...DEFAULT_SETTINGS, sites: { pmc: true, europepmc: true, pubmed: true } });
+    expect(normalizeSettings(null)).toEqual({ ...DEFAULT_SETTINGS, sites: { pmc: true, europepmc: true, pubmed: true, springer: true, nature: true, frontiers: true, mdpi: true, plos: true, elife: true } });
     expect(normalizeSettings({ language: 'fr', filenameTemplate: '   ', includeImages: 'yes', sites: { pmc: false, nature: false } }))
-      .toMatchObject({ language: 'auto', filenameTemplate: '{title} ({year})', includeImages: true, sites: { pmc: false, europepmc: true, pubmed: true } });
+      .toMatchObject({ language: 'auto', filenameTemplate: '{title} ({year})', includeImages: true, sites: { pmc: false, europepmc: true, pubmed: true, nature: false } });
   });
   test('save merges site toggles', async () => {
     let stored = {};
@@ -47,7 +47,8 @@ describe('settings', () => {
 describe('popup view logic', () => {
   test('quickCheck classifies tabs without touching the page', () => {
     expect(quickCheck('chrome://newtab', {})).toEqual({ ok: false, error: 'unsupported_page' });
-    expect(quickCheck('https://www.frontiersin.org/articles/x', {})).toEqual({ ok: false, error: 'site_planned', siteName: 'Frontiers' });
+    expect(quickCheck('https://www.tandfonline.com/doi/full/10.1080/1', {})).toEqual({ ok: false, error: 'site_planned', siteName: 'Taylor & Francis' });
+    expect(quickCheck('https://www.frontiersin.org/journals/genetics', {})).toEqual({ ok: false, error: 'not_article' });
     expect(quickCheck('https://pubmed.ncbi.nlm.nih.gov/1/', { sites: { pubmed: false } })).toMatchObject({ error: 'site_disabled' });
     expect(quickCheck('https://pubmed.ncbi.nlm.nih.gov/?term=x', {})).toEqual({ ok: false, error: 'not_article' });
     expect(quickCheck('https://pubmed.ncbi.nlm.nih.gov/1/', {})).toEqual({ ok: true, siteId: 'pubmed', siteName: 'PubMed' });

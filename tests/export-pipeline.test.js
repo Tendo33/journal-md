@@ -139,7 +139,7 @@ describe('failure reasons', () => {
   const doc = html('pmc-article.html');
   test.each([
     ['https://example.com/paper', 'unsupported_page'],
-    ['https://www.nature.com/articles/s41598-020-1', 'site_planned'],
+    ['https://www.sciencedirect.com/science/article/pii/S0032579120300001', 'site_planned'],
     ['https://pmc.ncbi.nlm.nih.gov/search/?term=x', 'not_article'],
   ])('%s → %s', async (url, error) => {
     const r = await exportArticle({ doc, url, fetchJats: ok });
@@ -171,7 +171,7 @@ describe('inspectPage', () => {
       .toMatchObject({ ok: true, routes: { jats: false, dom: false, abstract: true } });
   });
   test('planned site', () => {
-    expect(inspectPage(html('pmc-article.html'), 'https://www.mdpi.com/2076-2615/11/5/1300')).toMatchObject({ ok: false, error: 'site_planned', siteName: 'MDPI' });
+    expect(inspectPage(html('pmc-article.html'), 'https://academic.oup.com/jas/article/1/1/1')).toMatchObject({ ok: false, error: 'site_planned', siteName: 'Oxford Academic' });
   });
 });
 

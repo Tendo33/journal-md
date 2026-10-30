@@ -62,11 +62,13 @@ function completeDanglingSentence(title, blocks) {
 }
 
 class JatsParser {
-  constructor(article, { pmcid, url } = {}) {
+  constructor(article, { pmcid, url, sourceRoute, assetUrl } = {}) {
     this.article = article;
-    this.ir = createArticle({ sourceRoute: SOURCE_ROUTES.JATS_EUROPEPMC });
+    this.ir = createArticle({ sourceRoute: sourceRoute || SOURCE_ROUTES.JATS_EUROPEPMC });
     this.ir.meta.url = url || '';
     this.pmcidHint = pmcid || '';
+    // 出版商自己的 XML（Frontiers）里图片是相对文件名，交给调用方按页面上的图片解析；默认走 PMC instance 地址
+    this.assetUrl = typeof assetUrl === 'function' ? assetUrl : null;
     this.figIds = new Set();
     this.tableIds = new Set();
     this.suppIds = new Set();
@@ -210,6 +212,7 @@ class JatsParser {
   }
 
   asset(href, kind) {
+    if (this.assetUrl) return this.assetUrl(href, kind) || '';
     return pmcAssetUrl(this.ir.meta.pmcid || this.pmcidHint, href, kind);
   }
 
@@ -826,7 +829,7 @@ class JatsParser {
 
 /**
  * @param {string|Element} xml fullTextXML 文本或已解析的 <article>
- * @param {{ pmcid?:string, url?:string, DOMParser?:any }} [options]
+ * @param {{ pmcid?:string, url?:string, DOMParser?:any, sourceRoute?:string, assetUrl?:(href:string, kind:string)=>string }} [options]
  */
 export function parseJats(xml, options = {}) {
   const article = typeof xml === 'string' ? parseJatsXml(xml, options.DOMParser) : xml;

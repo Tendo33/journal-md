@@ -1,5 +1,5 @@
-// content script：只在 PMC / Europe PMC / PubMed 页面注入；页面加载时不做任何工作、不发网络请求，
-// 只在收到 popup / 后台的消息时解析当前 DOM。
+// content script：只在支持站点的文章页注入；页面加载时不发网络请求，
+// 只在收到 popup / 后台的消息（或用户点页内按钮）时解析当前 DOM。
 import { exportArticle, inspectPage } from '../core/export/pipeline';
 import { loadSettings } from '../config/settings';
 import { resolveLanguage, t } from '../config/i18n';
@@ -8,8 +8,33 @@ import { writeClipboard } from '../utils/clipboard';
 import { describeResult } from '../ui/shared/result-text';
 import { showToast } from './toast';
 
+const SITE_XML_TIMEOUT_MS = 8000;
+
 function fetchJats(pmcid) {
   return chrome.runtime.sendMessage({ type: MSG.FETCH_JATS, pmcid });
+}
+
+function lookupDoi(doi) {
+  return chrome.runtime.sendMessage({ type: MSG.LOOKUP_DOI, doi });
+}
+
+/** 出版商同站 XML（Frontiers citation_xml_url）：只取和当前页同源的地址，在页面里请求（带用户自己的 Cookie，不经过第三方） */
+async function fetchSiteXml(url) {
+  let target;
+  try { target = new URL(url, location.href); } catch (_) { return { ok: false, reason: 'invalid_id' }; }
+  if (target.origin !== location.origin) return { ok: false, reason: 'invalid_id' };
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), SITE_XML_TIMEOUT_MS);
+  try {
+    const res = await fetch(target.href, { credentials: 'same-origin', signal: controller.signal, headers: { Accept: 'application/xml, text/xml' } });
+    if (!res.ok) return { ok: false, reason: res.status === 404 ? 'not_available' : 'http', status: res.status };
+    const xml = await res.text();
+    return /<article[\s>]/.test(xml) ? { ok: true, xml } : { ok: false, reason: 'not_available' };
+  } catch (_) {
+    return { ok: false, reason: controller.signal.aborted ? 'timeout' : 'network' };
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function runExport(action, withToast) {
@@ -18,7 +43,7 @@ async function runExport(action, withToast) {
   if (withToast) showToast(t(lang, 'statusWorking'), 'working');
   let result;
   try {
-    result = await exportArticle({ doc: document, url: location.href, settings, fetchJats });
+    result = await exportArticle({ doc: document, url: location.href, settings, fetchJats, services: { lookupDoi, fetchSiteXml } });
   } catch (e) {
     console.error('[journal-md] export failed', e);
     result = { ok: false, error: 'unknown' };

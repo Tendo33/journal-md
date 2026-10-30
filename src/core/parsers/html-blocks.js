@@ -7,12 +7,17 @@ import { ln, resolveUrl, textOf } from './dom-utils';
 import { rewriteAssetUrl } from '../assets';
 
 const HEADINGS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+const FLOAT_LABEL = /^((?:Table|Figure|Fig\.?|Box|Scheme|Chart)\s+[A-Z]?\d+[A-Za-z]?)(?:[.:|]\s*|\s+|$)/;
 const BLOCK_TAGS = new Set(['p', 'div', 'section', 'article', 'main', 'aside', 'header', 'footer', 'ul', 'ol', 'dl', 'table',
   'figure', 'blockquote', 'pre', 'hr', 'form', 'nav', 'details', ...HEADINGS]);
 const ALWAYS_SKIP = new Set(['script', 'style', 'noscript', 'template', 'button', 'svg', 'input', 'select', 'textarea', 'iframe', 'link', 'meta']);
 
 const DEFAULTS = {
   skip: '[hidden], [aria-hidden="true"]:not(mjx-assistive-mml), .MathJax_Preview, .MathJax, .MathJax_Display, .MJX_Assistive_MathML',
+  // MathJax 2 的 CHTML / SVG 输出（输入是 MathML 时没有 math/tex 脚本，公式只在辅助 MathML 或 data-mathml 里）
+  mathjaxOutput: '.mjx-chtml, .MathJax_CHTML, .MathJax_SVG, [data-mathml]',
+  cite: '',
+  tableLink: 'a[data-test="table-link"]',
   figure: 'figure, .fig',
   table: '.table-wrap, .tw, section.tw, div.table',
   formula: '.disp-formula, .display-formula, .formula',
@@ -27,10 +32,18 @@ export class HtmlConverter {
    * @param {object} ir ArticleIR（figures/tables 会写进去）
    * @param {{ baseUrl?:string, refIds?:Set<string>, selectors?:object }} options
    */
-  constructor(ir, { baseUrl = '', refIds = new Set(), selectors = {} } = {}) {
+  /**
+   * hooks（站点配置提供，都可选）：
+   *   citeRid(el) → 正文引用元素（sel.cite 命中的）指向的参考文献 id
+   *   tableSource(el) → 表格内容不在占位元素里时（MDPI 弹窗表）返回真正放表格的元素
+   *   imageSrc(url, img) → 改写图片地址（如换成大图）
+   */
+  constructor(ir, { baseUrl = '', refIds = new Set(), refAlias = new Map(), selectors = {}, hooks = {} } = {}) {
     this.ir = ir;
     this.baseUrl = baseUrl;
     this.refIds = refIds;
+    this.refAlias = refAlias;
+    this.hooks = hooks;
     this.sel = { ...DEFAULTS, ...selectors };
     this.counter = 0;
     this.seenFig = new Set();
@@ -55,10 +68,39 @@ export class HtmlConverter {
     return resolveUrl(href, this.baseUrl);
   }
 
+  /** 参考文献 id：本身是条目 id，或者是条目里某个锚点的 id（PLOS 的 #pmed-…-b1 在 li#ref1 里） */
+  refId(x) {
+    if (!x) return null;
+    if (this.refIds.has(x)) return x;
+    return this.refAlias.get(x) || null;
+  }
+
+  /** MathJax 2 CHTML/SVG 渲染结果 → TeX（后面紧跟 math/tex 脚本时交给脚本，避免重复） */
+  mathjaxTex(node) {
+    const next = node.nextElementSibling;
+    if (next && ln(next) === 'script' && this.mathScript(next)) return null;
+    const m = node.querySelector('math');
+    if (m) return mathmlToLatex(m);
+    const raw = node.getAttribute('data-mathml');
+    if (raw && typeof DOMParser !== 'undefined') {
+      try {
+        const doc = new DOMParser().parseFromString(raw, 'application/xml');
+        if (!doc.getElementsByTagName('parsererror').length) return mathmlToLatex(doc.documentElement);
+      } catch (_) { /* 解析失败就当没有公式 */ }
+    }
+    return '';
+  }
+
   // ---------- inline ----------
   inlines(el) {
     const out = [];
-    for (const n of Array.from(el.childNodes || [])) out.push(...this.inlineNode(n));
+    const nodes = Array.from(el.childNodes || []);
+    nodes.forEach((n, i) => {
+      // 排版缩进产生的换行空白紧挨着 <sub>/<sup> 时去掉（Springer：<i>K</i>\n   <sub>ij</sub>）
+      const next = nodes[i + 1];
+      if (n.nodeType === 3 && /\n/.test(n.nodeValue) && !n.nodeValue.trim() && next && next.nodeType === 1 && ['sub', 'sup'].includes(ln(next))) return;
+      out.push(...this.inlineNode(n));
+    });
     return normalizeInlines(out);
   }
 
@@ -67,6 +109,15 @@ export class HtmlConverter {
     if (node.nodeType !== 1) return [];
     const tag = ln(node);
     if (tag === 'script') return this.mathScript(node) ? [{ t: 'math', tex: this.mathScript(node).tex }] : [];
+    // 正文引用可能是 button（Frontiers），要在跳过 button 之前认出来
+    if (this.sel.cite && this.matches(node, this.sel.cite)) {
+      const rid = this.refId(this.hooks.citeRid ? this.hooks.citeRid(node) : node.getAttribute('data-rid'));
+      if (rid) return [{ t: 'cite', rid, c: trimInlines([{ t: 'text', v: node.textContent }]) }];
+    }
+    if (this.matches(node, this.sel.mathjaxOutput)) {
+      const tex = this.mathjaxTex(node);
+      return tex ? [{ t: 'math', tex }] : [];
+    }
     if (this.skipped(node)) return [];
     switch (tag) {
     case 'em': case 'i': case 'cite': case 'var':
@@ -95,6 +146,9 @@ export class HtmlConverter {
       if (this.matches(node, this.sel.equationImage)) return [{ t: 'mathImage', src: this.url(node.getAttribute('src')) }];
       return [];
     default:
+      // MDPI 用 class 表示斜体 / 粗体：<span class="html-italic">Felis catus</span>
+      if (tag === 'span' && node.classList && node.classList.contains('html-italic')) return [{ t: 'em', c: this.inlines(node) }];
+      if (tag === 'span' && node.classList && node.classList.contains('html-bold')) return [{ t: 'strong', c: this.inlines(node) }];
       return this.inlines(node);
     }
   }
@@ -107,14 +161,15 @@ export class HtmlConverter {
 
   anchor(a) {
     const href = a.getAttribute('href') || '';
-    const hash = href.includes('#') ? decodeURIComponent(href.slice(href.indexOf('#') + 1)) : '';
-    const rid = (hash && this.refIds.has(hash) && hash)
-      || (a.getAttribute('aria-describedby') && this.refIds.has(a.getAttribute('aria-describedby')) && a.getAttribute('aria-describedby'))
-      || (a.getAttribute('rid') && this.refIds.has(a.getAttribute('rid')) && a.getAttribute('rid'));
+    let hash = '';
+    try { hash = href.includes('#') ? decodeURIComponent(href.slice(href.indexOf('#') + 1)) : ''; } catch (_) { hash = ''; }
+    const rid = this.refId(hash) || this.refId(a.getAttribute('aria-describedby')) || this.refId(a.getAttribute('rid'));
     const label = this.inlines(a);
     if (rid) return [{ t: 'cite', rid, c: label }];
     if (!href || href.startsWith('#') || /^javascript:/i.test(href)) return label;
     const url = this.url(href);
+    // 指向本页其他位置的链接（Springer 的 /article/…#Fig1）只留文字
+    if (url && this.baseUrl && url.includes('#') && url.split('#')[0] === String(this.baseUrl).split('#')[0]) return label;
     return url ? [{ t: 'link', href: url, c: label }] : label;
   }
 
@@ -210,7 +265,12 @@ export class HtmlConverter {
     const items = [];
     let term = null;
     for (const c of Array.from(el.children)) {
-      if (ln(c) === 'dt') term = trimInlines(this.inlines(c));
+      if (ln(c) === 'dt') {
+        term = trimInlines(this.inlines(c));
+        const last = term[term.length - 1];
+        if (last && last.t === 'text') last.v = last.v.replace(/\s*:\s*$/, '');
+        else if (last && last.c && last.c.length && last.c[last.c.length - 1].t === 'text') last.c[last.c.length - 1].v = last.c[last.c.length - 1].v.replace(/\s*:\s*$/, '');
+      }
       else if (ln(c) === 'dd') {
         items.push([{ type: 'paragraph', inlines: trimInlines([...(term ? [{ t: 'strong', c: term }, { t: 'text', v: ': ' }] : []), ...this.inlines(c)]) }]);
         term = null;
@@ -248,7 +308,29 @@ export class HtmlConverter {
       }
       caption = this.hasBlockChild(clone) ? this.mixed(clone) : this.paragraphFromInline(Array.from(clone.childNodes));
     }
+    // 标签元素里还带着图题（Nature：「Fig. 1: AlphaFold produces…」）：拆成标签 + 加粗图题
+    const lm = label.match(FLOAT_LABEL);
+    if (lm && label.length > lm[0].length) {
+      const title = label.slice(lm[0].length).trim();
+      return { label: lm[1], caption: [{ type: 'paragraph', inlines: [{ t: 'strong', c: [{ t: 'text', v: title }] }] }, ...caption] };
+    }
+    // 没有单独的标签元素：「Table 1 Genus-level…」这样的开头拆成标签（Springer / Nature）
+    if (!label && caption[0] && caption[0].type === 'paragraph') {
+      const split = splitFloatLabel(caption[0].inlines);
+      if (split) {
+        caption = [{ type: 'paragraph', inlines: split.rest }, ...caption.slice(1)].filter((b) => b.type !== 'paragraph' || b.inlines.length);
+        return { label: split.label, caption };
+      }
+    }
     return { label, caption };
+  }
+
+  imageUrl(img) {
+    if (!img) return '';
+    // 懒加载和大图地址优先（MDPI data-large / data-original，其他站 data-src）
+    const raw = img.getAttribute('data-large') || img.getAttribute('data-original') || img.getAttribute('data-src') || img.getAttribute('src');
+    const url = rewriteAssetUrl(this.url(raw));
+    return this.hooks.imageSrc ? this.hooks.imageSrc(url, img) : url;
   }
 
   figure(el) {
@@ -257,7 +339,7 @@ export class HtmlConverter {
     this.seenFig.add(id);
     const { label, caption } = this.labelAndCaption(el);
     const img = el.querySelector('img');
-    const src = img ? rewriteAssetUrl(this.url(img.getAttribute('data-src') || img.getAttribute('src'))) : '';
+    const src = this.imageUrl(img);
     this.ir.figures.push({ id, label, caption, src, alt: img ? img.getAttribute('alt') || '' : '' });
     return id;
   }
@@ -266,7 +348,8 @@ export class HtmlConverter {
     const id = el.getAttribute('id') || this.uid('table');
     if (this.seenTable.has(id)) return id;
     this.seenTable.add(id);
-    const tableEl = ln(el) === 'table' ? el : el.querySelector('table');
+    const source = (this.hooks.tableSource && this.hooks.tableSource(el)) || el;
+    const tableEl = ln(el) === 'table' ? el : source.querySelector('table');
     const { label, caption } = ln(el) === 'table' ? { label: '', caption: [] } : this.labelAndCaption(el);
     const rows = [];
     if (tableEl) {
@@ -283,12 +366,15 @@ export class HtmlConverter {
         });
       }
     }
-    const footEl = ln(el) === 'table' ? null : el.querySelector(this.sel.tableFoot);
-    const img = !tableEl ? el.querySelector('img') : null;
+    const footEl = ln(el) === 'table' ? null : source.querySelector(this.sel.tableFoot);
+    const img = !tableEl ? Array.from(el.querySelectorAll('img')).find((i) => !this.matches(i, '.html-media-button img, button img')) : null;
+    // 页面只放了表题和「完整表格」链接（Springer / Nature 的 inline table）：记下链接，渲染时给出
+    const linkEl = !tableEl && !img ? el.querySelector(this.sel.tableLink) : null;
     this.ir.tables.push({
       id, label, caption, rows,
       foot: footEl ? this.mixed(footEl) : [],
-      src: img ? this.url(img.getAttribute('src')) : '',
+      src: img ? this.imageUrl(img) : '',
+      href: linkEl ? this.url(linkEl.getAttribute('href')) : '',
     });
     return id;
   }
@@ -331,7 +417,9 @@ export class HtmlConverter {
       }
       const tag = ln(n);
       const special = this.matches(n, this.sel.figure) || this.matches(n, this.sel.table) || this.matches(n, this.sel.formula);
-      if (!special && ['section', 'div', 'article', 'main'].includes(tag) && this.hasBlockChild(n)) {
+      // header / a 里也可能包着节标题（eLife：<header><a class="article-section__toggle"><h2>…</h2></a></header>）
+      const wrapsHeading = ['header', 'a'].includes(tag) && !!n.querySelector('h1, h2, h3, h4, h5, h6');
+      if (!special && (wrapsHeading || (['section', 'div', 'article', 'main'].includes(tag) && this.hasBlockChild(n)))) {
         this.events(n, out);
       } else if (!special && !this.isBlock(n)) {
         // 容器里直接出现的行内元素：和相邻行内节点合成一段
@@ -373,6 +461,22 @@ export class HtmlConverter {
     if (root.blocks.length) out.unshift({ title: null, blocks: root.blocks, children: [] });
     return out;
   }
+}
+
+/** 段首的「Table 1」「Fig. 2」拆成标签，其余是图注 */
+export function splitFloatLabel(inlines) {
+  const first = inlines[0];
+  let text = first && first.t === 'text' ? first.v : '';
+  let rest = inlines.slice(1);
+  // 标签可能整个包在 <b> 里：<b>Table 1</b> 或 <b>Table 1 <b>标题</b></b>
+  if (!text && first && first.t === 'strong' && first.c[0] && first.c[0].t === 'text') {
+    text = first.c[0].v;
+    rest = [...first.c.slice(1), ...inlines.slice(1)];
+  }
+  const m = text.replace(/^\s+/, '').match(FLOAT_LABEL);
+  if (!m) return null;
+  const after = text.replace(/^\s+/, '').slice(m[0].length);
+  return { label: m[1], rest: trimInlines([...(after ? [{ t: 'text', v: after }] : []), ...rest]) };
 }
 
 /** 从 DOM 参考文献条目里取 DOI / PMID（链接优先，其次文本） */

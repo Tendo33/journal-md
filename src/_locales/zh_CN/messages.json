@@ -126,7 +126,7 @@
     "message": "部分公式只有图片，已保留为图片链接。"
   },
   "err_unsupported_page": {
-    "message": "暂不支持此页面。请打开 PMC、Europe PMC 或 PubMed 上的文章页。"
+    "message": "暂不支持此页面。请打开 PMC、Europe PMC、PubMed、Springer/BMC、Nature、Frontiers、MDPI、PLOS 或 eLife 上的文章页。"
   },
   "err_site_planned": {
     "message": "暂不支持 {site}，计划在后续版本加入。"
@@ -159,7 +159,7 @@
     "message": "感谢安装"
   },
   "optWelcomeBody": {
-    "message": "打开 PMC、Europe PMC 或 PubMed 上的文章，然后点击工具栏图标、按 Alt+Shift+J，或在页面上点右键。"
+    "message": "打开 PMC、Europe PMC、PubMed、Springer/BMC、Nature、Frontiers、MDPI、PLOS 或 eLife 上的文章，然后点页面右下角的 Markdown 按钮、点击工具栏图标、按 Alt+Shift+J，或在页面上点右键。"
   },
   "optSectionOutput": {
     "message": "输出"
@@ -183,7 +183,7 @@
     "message": "优先使用结构化全文"
   },
   "optPreferJatsHelp": {
-    "message": "在 PMC 和 Europe PMC 页面上，先从 Europe PMC 获取开放获取文章的 XML；失败或超时则改用当前页面。"
+    "message": "先获取结构化全文（JATS XML）：开放获取文章从 Europe PMC 获取（出版商页面按 DOI 查找），Frontiers 用出版商自己的 XML。失败或超时则改用当前页面。"
   },
   "optSectionLanguage": {
     "message": "语言"
@@ -213,12 +213,18 @@
     "message": "版本 {version}"
   },
   "optPrivacy": {
-    "message": "文章在浏览器内完成转换。只有在你导出或复制文章时，扩展才会用文章的 PMCID 向 Europe PMC（EMBL-EBI）请求开放获取全文，不发送 Cookie 和页面地址。打开弹窗不会发出任何请求。"
+    "message": "文章在浏览器内完成转换。只有在你导出或复制文章时，扩展才会向 Europe PMC（EMBL-EBI）请求开放获取全文，只发送 PMCID 或 DOI，不发送 Cookie 和页面地址。打开弹窗不会发出任何请求。"
   },
   "btnClose": {
     "message": "关闭"
   },
   "err_page_changed": {
     "message": "页面还在切换到另一篇文章。请等它加载完成后再试。"
+  },
+  "routeUsedSiteXml": {
+    "message": "来源：出版商提供的 XML（结构化全文）。"
+  },
+  "noticeJats_not_found": {
+    "message": "Europe PMC 上没有这个 DOI 对应的全文。"
   }
 }

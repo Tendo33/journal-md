@@ -25,7 +25,15 @@
     "https://pmc.ncbi.nlm.nih.gov/*",
     "https://pubmed.ncbi.nlm.nih.gov/*",
     "https://europepmc.org/*",
-    "https://www.ebi.ac.uk/europepmc/*"
+    "https://www.ebi.ac.uk/europepmc/*",
+    "https://link.springer.com/*",
+    "https://*.biomedcentral.com/*",
+    "https://*.springeropen.com/*",
+    "https://www.nature.com/*",
+    "https://www.frontiersin.org/*",
+    "https://www.mdpi.com/*",
+    "https://journals.plos.org/*",
+    "https://elifesciences.org/*"
   ],
   "background": {
     "service_worker": "background.js",
@@ -38,7 +46,16 @@
       "matches": [
         "https://pmc.ncbi.nlm.nih.gov/articles/*",
         "https://pubmed.ncbi.nlm.nih.gov/*",
-        "https://europepmc.org/*"
+        "https://europepmc.org/*",
+        "https://link.springer.com/article/*",
+        "https://*.biomedcentral.com/articles/*",
+        "https://*.springeropen.com/articles/*",
+        "https://www.nature.com/articles/*",
+        "https://www.frontiersin.org/journals/*",
+        "https://www.frontiersin.org/articles/*",
+        "https://www.mdpi.com/*",
+        "https://journals.plos.org/*",
+        "https://elifesciences.org/articles/*"
       ],
       "js": [
         "content.js"

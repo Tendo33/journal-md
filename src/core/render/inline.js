@@ -73,11 +73,11 @@ function renderInline(n, ctx) {
     const inner = renderInlines(n.c, ctx);
     // 上标里只有引用标记时直接输出 [^n]，不再包 <sup>
     if (/^(\[\^\d+\][\s,–-]*)+$/.test(inner.trim())) return inner.trim();
-    return inner.trim() ? `<sup>${inner}</sup>` : '';
+    return inner.trim() ? `<sup>${inner.trim()}</sup>` : '';
   }
   case 'sub': {
     const inner = renderInlines(n.c, ctx);
-    return inner.trim() ? `<sub>${inner}</sub>` : '';
+    return inner.trim() ? `<sub>${inner.trim()}</sub>` : '';
   }
   case 'code':
     return n.v.includes('`') ? `\`\` ${n.v} \`\`` : `\`${n.v}\``;
@@ -101,8 +101,19 @@ function renderInline(n, ctx) {
     const label = renderInlines(n.c, ctx).trim();
     if (!num) return label;
     ctx.cited && ctx.cited.add(num);
-    // 纯数字引用（"12"、"[12]"、"(12)"）直接换成脚注；作者-年份格式保留原文再加脚注
-    if (!label || /^[[(]?\d+(?:\s*[,–-]\s*\d+)*[\])]?$/.test(label.replace(/\\/g, ''))) return `[^${num}]`;
+    // 「1–3」只链到第一条（PLOS）：按序号展开成 [^1][^2][^3]，范围过大时不展开
+    const range = label.replace(/\\/g, '').match(/^[[(]?(\d+)\s*[–-]\s*(\d+)[\])]?$/);
+    if (range && Number(range[2]) > Number(range[1]) && Number(range[2]) - Number(range[1]) <= 20 && ctx.citeNumberByLabel) {
+      const nums = [];
+      for (let k = Number(range[1]); k <= Number(range[2]); k += 1) nums.push(k === Number(range[1]) ? num : ctx.citeNumberByLabel(String(k)));
+      if (nums.every(Boolean)) {
+        nums.forEach((x) => ctx.cited && ctx.cited.add(x));
+        return nums.map((x) => `[^${x}]`).join('');
+      }
+    }
+    // 纯数字引用（"12"、"[12]"、"(12)"）直接换成脚注；作者-年份格式（含只有年份的「1988」「2010a」）保留原文再加脚注
+    const plain = label.replace(/\\/g, '');
+    if (!label || (/^[[(]?\d+(?:\s*[,–-]\s*\d+)*[\])]?$/.test(plain) && !/^(1[5-9]|20)\d\d[a-z]?$/.test(plain))) return `[^${num}]`;
     return `${label}[^${num}]`;
   }
   default:

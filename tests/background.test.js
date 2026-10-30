@@ -4,6 +4,7 @@
 import { downloadMarkdown, markdownDownloadUrl, canUseBlobUrl } from '@/background/download';
 import { buildMenuItems, menuAction, createMenuBuilder, MENU } from '@/background/context-menu';
 import { createActionRunner } from '@/background/run-action';
+import { SUPPORTED_PAGE_PATTERNS } from '@core/sites/registry';
 
 describe('download adapter (Chrome SW data URL vs Firefox blob URL)', () => {
   test('no createObjectURL → UTF-8 base64 data URL', () => {
@@ -41,7 +42,8 @@ describe('context menu', () => {
     expect(buildMenuItems('zh').map((i) => i.title)).toEqual(['导出本文为 Markdown', '复制全文 Markdown']);
     for (const item of en) {
       expect(item.contexts).toEqual(['page']);
-      expect(item.documentUrlPatterns).toEqual(['https://pmc.ncbi.nlm.nih.gov/articles/*', 'https://pubmed.ncbi.nlm.nih.gov/*', 'https://europepmc.org/*']);
+      expect(item.documentUrlPatterns).toEqual(SUPPORTED_PAGE_PATTERNS);
+      expect(item.documentUrlPatterns).toContain('https://www.nature.com/articles/*');
     }
   });
 
@@ -84,7 +86,7 @@ describe('action runner (context menu / shortcuts)', () => {
   test('unsupported tab never messages the page', async () => {
     const tabs = { sendMessage: jest.fn() };
     const runner = createActionRunner({ tabs, scripting: {}, action, timers });
-    await expect(runner.run({ id: 3, url: 'https://www.mdpi.com/x' }, 'download')).resolves.toEqual({ ok: false, error: 'site_planned' });
+    await expect(runner.run({ id: 3, url: 'https://onlinelibrary.wiley.com/doi/10.1111/x' }, 'download')).resolves.toEqual({ ok: false, error: 'site_planned' });
     expect(tabs.sendMessage).not.toHaveBeenCalled();
     expect(action.setBadgeText).toHaveBeenLastCalledWith({ tabId: 3, text: '!' });
   });

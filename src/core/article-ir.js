@@ -4,7 +4,7 @@
 //   meta: {
 //     title, authors: [{ name, affiliations: [string] }], journal, year (number|null),
 //     doi, pmid, pmcid, license, url, keywords: [string], mesh: [string],
-//     abstractOnly: boolean, fullTextUrl,
+//     abstractOnly: boolean, fullTextUrl, pdfUrl,
 //   },
 //   abstract: [Section],            // 结构化摘要的每个小标题一节；非结构化就是一节无标题
 //   sections: [Section],            // 正文
@@ -12,7 +12,7 @@
 //   refs: [Ref], supp: [Supp],
 //   back: { acknowledgements, dataAvailability, funding, competingInterests, other: [Section] },
 //   notices: [string],              // 解析过程中的提示代码，例如 'equation_image'
-//   sourceRoute,                    // jats-europepmc / dom-pmc / dom-europepmc / dom-pubmed
+//   sourceRoute,                    // SOURCE_ROUTES：jats-europepmc / jats-frontiers / dom-<site>
 // }
 //
 // Section = { title: Inline[]|null, blocks: Block[], children: Section[], type?: string }
@@ -27,16 +27,24 @@
 //   { t: 'text', v } | { t: 'em'|'strong'|'sup'|'sub'|'underline', c: Inline[] } | { t: 'code', v }
 //   { t: 'link', href, c } | { t: 'math', tex } | { t: 'mathImage', src } | { t: 'cite', rid, c } | { t: 'br' }
 // Figure = { id, label, caption: Block[], src, alt }
-// Table  = { id, label, caption: Block[], rows: [{ cells: [Cell] }], foot: Block[], src }  // 只有图片的表：rows 为空、src 有值
+// Table  = { id, label, caption: Block[], rows: [{ cells: [Cell] }], foot: Block[], src, href }
+//          只有图片的表：rows 为空、src 有值；内容在单独页面的表（Springer）：rows 为空、href 是完整表格页
 // Cell   = { header: boolean, colspan, rowspan, inlines }
 // Ref    = { id, label, text: Inline[], doi, pmid, url }
 // Supp   = { id, label, caption: Block[], href }
 
 export const SOURCE_ROUTES = Object.freeze({
   JATS_EUROPEPMC: 'jats-europepmc',
+  JATS_FRONTIERS: 'jats-frontiers', // 出版商同站 XML（citation_xml_url）
   DOM_PMC: 'dom-pmc',
   DOM_EUROPEPMC: 'dom-europepmc',
   DOM_PUBMED: 'dom-pubmed',
+  DOM_SPRINGER: 'dom-springer',
+  DOM_NATURE: 'dom-nature',
+  DOM_FRONTIERS: 'dom-frontiers',
+  DOM_MDPI: 'dom-mdpi',
+  DOM_PLOS: 'dom-plos',
+  DOM_ELIFE: 'dom-elife',
 });
 
 export function createMeta(overrides = {}) {
@@ -54,6 +62,7 @@ export function createMeta(overrides = {}) {
     mesh: [],
     abstractOnly: false,
     fullTextUrl: '',
+    pdfUrl: '',
     ...overrides,
   };
 }

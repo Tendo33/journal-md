@@ -8,7 +8,7 @@ import { normalizeLicense } from '../license';
 import { textOf, resolveUrl } from '../parsers/dom-utils';
 
 const REF_LINK_NOISE = /^(DOI|PubMed|PMC free article|Google Scholar|CrossRef|Crossref|Article|CAS|PubMed Central|Europe PMC|Free full text|Abstract|Full Text)$/i;
-const DROP_SECTION = /^(references?|literature cited|bibliography|associated data|supplementary (information|materials?|data)|additional files?|electronic supplementary material|citations?( (&|and) impact)?|cited by|similar articles|related articles|articles citing this)$/i;
+const DROP_SECTION = /^(references?|literature cited|bibliography|associated data|supplementary (information|materials?|data)|additional files?|electronic supplementary material|citations?( (&|and) impact)?|cited by|similar articles|related articles|articles citing this|author information|authors? and affiliations|ethics declarations|additional information|rights and permissions|about this article|cite this article|share this article|comments|statements|authors[’'] original submitted files for images|peer review( information)?|publisher[’']s note|reprints and permissions|metrics|article and author information|download links|copyright)$/i;
 const NOTES_SECTION = /^(footnotes?|notes|article notes)$/i;
 
 function first(root, selectors) {
@@ -60,9 +60,36 @@ function flatten(sections) {
   return out;
 }
 
+/** 名字可能是 citation_*，也可能只有 Dublin Core（eLife 只有 dc.*；有的站点写 DC.title） */
+function metaValues(doc, ...names) {
+  for (const n of names) {
+    const v = citationMeta(doc, n);
+    if (v.length) return v;
+    const upper = n.replace(/^dc\./, 'DC.');
+    if (upper !== n) {
+      const u = citationMeta(doc, upper);
+      if (u.length) return u;
+    }
+  }
+  return [];
+}
+
+/** dc.creator 是「Love, Michael I」：改成「Michael I Love」，与 citation_author 的常见写法一致时不动 */
+function personName(name) {
+  const m = String(name).match(/^([^,]+),\s*(.+)$/);
+  return m ? `${m[2]} ${m[1]}`.trim() : String(name).trim();
+}
+
+/** 没有专门类名的摘要：标题正好是「Abstract」的 h2/h3，取它的父元素（Frontiers） */
+function abstractByHeading(root) {
+  const h = all(root, 'h2, h3').find((x) => /^\s*abstract\s*$/i.test(x.textContent || ''));
+  return h && h.parentElement && h.parentElement !== root && h.parentElement.firstElementChild === h ? h.parentElement : null;
+}
+
 function refText(conv, li, cfg) {
   const cite = first(li, cfg.refText);
   const clone = (cite || li).cloneNode(true);
+  if (cfg.hooks && cfg.hooks.refPrepare) cfg.hooks.refPrepare(clone);
   removeAll(clone, cfg.refLabel);
   all(clone, 'a').forEach((a) => { if (REF_LINK_NOISE.test(textOf(a))) a.remove(); });
   let inl = trimInlines(conv.inlines(clone));
@@ -88,6 +115,8 @@ function suppItems(conv, root, cfg, baseUrl) {
     } else {
       label = link ? textOf(link) : `Supplementary file ${i + 1}`;
     }
+    // Springer / Nature 的链接文字带「(download PDF )」
+    label = label.replace(/\s*\(download [^)]*\)\s*$/i, '').trim();
     out.push({
       id: el.getAttribute('id') || `supp-${i + 1}`,
       label,
@@ -112,40 +141,58 @@ export function extractDomArticle(doc, url, cfg, ids = {}) {
 
   // ---- 元数据 ----
   const h1 = first(root, cfg.title) || first(doc, cfg.title);
-  meta.title = (citationMeta(doc, 'citation_title')[0] || textOf(h1)).replace(/\s+/g, ' ').trim();
-  const authors = citationMeta(doc, 'citation_author');
+  meta.title = (metaValues(doc, 'citation_title', 'dc.title')[0] || textOf(h1)).replace(/\s+/g, ' ').trim();
+  const authors = metaValues(doc, 'citation_author', 'dc.creator', 'dc.contributor').map(personName);
   const authorEls = authors.length ? [] : all(root, cfg.authors);
   meta.authors = (authors.length ? authors : authorEls.map(textOf)).filter(Boolean)
     .filter((n, i, arr) => arr.indexOf(n) === i).map((name) => ({ name, affiliations: [] }));
-  meta.journal = citationMeta(doc, 'citation_journal_title')[0] || textOf(first(root, cfg.journal));
-  meta.year = extractYear(citationMeta(doc, 'citation_publication_date')[0] || citationMeta(doc, 'citation_date')[0] || textOf(first(root, cfg.date)));
+  meta.journal = metaValues(doc, 'citation_journal_title')[0] || textOf(first(root, cfg.journal)) || (cfg.journalName || '');
+  meta.year = extractYear(metaValues(doc, 'citation_publication_date', 'citation_date', 'citation_online_date', 'dc.date')[0] || textOf(first(root, cfg.date)));
   // DOI / PMCID 只从文章自己的元数据区取，不能扫整页：参考文献和「相关文章」里也有 DOI、PMCID（QA JM-01）
   const metaArea = first(doc, cfg.metaArea);
   const doiEl = metaArea ? first(metaArea, cfg.doi) : null;
-  meta.doi = normalizeDoi(citationMeta(doc, 'citation_doi')[0] || (doiEl && (doiEl.getAttribute('href') || textOf(doiEl))) || '');
+  meta.doi = normalizeDoi(metaValues(doc, 'citation_doi', 'dc.identifier')[0] || (doiEl && (doiEl.getAttribute('href') || textOf(doiEl))) || '');
   // 页面上的 ID 优先，URL 里的只作兜底：两者不一致说明单页应用的 DOM 还是上一篇（审查 N-D）
   const pmidText = metaArea ? (textOf(metaArea).match(/PMID:?\s*(\d{1,9})/i) || [])[1] : '';
   meta.pmid = normalizePmid(citationMeta(doc, 'citation_pmid')[0] || pmidText || ids.pmid || '');
   const pmcText = metaArea ? (textOf(metaArea).match(/PMCID:?\s*(PMC\d+)/i) || [])[1] : '';
   meta.pmcid = normalizePmcid(citationMeta(doc, 'citation_pmcid')[0] || pmcText || ids.pmcid || '');
   const lic = first(root, cfg.license) || first(doc, cfg.license);
-  meta.license = lic ? normalizeLicense(lic.getAttribute('href') || textOf(lic)) : '';
+  const dcRights = metaValues(doc, 'dc.rights')[0] || '';
+  // 没有许可链接时看版权说明文字（PLOS：「…distributed under the terms of the Creative Commons Attribution License…」）
+  const licText = all(doc, cfg.licenseText).map(textOf).find((tx) => /creative commons|\bCC[ -]BY\b|CC0/i.test(tx)) || '';
+  meta.license = lic ? normalizeLicense(lic.getAttribute('href') || textOf(lic))
+    : (/creativecommons\.org|creative commons/i.test(dcRights) ? normalizeLicense(dcRights) : (licText ? normalizeLicense(licText.replace(/^.*?(?=creative commons|\bCC[ -]BY|CC0)/i, '')) : ''));
+  // PDF 地址（L3 PDF 解析用）：citation_pdf_url，没有时按站点配置找下载链接
+  const pdfLink = first(root, cfg.pdfLink) || first(doc, cfg.pdfLink);
+  meta.pdfUrl = resolveUrl(metaValues(doc, 'citation_pdf_url')[0] || (pdfLink && pdfLink.getAttribute('href')) || '', url);
   meta.keywords = citationMeta(doc, 'citation_keywords').flatMap(splitKeywords);
+  const kwItems = all(root, cfg.keywordItems).map(textOf).filter(Boolean);
+  if (kwItems.length) meta.keywords = [...new Set(kwItems)];
 
   // ---- 参考文献（先建 id 集合，正文里的 #CR1 链接才能变成脚注）----
-  const refItems = all(root, cfg.refItems).filter((li) => li.getAttribute('id'));
-  const refIds = new Set(refItems.map((li) => li.getAttribute('id')));
-  const conv = new HtmlConverter(ir, { baseUrl: url, refIds, selectors: cfg.selectors });
-  ir.refs = refItems.map((li) => ({
-    id: li.getAttribute('id'),
-    label: textOf(li.querySelector(cfg.refLabel)),
+  // 条目 id：li 自己的 id，或者条目里第一个带 id 的元素（Springer 的 p#ref-CR1）；cfg.refId 可按序号生成（MDPI）。
+  // 条目里其他元素的 id 记作别名，正文链接指向它们时也能对上（PLOS 的 li#ref1 > a#pmed-…-b1）
+  const refAlias = new Map();
+  const refItems = all(root, cfg.refItems).map((li, i) => {
+    const inner = Array.from(li.querySelectorAll('[id]')).map((e) => e.getAttribute('id'));
+    const id = (cfg.refId && cfg.refId(li, i)) || li.getAttribute('id') || inner[0] || '';
+    for (const a of inner) if (a !== id && !refAlias.has(a)) refAlias.set(a, id);
+    return { li, id };
+  }).filter((r) => r.id);
+  const refIds = new Set(refItems.map((r) => r.id));
+  const conv = new HtmlConverter(ir, { baseUrl: url, refIds, refAlias, selectors: cfg.selectors, hooks: cfg.hooks || {} });
+  ir.refs = refItems.map(({ li, id }, i) => ({
+    id,
+    label: textOf(first(li, cfg.refLabel)).replace(/[.\s]+$/, '') || String(i + 1),
     text: refText(conv, li, cfg),
     ...refIdsFromElement(li),
     url: '',
   }));
 
   // ---- 摘要 ----
-  const absEls = all(root, cfg.abstract).filter((el, _i, arr) => !arr.some((o) => o !== el && o.contains(el)));
+  let absEls = all(root, cfg.abstract).filter((el, _i, arr) => !arr.some((o) => o !== el && o.contains(el)));
+  if (!absEls.length && cfg.abstractByHeading) absEls = [abstractByHeading(root)].filter(Boolean);
   // 页面上可见的关键词优先于 citation_keywords（后者常常不全）
   const kwdEl = first(root, cfg.keywords);
   if (kwdEl && splitKeywords(textOf(kwdEl)).length) meta.keywords = splitKeywords(textOf(kwdEl));
@@ -168,19 +215,40 @@ export function extractDomArticle(doc, url, cfg, ids = {}) {
     body = root.cloneNode(true);
   }
   removeAll(body, [cfg.abstract, cfg.refList, cfg.supp, cfg.keywords, ...(cfg.remove || [])]);
+  if (cfg.abstractByHeading) { const a = abstractByHeading(body); if (a) a.remove(); }
+  if (cfg.hooks && cfg.hooks.prepareBody) cfg.hooks.prepareBody(body);
   const sections = conv.sections(body);
 
+  const plainTitle = (x) => inlinesToPlain(x.title || []).replace(/\s+/g, ' ').trim();
+  // 子节里的致谢 / 利益冲突 / 数据可用性也移到文末（Springer「Additional information > Competing interests」、
+  // Frontiers「Statements > Conflict of interest」）；参考文献、附件等子节直接去掉
+  const prune = (sec) => {
+    const children = [];
+    for (const c of sec.children || []) {
+      const t = plainTitle(c);
+      const k = c.title ? classifyBackSection(t, '') : null;
+      if (k) ir.back[k].push(...c.blocks, ...flatten(c.children));
+      else if (DROP_SECTION.test(t)) continue;
+      else if (NOTES_SECTION.test(t)) {
+        if (c.blocks.length || c.children.length) ir.back.other.push({ title: c.title, blocks: [...c.blocks, ...flatten(c.children)], children: [] });
+      } else {
+        const p = prune(c);
+        if (p.blocks.length || p.children.length || !p.title) children.push(p);
+      }
+    }
+    return { ...sec, children };
+  };
   for (const s of sections) {
-    const title = inlinesToPlain(s.title || []).replace(/\s+/g, ' ').trim();
+    const title = plainTitle(s);
     const key = s.title ? classifyBackSection(title, '') : null;
     if (key) {
       ir.back[key].push(...s.blocks, ...flatten(s.children));
-    } else if (DROP_SECTION.test(title)) {
-      continue;
     } else if (NOTES_SECTION.test(title)) {
       if (s.blocks.length || s.children.length) ir.back.other.push({ title: s.title, blocks: [...s.blocks, ...flatten(s.children)], children: [] });
     } else {
-      ir.sections.push(s);
+      const pruned = prune(s);
+      if (DROP_SECTION.test(title)) continue;
+      if (pruned.blocks.length || pruned.children.length) ir.sections.push(pruned);
     }
   }
   ir.notices = [...new Set(ir.notices)];

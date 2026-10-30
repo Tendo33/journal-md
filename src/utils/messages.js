@@ -4,6 +4,7 @@ export const MSG = Object.freeze({
   INSPECT: 'JMD_INSPECT', // popup → content：页面识别结果
   EXPORT: 'JMD_EXPORT', // popup / background → content：导出；action: none | download | copy
   FETCH_JATS: 'JMD_FETCH_JATS', // content → background：取 Europe PMC fullTextXML
+  LOOKUP_DOI: 'JMD_LOOKUP_DOI', // content → background：出版商页面按 DOI 查 Europe PMC 的 PMCID（只在导出时）
   DOWNLOAD: 'JMD_DOWNLOAD', // content → background：下载 .md
 });
 

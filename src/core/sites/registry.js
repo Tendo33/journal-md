@@ -1,6 +1,6 @@
-// 站点识别与注册表。M1 支持 PMC / Europe PMC / PubMed；其余 P0 站点先登记为 planned，
-// popup 显示「暂不支持，计划在后续版本」。M2 新增站点时把 status 改为 supported 并挂上 adapter。
-import { normalizePmcid, normalizePmid } from '../ids';
+// 站点识别与注册表：PRD §2.7 的 P0 站点（PMC、Europe PMC、PubMed + 六个出版商）。
+// publisher：出版商页面，走「同站 XML → Europe PMC（按 DOI）→ DOM」；openAccess：整站开放获取（PDF 解析不用逐篇确认）。
+import { normalizeDoi, normalizePmcid, normalizePmid } from '../ids';
 
 export const SITE_STATUS = Object.freeze({ SUPPORTED: 'supported', PLANNED: 'planned' });
 
@@ -43,12 +43,94 @@ export const SITES = [
     },
     routes: ['jats', 'dom'],
   },
-  { id: 'springer', name: 'BMC / SpringerOpen / Springer Link', status: SITE_STATUS.PLANNED, hosts: ['*.biomedcentral.com', '*.springeropen.com', 'link.springer.com'] },
-  { id: 'nature', name: 'Nature / Scientific Reports', status: SITE_STATUS.PLANNED, hosts: ['www.nature.com'] },
-  { id: 'frontiers', name: 'Frontiers', status: SITE_STATUS.PLANNED, hosts: ['www.frontiersin.org'] },
-  { id: 'mdpi', name: 'MDPI', status: SITE_STATUS.PLANNED, hosts: ['www.mdpi.com'] },
-  { id: 'plos', name: 'PLOS', status: SITE_STATUS.PLANNED, hosts: ['journals.plos.org'] },
-  { id: 'elife', name: 'eLife', status: SITE_STATUS.PLANNED, hosts: ['elifesciences.org'] },
+  {
+    id: 'springer',
+    name: 'Springer Link / BMC / SpringerOpen',
+    status: SITE_STATUS.SUPPORTED,
+    publisher: true,
+    hosts: ['link.springer.com', '*.biomedcentral.com', '*.springeropen.com'],
+    // BMC、SpringerOpen 整站开放获取；link.springer.com 上是混合的，按页面许可判断
+    openAccessHosts: ['*.biomedcentral.com', '*.springeropen.com'],
+    article: (u) => {
+      const m = u.pathname.match(/^\/(?:article|articles)\/(10\.\d{4,9}\/[^?#]+?)\/?$/);
+      if (!m || /\/(figures|tables)\/\d+$/.test(m[1])) return null;
+      return { doi: normalizeDoi(m[1]) };
+    },
+    routes: ['jats', 'dom'],
+  },
+  {
+    id: 'nature',
+    name: 'Nature / Scientific Reports',
+    status: SITE_STATUS.SUPPORTED,
+    publisher: true,
+    hosts: ['www.nature.com'],
+    article: (u) => {
+      const m = u.pathname.match(/^\/articles\/([a-z][\w.-]*\d[\w.-]*?)\/?$/i);
+      if (!m || /\.pdf$/i.test(m[1])) return null;
+      return { doi: `10.1038/${m[1]}` };
+    },
+    routes: ['jats', 'dom'],
+  },
+  {
+    id: 'frontiers',
+    name: 'Frontiers',
+    status: SITE_STATUS.SUPPORTED,
+    publisher: true,
+    openAccessHosts: ['www.frontiersin.org'],
+    siteXml: true,
+    xmlRoute: 'jats-frontiers',
+    hosts: ['www.frontiersin.org'],
+    article: (u) => {
+      const m = u.pathname.match(/^\/(?:journals\/[^/]+\/)?articles\/(10\.3389\/[^/]+)(?:\/(?:full|abstract))?\/?$/i);
+      return m ? { doi: normalizeDoi(m[1]) } : null;
+    },
+    routes: ['jats', 'dom'],
+  },
+  {
+    id: 'mdpi',
+    name: 'MDPI',
+    status: SITE_STATUS.SUPPORTED,
+    publisher: true,
+    openAccessHosts: ['www.mdpi.com'],
+    hosts: ['www.mdpi.com'],
+    // /2076-2615/11/5/1300（可带 /htm）；DOI 不在地址里
+    article: (u) => (/^\/\d{4}-\d{3}[\dX]\/\d+\/\d+\/\d+(?:\/htm)?\/?$/i.test(u.pathname) ? {} : null),
+    routes: ['jats', 'dom'],
+  },
+  {
+    id: 'plos',
+    name: 'PLOS',
+    status: SITE_STATUS.SUPPORTED,
+    publisher: true,
+    openAccessHosts: ['journals.plos.org'],
+    hosts: ['journals.plos.org'],
+    article: (u) => {
+      if (!/^\/[a-z]+\/article\/?$/.test(u.pathname)) return null;
+      const doi = normalizeDoi(u.searchParams.get('id') || '');
+      return doi ? { doi } : null;
+    },
+    routes: ['jats', 'dom'],
+  },
+  {
+    id: 'elife',
+    name: 'eLife',
+    status: SITE_STATUS.SUPPORTED,
+    publisher: true,
+    openAccessHosts: ['elifesciences.org'],
+    hosts: ['elifesciences.org'],
+    article: (u) => {
+      const m = u.pathname.match(/^\/articles\/(\d+)\/?$/);
+      return m ? { doi: `10.7554/eLife.${m[1]}` } : null;
+    },
+    routes: ['jats', 'dom'],
+  },
+  // PRD §1.1 P1：只用来在弹窗里说明「计划支持」，不申请任何权限（识别靠点击图标时的 activeTab）
+  { id: 'biorxiv', name: 'bioRxiv / medRxiv', status: SITE_STATUS.PLANNED, hosts: ['www.biorxiv.org', 'www.medrxiv.org'] },
+  { id: 'sciencedirect', name: 'ScienceDirect', status: SITE_STATUS.PLANNED, hosts: ['www.sciencedirect.com'] },
+  { id: 'cell', name: 'Cell Press', status: SITE_STATUS.PLANNED, hosts: ['www.cell.com'] },
+  { id: 'wiley', name: 'Wiley', status: SITE_STATUS.PLANNED, hosts: ['onlinelibrary.wiley.com'] },
+  { id: 'oup', name: 'Oxford Academic', status: SITE_STATUS.PLANNED, hosts: ['academic.oup.com'] },
+  { id: 'tandf', name: 'Taylor & Francis', status: SITE_STATUS.PLANNED, hosts: ['www.tandfonline.com'] },
 ];
 
 export const SUPPORTED_SITE_IDS = SITES.filter((s) => s.status === SITE_STATUS.SUPPORTED).map((s) => s.id);
@@ -88,9 +170,24 @@ export function detectSite(url) {
   return { site, supported, isArticle: !!ids, ids: ids || {} };
 }
 
-/** content script / 右键菜单用的 URL 模式（只含 M1 支持的站点） */
+/** 站点整体开放获取（PDF 解析默认只发 OA 的，见 PRD §2.11） */
+export function isOpenAccessHost(site, hostname) {
+  const host = String(hostname || '').toLowerCase();
+  return !!(site && (site.openAccessHosts || []).some((h) => hostMatches(host, h)));
+}
+
+/** content script / 右键菜单用的 URL 模式；必须和 manifest content_scripts.matches 一致（测试会比对） */
 export const SUPPORTED_PAGE_PATTERNS = [
   'https://pmc.ncbi.nlm.nih.gov/articles/*',
   'https://pubmed.ncbi.nlm.nih.gov/*',
   'https://europepmc.org/*',
+  'https://link.springer.com/article/*',
+  'https://*.biomedcentral.com/articles/*',
+  'https://*.springeropen.com/articles/*',
+  'https://www.nature.com/articles/*',
+  'https://www.frontiersin.org/journals/*',
+  'https://www.frontiersin.org/articles/*',
+  'https://www.mdpi.com/*',
+  'https://journals.plos.org/*',
+  'https://elifesciences.org/articles/*',
 ];

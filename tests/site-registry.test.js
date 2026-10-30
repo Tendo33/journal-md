@@ -22,27 +22,45 @@ describe('detectSite', () => {
   });
 
   test.each([
-    ['https://gsejournal.biomedcentral.com/articles/10.1186/s12711-020-00531-3', 'springer'],
-    ['https://link.springer.com/article/10.1007/x', 'springer'],
-    ['https://www.nature.com/articles/s41598-020-1', 'nature'],
-    ['https://www.frontiersin.org/articles/10.3389/fgene.2021.1/full', 'frontiers'],
-    ['https://www.mdpi.com/2076-2615/11/5/1300', 'mdpi'],
-    ['https://journals.plos.org/plosone/article?id=10.1371/journal.pone.1', 'plos'],
-    ['https://elifesciences.org/articles/12345', 'elife'],
-  ])('planned P0 site %s → %s (not yet supported)', (url, id) => {
+    ['https://gsejournal.biomedcentral.com/articles/10.1186/s12711-020-00531-3', 'springer', true, { doi: '10.1186/s12711-020-00531-3' }],
+    ['https://link.springer.com/article/10.1186/s13059-014-0550-8', 'springer', true, { doi: '10.1186/s13059-014-0550-8' }],
+    ['https://link.springer.com/article/10.1186/gb-2014-15-3-r46/tables/1', 'springer', false, {}],
+    ['https://link.springer.com/search?query=x', 'springer', false, {}],
+    ['https://www.nature.com/articles/s41586-021-03819-2', 'nature', true, { doi: '10.1038/s41586-021-03819-2' }],
+    ['https://www.nature.com/articles/s41586-021-03819-2.pdf', 'nature', false, {}],
+    ['https://www.nature.com/srep/', 'nature', false, {}],
+    ['https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2013.00863/full', 'frontiers', true, { doi: '10.3389/fpsyg.2013.00863' }],
+    ['https://www.frontiersin.org/articles/10.3389/fgene.2021.1/full', 'frontiers', true, { doi: '10.3389/fgene.2021.1' }],
+    ['https://www.mdpi.com/2076-2615/11/5/1300', 'mdpi', true, {}],
+    ['https://www.mdpi.com/2076-2615/11/5/1300/htm', 'mdpi', true, {}],
+    ['https://www.mdpi.com/journal/animals', 'mdpi', false, {}],
+    ['https://journals.plos.org/plosone/article?id=10.1371/journal.pone.1', 'plos', true, { doi: '10.1371/journal.pone.1' }],
+    ['https://journals.plos.org/plosone/search?q=x', 'plos', false, {}],
+    ['https://elifesciences.org/articles/09560', 'elife', true, { doi: '10.7554/eLife.09560' }],
+    ['https://elifesciences.org/subjects/neuroscience', 'elife', false, {}],
+  ])('publisher page %s → %s', (url, id, isArticle, ids) => {
     const r = detectSite(url);
     expect(r.site.id).toBe(id);
+    expect(r.site.publisher).toBe(true);
+    expect(r.supported).toBe(true);
+    expect(r.isArticle).toBe(isArticle);
+    expect(r.ids).toEqual(ids);
+  });
+
+  test('P1 sites are recognised as planned and request no permission', () => {
+    const r = detectSite('https://www.sciencedirect.com/science/article/pii/1');
+    expect(r.site.id).toBe('sciencedirect');
     expect(r.supported).toBe(false);
   });
 
   test('unknown, malformed and non-http URLs', () => {
-    expect(detectSite('https://www.sciencedirect.com/science/article/pii/1').site).toBeNull();
+    expect(detectSite('https://example.org/article/1').site).toBeNull();
     expect(detectSite('chrome://extensions').site).toBeNull();
     expect(detectSite('not a url').site).toBeNull();
     expect(detectSite('https://evilbiomedcentral.com/x').site).toBeNull();
   });
 
-  test('supported sites are covered by host permissions; planned sites request none in M1', () => {
+  test('supported sites are covered by host permissions; planned sites request none', () => {
     const hostPerms = manifest.host_permissions.map((h) => h.replace(/^https:\/\//, '').replace(/\/.*$/, ''));
     for (const s of SITES) {
       for (const h of s.hosts) {
@@ -52,8 +70,8 @@ describe('detectSite', () => {
     }
   });
 
-  test('content scripts only run on M1 supported sites', () => {
-    expect(SUPPORTED_SITE_IDS).toEqual(['pmc', 'europepmc', 'pubmed']);
+  test('content scripts only run on supported sites', () => {
+    expect(SUPPORTED_SITE_IDS).toEqual(['pmc', 'europepmc', 'pubmed', 'springer', 'nature', 'frontiers', 'mdpi', 'plos', 'elife']);
     expect(manifest.content_scripts[0].matches).toEqual(SUPPORTED_PAGE_PATTERNS);
   });
 });

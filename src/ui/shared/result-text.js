@@ -26,6 +26,8 @@ export function describeResult(result, lang, action) {
       notes.push(t(lang, 'noticeAbstractOnly'));
     }
   }
-  const route = result.route === 'jats-europepmc' ? t(lang, 'routeUsedJats') : t(lang, 'routeUsedDom');
+  let route = t(lang, 'routeUsedDom');
+  if (result.route === 'jats-europepmc') route = t(lang, 'routeUsedJats');
+  else if (/^jats-/.test(result.route || '')) route = t(lang, 'routeUsedSiteXml');
   return { status, notes, route };
 }

@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<!-- Real page fixture: https://link.springer.com/article/10.1186/s13059-014-0550-8 (via genomebiology.biomedcentral.com; subsections Sec14-16, Sec20-23, Sec25-29, Sec31-32 removed to keep the file small) (fetched 2026-10-30, trimmed: scripts/styles/svg/comments/tracking attributes removed, only the article subtree kept). -->
+<html lang="en" class="no-js"><head>
+        <meta charset="UTF-8">
+        <meta name="applicable-device" content="pc,mobile">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta name="robots" content="max-image-preview:large">
+            <meta name="access" content="Yes">
+        <meta name="360-site-verification" content="1268d79b5e96aecf3ff2a7dac04ad990">
+        <title>Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2 | Genome Biology | Springer Nature Link</title>
+    <meta name="journal_id" content="13059">
+    <meta name="dc.title" content="Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2">
+    <meta name="dc.source" content="Genome Biology 2014 15:12">
+    <meta name="dc.format" content="text/html">
+    <meta name="dc.publisher" content="BioMed Central">
+    <meta name="dc.date" content="2014-12-05">
+    <meta name="dc.type" content="OriginalPaper">
+    <meta name="dc.language" content="En">
+    <meta name="dc.copyright" content="2014 Love et al.; licensee BioMed Central.">
+    <meta name="dc.rights" content="2014 Love et al.; licensee BioMed Central.">
+    <meta name="dc.rightsAgent" content="journalpermissions@springernature.com">
+    <meta name="dc.description" content="In comparative high-throughput sequencing assays, a fundamental task is the analysis of count data, such as read counts per gene in RNA-seq, for evidence of systematic changes across experimental conditions. Small replicate numbers, discreteness, large dynamic range and the presence of outliers require a suitable statistical approach. We present DESeq2, a method for differential analysis of count data, using shrinkage estimation for dispersions and fold changes to improve stability and interpretability of estimates. This enables a more quantitative analysis focused on the strength rather than the mere presence of differential expression. The DESeq2 package is available at http://www.bioconductor.org/packages/release/bioc/html/DESeq2.html .">
+    <meta name="prism.issn" content="1474-760X">
+    <meta name="prism.publicationName" content="Genome Biology">
+    <meta name="prism.publicationDate" content="2014-12-05">
+    <meta name="prism.volume" content="15">
+    <meta name="prism.number" content="12">
+    <meta name="prism.section" content="OriginalPaper">
+    <meta name="prism.startingPage" content="550">
+    <meta name="prism.endingPage" content="">
+    <meta name="prism.copyright" content="2014 Love et al.; licensee BioMed Central.">
+    <meta name="prism.rightsAgent" content="journalpermissions@springernature.com">
+    <meta name="prism.url" content="https://link.springer.com/article/10.1186/s13059-014-0550-8">
+    <meta name="prism.doi" content="doi:10.1186/s13059-014-0550-8">
+    <meta name="citation_pdf_url" content="https://link.springer.com/content/pdf/10.1186/s13059-014-0550-8.pdf">
+    <meta name="citation_fulltext_html_url" content="https://link.springer.com/article/10.1186/s13059-014-0550-8">
+    <meta name="citation_journal_title" content="Genome Biology">
+    <meta name="citation_journal_abbrev" content="Genome Biol">
+    <meta name="citation_publisher" content="BioMed Central">
+    <meta name="citation_issn" content="1474-760X">
+    <meta name="citation_title" content="Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2">
+    <meta name="citation_volume" content="15">
+    <meta name="citation_issue" content="12">
+    <meta name="citation_publication_date" content="2014/12">
+    <meta name="citation_online_date" content="2014/12/05">
+    <meta name="citation_firstpage" content="550">
+    <meta name="citation_lastpage" content="">
+    <meta name="citation_article_type" content="METHOD">
+    <meta name="citation_fulltext_world_readable" content="">
+    <meta name="citation_language" content="en">
+    <meta name="dc.identifier" content="doi:10.1186/s13059-014-0550-8">
+    <meta name="DOI" content="10.1186/s13059-014-0550-8">
+    <meta name="size" content="523527">
+    <meta name="citation_doi" content="10.1186/s13059-014-0550-8">
+    <meta name="citation_springer_api_url" content="http://api.springer.com/xmldata/jats?q=doi:10.1186/s13059-014-0550-8&amp;api_key=">
+    <meta name="description" content="In comparative high-throughput sequencing assays, a fundamental task is the analysis of count data, such as read counts per gene in RNA-seq, for evidence o">
+    <meta name="dc.creator" content="Love, Michael I">
+    <meta name="dc.creator" content="Huber, Wolfgang">
+    <meta name="dc.creator" content="Anders, Simon">
+    <meta name="dc.subject" content="Animal Genetics and Genomics">
+    <meta name="dc.subject" content="Human Genetics">
+    <meta name="dc.subject" content="Plant Genetics and Genomics">
+    <meta name="dc.subject" content="Microbial Genetics and Genomics">
+    <meta name="dc.subject" content="Bioinformatics">
+    <meta name="dc.subject" content="Evolutionary Biology">
+    <meta name="citation_author" content="Love, Michael I">
+    <meta name="citation_author" content="Huber, Wolfgang">
+    <meta name="citation_author" content="Anders, Simon">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="citation_cover_date" content="2014/12/01">
+    <meta property="og:url" content="https://link.springer.com/article/10.1186/s13059-014-0550-8">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="SpringerLink">
+    <meta property="og:title" content="Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2 - Genome Biology">
+    <meta property="og:description" content="In comparative high-throughput sequencing assays, a fundamental task is the analysis of count data, such as read counts per gene in RNA-seq, for evidence of systematic changes across experimental conditions. Small replicate numbers, discreteness, large dynamic range and the presence of outliers require a suitable statistical approach. We present DESeq2, a method for differential analysis of count data, using shrinkage estimation for dispersions and fold changes to improve stability and interpretability of estimates. This enables a more quantitative analysis focused on the strength rather than the mere presence of differential expression. The DESeq2 package is available at http://www.bioconductor.org/packages/release/bioc/html/DESeq2.html .">
+        <meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#e6e6e6">
+    </head>
+    <body class="">
+    <article lang="en" id="main" class="app-masthead__colour-21">
+        <section class="app-masthead " aria-label="About this article">
+    <div class="app-masthead__container">
+            <div class="app-article-masthead u-sans-serif js-context-bar-sticky-point-masthead" data-test="masthead-component">
+    <div class="app-article-masthead__info">
+        <nav aria-label="breadcrumbs" data-test="breadcrumbs">
+            <ol class="c-breadcrumbs c-breadcrumbs--contrast" itemscope="" itemtype="https://schema.org/BreadcrumbList">
+                    <li class="c-breadcrumbs__item" id="breadcrumb0" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
+                        <a href="/" class="c-breadcrumbs__link" itemprop="item"><span itemprop="name">Home</span></a><meta itemprop="position" content="1">
+                    </li>
+                    <li class="c-breadcrumbs__item" id="breadcrumb1" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
+                        <a href="/journal/13059" class="c-breadcrumbs__link" itemprop="item"><span itemprop="name">Genome Biology</span></a><meta itemprop="position" content="2">
+                    </li>
+                    <li class="c-breadcrumbs__item" id="breadcrumb2" itemprop="itemListElement" itemscope="" itemtype="https://schema.org/ListItem">
+                        <span itemprop="name">Article</span><meta itemprop="position" content="3">
+                    </li>
+            </ol>
+        </nav>
+        <h1 class="c-article-title" data-test="article-title" data-article-title="">Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2</h1>
+            <ul class="c-article-identifiers">
+        <li class="c-article-identifiers__item c-article-identifiers__item--type" data-test="article-category">METHOD</li>
+        <li class="c-article-identifiers__item">
+            <a href="https://www.springernature.com/gp/open-science/about/the-fundamentals-of-open-access-and-open-research" class="u-color-open-access" data-test="open-access">Open access</a>
+        </li>
+                <li class="c-article-identifiers__item" data-test="publication-date-label">
+                    Published: <time datetime="2014-12-05">05 December 2014</time>
+                </li>
+            </ul>
+            <ul class="c-article-identifiers c-article-identifiers--cite-list">
+                    <li class="c-article-identifiers__item">
+                        <span data-test="journal-volume">Volume&nbsp;15</span>, article&nbsp;number&nbsp;<span data-test="article-number">550</span> (<span data-test="article-publication-year">2014</span>)
+                    </li>
+                <li class="c-article-identifiers__item c-article-identifiers__item--cite">
+                    <a href="#citeas">Cite this article</a>
+                </li>
+            </ul>
+        <div class="app-article-masthead__buttons" data-test="download-article-link-wrapper">
+            <p class="app-article-masthead__access">
+                You have full access to this open access article</p>
+            <div class="app-masthead__access-container" data-test="pdf-link">
+        <div class="c-pdf-container">
+            <div class="c-pdf-download u-clear-both u-mb-16">
+                <a href="/content/pdf/10.1186/s13059-014-0550-8.pdf" class="c-pdf-download__link" data-article-pdf="true" data-readcube-pdf-url="true" data-test="pdf-link" data-draft-ignore="true" download="">
+                        <span class="c-pdf-download__text">Download PDF</span>
+                </a>
+            </div>
+        </div>
+    <div class="app-masthead-save-research">
+            <form action="/article/10.1186/s13059-014-0550-8/save-research" method="GET" id="save_article_form">
+                <input type="hidden" name="_csrf" value="cDGEFJap3rkkqedkWXcYY1lOGNTwE2EP">
+                <button class="app-masthead-save-research__action-button" rel="nofollow" type="submit" id="save_article">
+                <span>Save article</span>
+                </button>
+            </form>
+        <div class="app-masthead-save-research__hide-on-lg">
+            <a class="app-masthead-save-research__action-link" rel="nofollow" href="/saved-research" data-test="view-saved-research-link">
+                <span>View saved research</span>
+            </a>
+        </div>
+    </div>
+            </div>
+        </div>
+    </div>
+        <div class="app-article-masthead__brand">
+                <a href="/journal/13059" class="app-article-masthead__journal-link">
+                <picture>
+                    <img width="72" height="95" src="https://media.springernature.com/w72/springer-static/cover-hires/journal/13059?as=webp" alt="">
+                </picture>
+                <span class="app-article-masthead__journal-title">Genome Biology</span>
+            </a>
+                    <a href="/journal/13059/aims-and-scope" class="app-article-masthead__submission-link">
+                        Aims and scope
+                    </a>
+                    <a href="https://submission.springernature.com/new-submission/13059/3" class="app-article-masthead__submission-link">
+                        Submit manuscript
+                    </a>
+        </div>
+</div>
+    </div>
+</section>
+        <div class="c-article-main u-container u-mt-24 u-mb-32 eds-l-with-sidebar app-force-direction-column-narrow" id="main-content" data-component="article-container">
+            <main class="u-serif js-main-column">
+                    <div class="c-context-bar u-hide" data-test="context-bar" data-context-bar="" aria-hidden="true">
+                        <div class="c-context-bar__container">
+                            <div class="c-context-bar__title">
+                                Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2
+                            </div>
+                                <div class="c-context-bar__cta-container" data-test="inCoD">
+        <div class="c-pdf-container">
+            <div class="c-pdf-download u-clear-both u-mb-16">
+                <a href="/content/pdf/10.1186/s13059-014-0550-8.pdf" class="c-pdf-download__link" data-article-pdf="true" data-readcube-pdf-url="true" data-test="pdf-link" data-draft-ignore="true" download="">
+                        <span class="c-pdf-download__text">Download PDF</span>
+                </a>
+            </div>
+        </div>
+                                </div>
+                        </div>
+                    </div>
+                <div class="c-article-header">
+                    <header>
+                        <ul class="c-article-author-list c-article-author-list--short" data-test="authors-list" data-component-authors-activator="authors-list"><li class="c-article-author-list__item"><a data-test="author-name" href="#auth-Michael_I-Love-Aff1-Aff2-Aff3" data-author-popup="auth-Michael_I-Love-Aff1-Aff2-Aff3" data-author-search="Love, Michael I">Michael I Love</a><sup class="u-js-hide"><a href="#Aff1">1</a>,<a href="#Aff2">2</a>,<a href="#Aff3">3</a></sup>, </li><li class="c-article-author-list__item"><a data-test="author-name" href="#auth-Wolfgang-Huber-Aff2" data-author-popup="auth-Wolfgang-Huber-Aff2" data-author-search="Huber, Wolfgang">Wolfgang Huber</a><sup class="u-js-hide"><a href="#Aff2">2</a></sup> &amp; </li><li class="c-article-author-list__item"><a data-test="author-name" href="#auth-Simon-Anders-Aff2" data-author-popup="auth-Simon-Anders-Aff2" data-author-search="Anders, Simon" data-corresp-id="c1">Simon Anders</a><sup class="u-js-hide"><a href="#Aff2">2</a></sup>&nbsp;</li></ul>
+                        <div data-test="article-metrics">
+        <ul class="app-article-metrics-bar">
+                <li class="app-article-metrics-bar__item" data-test="access-count">
+                    <p class="app-article-metrics-bar__count">822k <span class="app-article-metrics-bar__label">Accesses</span></p>
+                </li>
+                <li class="app-article-metrics-bar__item" data-test="citation-count">
+                    <p class="app-article-metrics-bar__count">102k <span class="app-article-metrics-bar__label">Citations</span></p>
+                </li>
+                    <li class="app-article-metrics-bar__item" data-test="altmetric-score">
+                        <p class="app-article-metrics-bar__count">227 <span class="app-article-metrics-bar__label">
+                                Altmetric
+                                </span></p>
+                    </li>
+                <li class="app-article-metrics-bar__item">
+                    <p class="app-article-metrics-bar__count">174 <span class="app-article-metrics-bar__label">Mentions</span></p>
+                </li>
+                    <li class="app-article-metrics-bar__item app-article-metrics-bar__item--metrics">
+                        <p class="app-article-metrics-bar__details"><a href="/article/10.1186/s13059-014-0550-8/metrics" rel="nofollow">Explore all metrics</a></p>
+                    </li>
+        </ul>
+                        </div>
+                    </header>
+                </div>
+                <div data-article-body="true" class="c-article-body">
+                    <section aria-labelledby="Abs1" data-title="Abstract" lang="en"><div class="c-article-section" id="Abs1-section"><h2 class="c-article-section__title js-section-title js-c-reading-companion-sections-item" id="Abs1">Abstract</h2><div class="c-article-section__content" id="Abs1-content"><p>In comparative high-throughput sequencing assays, a fundamental task is the analysis of count data, such as read counts per gene in RNA-seq, for evidence of systematic changes across experimental conditions. Small replicate numbers, discreteness, large dynamic range and the presence of outliers require a suitable statistical approach. We present <i>DESeq2</i>, a method for differential analysis of count data, using shrinkage estimation for dispersions and fold changes to improve stability and interpretability of estimates. This enables a more quantitative analysis focused on the strength rather than the mere presence of differential expression. The <i>DESeq2</i> package is available at <a href="http://www.bioconductor.org/packages/release/bioc/html/DESeq2.html">http://www.bioconductor.org/packages/release/bioc/html/DESeq2.html</a>.</p></div></div></section>
+                    <div data-test="cobranding-download">
+                    </div>
+                                <div class="main-content">
+                                    <section data-title="Background"><div class="c-article-section" id="Sec1-section"><h2 class="c-article-section__title js-section-title js-c-reading-companion-sections-item" id="Sec1">Background</h2><div class="c-article-section__content" id="Sec1-content"><p>The rapid adoption of high-throughput sequencing (HTS) technologies for genomic studies has resulted in a need for statistical methods to assess quantitative differences between experiments. An important task here is the analysis of RNA sequencing (RNA-seq) data with the aim of finding genes that are differentially expressed across groups of samples. This task is general: methods for it are typically also applicable for other comparative HTS assays, including chromatin immunoprecipitation sequencing, chromosome conformation capture, or counting observed taxa in metagenomic studies.</p><p>Besides the need to account for the specifics of count data, such as non-normality and a dependence of the variance on the mean, a core challenge is the small number of samples in typical HTS experiments – often as few as two or three replicates per condition. Inferential methods that treat each gene separately suffer here from lack of power, due to the high uncertainty of within-group variance estimates. In high-throughput assays, this limitation can be overcome by pooling information across genes, specifically, by exploiting assumptions about the similarity of the variances of different genes measured in the same experiment [<a data-test="citation-ref" aria-label="Reference 1" title="Lönnstedt I, Speed T: Replicated microarray data . Stat Sinica. 2002, 12: 31-46." href="/article/10.1186/s13059-014-0550-8#ref-CR1" id="ref-link-section-d203557095e505">1</a>].</p><p>Many methods for differential expression analysis of RNA-seq data perform such information sharing across genes for variance (or, equivalently, dispersion) estimation. <i>edgeR</i> [<a data-test="citation-ref" aria-label="Reference 2" title="Robinson MD, Smyth GK: Moderated statistical tests for assessing differences in tag abundance . Bioinformatics. 2007, 23: 2881-2887. 10.1093/bioinformatics/btm453." href="/article/10.1186/s13059-014-0550-8#ref-CR2" id="ref-link-section-d203557095e514">2</a>],[<a data-test="citation-ref" aria-label="Reference 3" title="McCarthy DJ, Chen Y, Smyth GK: Differential expression analysis of multifactor RNA-seq experiments with respect to biological variation . Nucleic Acids Res. 2012, 40: 4288-4297. 10.1093/nar/gks042." href="/article/10.1186/s13059-014-0550-8#ref-CR3" id="ref-link-section-d203557095e517">3</a>] moderates the dispersion estimate for each gene toward a common estimate across all genes, or toward a local estimate from genes with similar expression strength, using a weighted conditional likelihood. Our <i>DESeq</i> method [<a data-test="citation-ref" aria-label="Reference 4" title="Anders S, Huber W: Differential expression analysis for sequence count data . Genome Biol. 2010, 11: 106-10.1186/gb-2010-11-10-r106." href="/article/10.1186/s13059-014-0550-8#ref-CR4" id="ref-link-section-d203557095e523">4</a>] detects and corrects dispersion estimates that are too low through modeling of the dependence of the dispersion on the average expression strength over all samples. <i>BBSeq</i> [<a data-test="citation-ref" aria-label="Reference 5" title="Zhou Y-H, Xia K, Wright FA: A powerful and flexible approach to the analysis of RNA sequence count data . Bioinformatics. 2011, 27: 2672-2678. 10.1093/bioinformatics/btr449." href="/article/10.1186/s13059-014-0550-8#ref-CR5" id="ref-link-section-d203557095e530">5</a>] models the dispersion on the mean, with the mean absolute deviation of dispersion estimates used to reduce the influence of outliers. <i>DSS</i> [<a data-test="citation-ref" aria-label="Reference 6" title="Wu H, Wang C, Wu Z: A new shrinkage estimator for dispersion improves differential expression detection in RNA-seq data . Biostatistics. 2013, 14: 232-243. 10.1093/biostatistics/kxs033." href="/article/10.1186/s13059-014-0550-8#ref-CR6" id="ref-link-section-d203557095e536">6</a>] uses a Bayesian approach to provide an estimate for the dispersion for individual genes that accounts for the heterogeneity of dispersion values for different genes. <i>baySeq</i> [<a data-test="citation-ref" aria-label="Reference 7" title="Hardcastle T, Kelly K: baySeq: empirical Bayesian methods for identifying differential expression in sequence count data . BMC Bioinformatics. 2010, 11: 422-10.1186/1471-2105-11-422." href="/article/10.1186/s13059-014-0550-8#ref-CR7" id="ref-link-section-d203557095e542">7</a>] and <i>ShrinkBayes</i> [<a data-test="citation-ref" aria-label="Reference 8" title="Van De Wiel MA, Leday GGR, Pardo L, Rue H, Van Der Vaart AW, Van Wieringen WN: Bayesian analysis of RNA sequencing data by estimating multiple shrinkage priors . Biostatistics. 2013, 14: 113-128. 10.1093/biostatistics/kxs031." href="/article/10.1186/s13059-014-0550-8#ref-CR8" id="ref-link-section-d203557095e549">8</a>] estimate priors for a Bayesian model over all genes, and then provide posterior probabilities or false discovery rates (FDRs) for differential expression.</p><p>The most common approach in the comparative analysis of transcriptomics data is to test the null hypothesis that the logarithmic fold change (LFC) between treatment and control for a gene’s expression is exactly zero, i.e., that the gene is not at all affected by the treatment. Often the goal of differential analysis is to produce a list of genes passing multiple-test adjustment, ranked by <i>P</i> value. However, small changes, even if statistically highly significant, might not be the most interesting candidates for further investigation. Ranking by fold change, on the other hand, is complicated by the noisiness of LFC estimates for genes with low counts. Furthermore, the number of genes called significantly differentially expressed depends as much on the sample size and other aspects of experimental design as it does on the biology of the experiment – and well-powered experiments often generate an overwhelmingly long list of hits [<a data-test="citation-ref" aria-label="Reference 9" title="Boer JM, Huber WK, Sültmann H, Wilmer F, von Heydebreck A, Haas S, Korn B, Gunawan B, Vente A, Füzesi L, Vingron M, Poustka A: Identification and classification of differentially expressed genes in renal cell carcinoma by expression profiling on a global human 31,500-element cDNA array . Genome Res. 2001, 11: 1861-1870." href="/article/10.1186/s13059-014-0550-8#ref-CR9" id="ref-link-section-d203557095e558">9</a>]. We, therefore, developed a statistical framework to facilitate gene ranking and visualization based on stable estimation of effect sizes (LFCs), as well as testing of differential expression with respect to user-defined thresholds of biological significance.</p><p>Here we present <i>DESeq2</i>, a successor to our <i>DESeq</i> method [<a data-test="citation-ref" aria-label="Reference 4" title="Anders S, Huber W: Differential expression analysis for sequence count data . Genome Biol. 2010, 11: 106-10.1186/gb-2010-11-10-r106." href="/article/10.1186/s13059-014-0550-8#ref-CR4" id="ref-link-section-d203557095e571">4</a>]. <i>DESeq2</i> integrates methodological advances with several novel features to facilitate a more quantitative analysis of comparative RNA-seq data using shrinkage estimators for dispersion and fold change. We demonstrate the advantages of <i>DESeq2</i>’s new features by describing a number of applications possible with shrunken fold changes and their estimates of standard error, including improved gene ranking and visualization, hypothesis tests above and below a threshold, and the regularized logarithm transformation for quality assessment and clustering of overdispersed count data. We furthermore compare <i>DESeq2</i>’s statistical power with existing tools, revealing that our methodology has high sensitivity and precision, while controlling the false positive rate. <i>DESeq2</i> is available [<a data-test="citation-ref" aria-label="Reference 10" title="DESeq2. [
+                              http://www.bioconductor.org/packages/release/bioc/html/DESeq2.html
+                           ]" href="/article/10.1186/s13059-014-0550-8#ref-CR10" id="ref-link-section-d203557095e587">10</a>] as an R/Bioconductor package [<a data-test="citation-ref" aria-label="Reference 11" title="Gentleman RC, Carey VJ, Bates DM, Bolstad B, Dettling M, Dudoit S, Ellis B, Gautier L, Ge Y, Gentry J, Hornik K, Hothorn T, Huber W, Iacus S, Irizarry R, Leisch F, Li C, Maechler M, Rossini AJ, Sawitzki G, Smith C, Smyth G, Tierney L, Yang JY, Zhang J: Bioconductor: open software development for computational biology and bioinformatics . Genome Biol. 2004, 5: R80-10.1186/gb-2004-5-10-r80." href="/article/10.1186/s13059-014-0550-8#ref-CR11" id="ref-link-section-d203557095e590">11</a>].</p></div></div></section><section data-title="Results and discussion"><div class="c-article-section" id="Sec2-section"><h2 class="c-article-section__title js-section-title js-c-reading-companion-sections-item" id="Sec2">Results and discussion</h2><div class="c-article-section__content" id="Sec2-content"><h3 class="c-article__sub-heading" id="Sec3">Model and normalization</h3><p>The starting point of a <i>DESeq2</i> analysis is a count matrix <i>K</i> with one row for each gene <i>i</i> and one column for each sample <i>j</i>. The matrix entries <i>K</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub> indicate the number of sequencing reads that have been unambiguously mapped to a gene in a sample. Note that although we refer in this paper to counts of reads in genes, the methods presented here can be applied as well to other kinds of HTS count data. For each gene, we fit a generalized linear model (GLM) [<a data-test="citation-ref" aria-label="Reference 12" title="McCullagh P, Nelder JA: Generalized linear models . Monographs on Statistics &amp; Applied Probability . 1989, Chapman &amp; Hall/CRC, London, UK," href="/article/10.1186/s13059-014-0550-8#ref-CR12" id="ref-link-section-d203557095e627">12</a>] as follows.</p><p>We model read counts <i>K</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub> as following a negative binomial distribution (sometimes also called a gamma-Poisson distribution) with mean <i>μ</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub> and dispersion <i>α</i>
+                           <sub>
+                              <i>i</i>
+                           </sub>. The mean is taken as a quantity <i>q</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub>, proportional to the concentration of cDNA fragments from the gene in the sample, scaled by a normalization factor <i>s</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub>, i.e., <i>μ</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub>=<i>s</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub>
+                           <i>q</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub>. For many applications, the same constant <i>s</i>
+                           <sub>
+                              <i>j</i>
+                           </sub> can be used for all genes in a sample, which then accounts for differences in sequencing depth between samples. To estimate these <i>size factors</i>, the <i>DESeq2</i> package offers the median-of-ratios method already used in <i>DESeq</i> [<a data-test="citation-ref" aria-label="Reference 4" title="Anders S, Huber W: Differential expression analysis for sequence count data . Genome Biol. 2010, 11: 106-10.1186/gb-2010-11-10-r106." href="/article/10.1186/s13059-014-0550-8#ref-CR4" id="ref-link-section-d203557095e726">4</a>]. However, it can be advantageous to calculate gene-specific normalization factors <i>s</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub> to account for further sources of technical biases such as differing dependence on GC content, gene length or the like, using published methods [<a data-test="citation-ref" aria-label="Reference 13" title="Hansen KD, Irizarry RA, Wu Z: Removing technical variability in RNA-seq data using conditional quantile normalization . Biostatistics. 2012, 13: 204-216. 10.1093/biostatistics/kxr054." href="/article/10.1186/s13059-014-0550-8#ref-CR13" id="ref-link-section-d203557095e739">13</a>],[<a data-test="citation-ref" aria-label="Reference 14" title="Risso D, Schwartz K, Sherlock G, Dudoit S: GC-content normalization for RNA-seq data . BMC Bioinformatics. 2011, 12: 480-10.1186/1471-2105-12-480." href="/article/10.1186/s13059-014-0550-8#ref-CR14" id="ref-link-section-d203557095e742">14</a>], and these can be supplied instead.</p><p>We use GLMs with a logarithmic link, <math display="inline"><munder xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mo>log</mo>
+                                       </mrow>
+                                       <mrow>
+                                          <mn>2</mn>
+                                       </mrow>
+                                    </munder><msub xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mi>q</mi>
+                                       </mrow>
+                                       <mrow>
+                                          <mtext mathvariant="italic">ij</mtext>
+                                       </mrow>
+                                    </msub><mo xmlns="http://www.w3.org/1998/Math/MathML">=</mo><munder xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mo>∑</mo>
+                                       </mrow>
+                                       <mrow>
+                                          <mi>r</mi>
+                                       </mrow>
+                                    </munder><msub xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mi>x</mi>
+                                       </mrow>
+                                       <mrow>
+                                          <mtext mathvariant="italic">jr</mtext>
+                                       </mrow>
+                                    </msub><msub xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mi>β</mi>
+                                       </mrow>
+                                       <mrow>
+                                          <mtext mathvariant="italic">ir</mtext>
+                                       </mrow>
+                                    </msub></math>, with design matrix elements <i>x</i>
+                           <sub>
+                              <i>jr</i>
+                           </sub> and coefficients <i>β</i>
+                           <sub>
+                              <i>ir</i>
+                           </sub>. In the simplest case of a comparison between two groups, such as treated and control samples, the design matrix elements indicate whether a sample <i>j</i> is treated or not, and the GLM fit returns coefficients indicating the overall expression strength of the gene and the log <sub>2</sub> fold change between treatment and control. The use of linear models, however, provides the flexibility to also analyze more complex designs, as is often useful in genomic studies [<a data-test="citation-ref" aria-label="Reference 15" title="Smyth GK: Linear models and empirical Bayes methods for assessing differential expression in microarray experiments . Stat Appl Genet Mol Biol. 2004, 3: 1-25." href="/article/10.1186/s13059-014-0550-8#ref-CR15" id="ref-link-section-d203557095e857">15</a>].</p><h3 class="c-article__sub-heading" id="Sec4">Empirical Bayes shrinkage for dispersion estimation</h3><p>Within-group variability, i.e., the variability between replicates, is modeled by the dispersion parameter <i>α</i>
+                           <sub>
+                              <i>i</i>
+                           </sub>, which describes the variance of counts via <math display="inline"><mo xmlns="http://www.w3.org/1998/Math/MathML">Var</mo><msub xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mi>K</mi>
+                                       </mrow>
+                                       <mrow>
+                                          <mtext mathvariant="italic">ij</mtext>
+                                       </mrow>
+                                    </msub><mo xmlns="http://www.w3.org/1998/Math/MathML">=</mo><msub xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mi>μ</mi>
+                                       </mrow>
+                                       <mrow>
+                                          <mtext mathvariant="italic">ij</mtext>
+                                       </mrow>
+                                    </msub><mo xmlns="http://www.w3.org/1998/Math/MathML">+</mo><msub xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mi>α</mi>
+                                       </mrow>
+                                       <mrow>
+                                          <mi>i</mi>
+                                       </mrow>
+                                    </msub><msubsup xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mi>μ</mi>
+                                       </mrow>
+                                       <mrow>
+                                          <mtext mathvariant="italic">ij</mtext>
+                                       </mrow>
+                                       <mrow>
+                                          <mn>2</mn>
+                                       </mrow>
+                                    </msubsup></math>. Accurate estimation of the dispersion parameter <i>α</i>
+                           <sub>
+                              <i>i</i>
+                           </sub> is critical for the statistical inference of differential expression. For studies with large sample sizes this is usually not a problem. For controlled experiments, however, sample sizes tend to be smaller (experimental designs with as little as two or three replicates are common and reasonable), resulting in highly variable dispersion estimates for each gene. If used directly, these noisy estimates would compromise the accuracy of differential expression testing.</p><p>One sensible solution is to share information across genes. In <i>DESeq2</i>, we assume that genes of similar average expression strength have similar dispersion. We here explain the concepts of our approach using as examples a dataset by Bottomly <i>et al.</i> [<a data-test="citation-ref" aria-label="Reference 16" title="Bottomly D, Walter NAR, Hunter JE, Darakjian P, Kawane S, Buck KJ, Searles RP, Mooney M, McWeeney SK, Hitzemann R: Evaluating gene expression in C57BL/6J and DBA/2J mouse striatum using RNA-seq and microarrays . PLoS ONE. 2011, 6: 17820-10.1371/journal.pone.0017820." href="/article/10.1186/s13059-014-0550-8#ref-CR16" id="ref-link-section-d203557095e976">16</a>] with RNA-seq data for mice of two different strains and a dataset by Pickrell <i>et al.</i> [<a data-test="citation-ref" aria-label="Reference 17" title="Pickrell JK, Marioni JC, Pai AA, Degner JF, Engelhardt BE, Nkadori E, Veyrieras J-B, Stephens M, Gilad Y, Pritchard JK: Understanding mechanisms underlying human gene expression variation with RNA sequencing . Nature. 2010, 464: 768-772. 10.1038/nature08872." href="/article/10.1186/s13059-014-0550-8#ref-CR17" id="ref-link-section-d203557095e982">17</a>] with RNA-seq data for human lymphoblastoid cell lines. For the mathematical details, see Materials and methods.</p><p>We first treat each gene separately and estimate gene-wise dispersion estimates (using maximum likelihood), which rely only on the data of each individual gene (black dots in Figure <a href="/article/10.1186/s13059-014-0550-8#Fig1">1</a>). Next, we determine the location parameter of the distribution of these estimates; to allow for dependence on average expression strength, we fit a smooth curve, as shown by the red line in Figure <a href="/article/10.1186/s13059-014-0550-8#Fig1">1</a>. This provides an accurate estimate for the expected dispersion value for genes of a given expression strength but does not represent deviations of individual genes from this overall trend. We then shrink the gene-wise dispersion estimates toward the values predicted by the curve to obtain final dispersion values (blue arrow heads). We use an empirical Bayes approach (Materials and methods), which lets the strength of shrinkage depend (i) on an estimate of how close true dispersion values tend to be to the fit and (ii) on the degrees of freedom: as the sample size increases, the shrinkage decreases in strength, and eventually becomes negligible. Our approach therefore accounts for gene-specific variation to the extent that the data provide this information, while the fitted curve aids estimation and testing in less information-rich settings.</p><div class="c-article-section__figure js-c-reading-companion-figures-item" data-test="figure" data-container-section="figure" id="figure-1" data-title="Figure 1"><figure><figcaption><b id="Fig1" class="c-article-section__figure-caption" data-test="figure-caption-text">Figure 1</b></figcaption><div class="c-article-section__figure-content"><div class="c-article-section__figure-item"><picture class="c-article-section__figure-picture"><img aria-describedby="figure-1-desc" src="//media.springernature.com/lw685/springer-static/image/art%3A10.1186%2Fs13059-014-0550-8/MediaObjects/13059_2014_Article_550_Fig1_HTML.jpg" alt="Figure 1" loading="lazy"></picture><div class="c-article-section__figure-link"><a class="c-article__pill-button" data-test="article-link" href="/article/10.1186/s13059-014-0550-8/figures/1" aria-label="Full size image figure 1" rel="nofollow"><span>Full size image</span></a></div></div><div class="c-article-section__figure-description" data-test="bottom-caption" id="figure-1-desc"><p>
+                                       <b>Shrinkage estimation of dispersion.</b> Plot of dispersion estimates over the average expression strength <b>(A)</b> for the Bottomly <i>et al.</i> [<a data-test="citation-ref" aria-label="Reference 16" title="Bottomly D, Walter NAR, Hunter JE, Darakjian P, Kawane S, Buck KJ, Searles RP, Mooney M, McWeeney SK, Hitzemann R: Evaluating gene expression in C57BL/6J and DBA/2J mouse striatum using RNA-seq and microarrays . PLoS ONE. 2011, 6: 17820-10.1371/journal.pone.0017820." href="/article/10.1186/s13059-014-0550-8#ref-CR16" id="ref-link-section-d203557095e1013">16</a>] dataset with six samples across two groups and <b>(B)</b> for five samples from the Pickrell <i>et al.</i> [<a data-test="citation-ref" aria-label="Reference 17" title="Pickrell JK, Marioni JC, Pai AA, Degner JF, Engelhardt BE, Nkadori E, Veyrieras J-B, Stephens M, Gilad Y, Pritchard JK: Understanding mechanisms underlying human gene expression variation with RNA sequencing . Nature. 2010, 464: 768-772. 10.1038/nature08872." href="/article/10.1186/s13059-014-0550-8#ref-CR17" id="ref-link-section-d203557095e1023">17</a>] dataset, fitting only an intercept term. First, gene-wise MLEs are obtained using only the respective gene’s data (black dots). Then, a curve (red) is fit to the MLEs to capture the overall trend of dispersion-mean dependence. This fit is used as a prior mean for a second estimation round, which results in the final MAP estimates of dispersion (arrow heads). This can be understood as a shrinkage (along the blue arrows) of the noisy gene-wise estimates toward the consensus represented by the red line. The black points circled in blue are detected as dispersion outliers and not shrunk toward the prior (shrinkage would follow the dotted line). For clarity, only a subset of genes is shown, which is enriched for dispersion outliers. Additional file <a href="/article/10.1186/s13059-014-0550-8#MOESM1">1</a>: Figure S1 displays the same data but with dispersions of all genes shown. MAP, maximum <i>a posteriori</i>; MLE, maximum-likelihood estimate.</p></div></div></figure></div>
+                        <p>Our approach is similar to the one used by <i>DSS</i> [<a data-test="citation-ref" aria-label="Reference 6" title="Wu H, Wang C, Wu Z: A new shrinkage estimator for dispersion improves differential expression detection in RNA-seq data . Biostatistics. 2013, 14: 232-243. 10.1093/biostatistics/kxs033." href="/article/10.1186/s13059-014-0550-8#ref-CR6" id="ref-link-section-d203557095e1047">6</a>], in that both methods sequentially estimate a prior distribution for the true dispersion values around the fit, and then provide the maximum <i>a posteriori</i> (MAP) as the final estimate. It differs from the previous implementation of <i>DESeq</i>, which used the maximum of the fitted curve and the gene-wise dispersion estimate as the final estimate and tended to overestimate the dispersions (Additional file <a href="/article/10.1186/s13059-014-0550-8#MOESM1">1</a>: Figure S2). The approach of <i>DESeq2</i> differs from that of <i>edgeR</i> [<a data-test="citation-ref" aria-label="Reference 3" title="McCarthy DJ, Chen Y, Smyth GK: Differential expression analysis of multifactor RNA-seq experiments with respect to biological variation . Nucleic Acids Res. 2012, 40: 4288-4297. 10.1093/nar/gks042." href="/article/10.1186/s13059-014-0550-8#ref-CR3" id="ref-link-section-d203557095e1066">3</a>], as <i>DESeq2</i> estimates the width of the prior distribution from the data and therefore automatically controls the amount of shrinkage based on the observed properties of the data. In contrast, the default steps in <i>edgeR</i> require a user-adjustable parameter, the <i>prior degrees of freedom</i>, which weighs the contribution of the individual gene estimate and <i>edgeR</i>’s dispersion fit.</p><p>Note that in Figure <a href="/article/10.1186/s13059-014-0550-8#Fig1">1</a> a number of genes with gene-wise dispersion estimates below the curve have their final estimates raised substantially. The shrinkage procedure thereby helps avoid potential false positives, which can result from underestimates of dispersion. If, on the other hand, an individual gene’s dispersion is far above the distribution of the gene-wise dispersion estimates of other genes, then the shrinkage would lead to a greatly reduced final estimate of dispersion. We reasoned that in many cases, the reason for extraordinarily high dispersion of a gene is that it does not obey our modeling assumptions; some genes may show much higher variability than others for biological or technical reasons, even though they have the same average expression levels. In these cases, inference based on the shrunken dispersion estimates could lead to undesirable false positive calls. <i>DESeq2</i> handles these cases by using the gene-wise estimate instead of the shrunken estimate when the former is more than 2 residual standard deviations above the curve.</p><h3 class="c-article__sub-heading" id="Sec5">Empirical Bayes shrinkage for fold-change estimation</h3><p>A common difficulty in the analysis of HTS data is the strong variance of LFC estimates for genes with low read count. We demonstrate this issue using the dataset by Bottomly <i>et al.</i> [<a data-test="citation-ref" aria-label="Reference 16" title="Bottomly D, Walter NAR, Hunter JE, Darakjian P, Kawane S, Buck KJ, Searles RP, Mooney M, McWeeney SK, Hitzemann R: Evaluating gene expression in C57BL/6J and DBA/2J mouse striatum using RNA-seq and microarrays . PLoS ONE. 2011, 6: 17820-10.1371/journal.pone.0017820." href="/article/10.1186/s13059-014-0550-8#ref-CR16" id="ref-link-section-d203557095e1103">16</a>]. As visualized in Figure <a href="/article/10.1186/s13059-014-0550-8#Fig2">2</a>A, weakly expressed genes seem to show much stronger differences between the compared mouse strains than strongly expressed genes. This phenomenon, seen in most HTS datasets, is a direct consequence of dealing with <i>count</i> data, in which ratios are inherently noisier when counts are low. This heteroskedasticity (variance of LFCs depending on mean count) complicates downstream analysis and data interpretation, as it makes effect sizes difficult to compare across the dynamic range of the data.</p><div class="c-article-section__figure js-c-reading-companion-figures-item" data-test="figure" data-container-section="figure" id="figure-2" data-title="Figure 2"><figure><figcaption><b id="Fig2" class="c-article-section__figure-caption" data-test="figure-caption-text">Figure 2</b></figcaption><div class="c-article-section__figure-content"><div class="c-article-section__figure-item"><picture class="c-article-section__figure-picture"><img aria-describedby="figure-2-desc" src="//media.springernature.com/lw685/springer-static/image/art%3A10.1186%2Fs13059-014-0550-8/MediaObjects/13059_2014_Article_550_Fig2_HTML.jpg" alt="Figure 2" loading="lazy"></picture><div class="c-article-section__figure-link"><a class="c-article__pill-button" data-test="article-link" href="/article/10.1186/s13059-014-0550-8/figures/2" aria-label="Full size image figure 2" rel="nofollow"><span>Full size image</span></a></div></div><div class="c-article-section__figure-description" data-test="bottom-caption" id="figure-2-desc"><p>
+                                       <b>Effect of shrinkage on logarithmic fold change estimates.</b> Plots of the <b>(A)</b> MLE (i.e., no shrinkage) and <b>(B)</b> MAP estimate (i.e., with shrinkage) for the LFCs attributable to mouse strain, over the average expression strength for a ten vs eleven sample comparison of the Bottomly <i>et al.</i> [<a data-test="citation-ref" aria-label="Reference 16" title="Bottomly D, Walter NAR, Hunter JE, Darakjian P, Kawane S, Buck KJ, Searles RP, Mooney M, McWeeney SK, Hitzemann R: Evaluating gene expression in C57BL/6J and DBA/2J mouse striatum using RNA-seq and microarrays . PLoS ONE. 2011, 6: 17820-10.1371/journal.pone.0017820." href="/article/10.1186/s13059-014-0550-8#ref-CR16" id="ref-link-section-d203557095e1134">16</a>] dataset. Small triangles at the top and bottom of the plots indicate points that would fall outside of the plotting window. Two genes with similar mean count and MLE logarithmic fold change are highlighted with green and purple circles. <b>(C)</b> The counts (normalized by size factors <i>s</i>
+                                       <sub>
+                                          <i>j</i>
+                                       </sub>) for these genes reveal low dispersion for the gene in green and high dispersion for the gene in purple. <b>(D)</b> Density plots of the likelihoods (solid lines, scaled to integrate to 1) and the posteriors (dashed lines) for the green and purple genes and of the prior (solid black line): due to the higher dispersion of the purple gene, its likelihood is wider and less peaked (indicating less information), and the prior has more influence on its posterior than for the green gene. The stronger curvature of the green posterior at its maximum translates to a smaller reported standard error for the MAP LFC estimate (horizontal error bar). adj., adjusted; LFC, logarithmic fold change; MAP, maximum <i>a posteriori</i>; MLE, maximum-likelihood estimate.</p></div></div></figure></div>
+                        <p>
+                           <i>DESeq2</i> overcomes this issue by shrinking LFC estimates toward zero in a manner such that shrinkage is stronger when the available information for a gene is low, which may be because counts are low, dispersion is high or there are few degrees of freedom. We again employ an empirical Bayes procedure: we first perform ordinary GLM fits to obtain maximum-likelihood estimates (MLEs) for the LFCs and then fit a zero-centered normal distribution to the observed distribution of MLEs over all genes. This distribution is used as a prior on LFCs in a second round of GLM fits, and the MAP estimates are kept as final estimates of LFC. Furthermore, a standard error for each estimate is reported, which is derived from the posterior’s curvature at its maximum (see Materials and methods for details). These shrunken LFCs and their standard errors are used in the Wald tests for differential expression described in the next section.</p><p>The resulting MAP LFCs are biased toward zero in a manner that removes the problem of exaggerated LFCs for low counts. As Figure <a href="/article/10.1186/s13059-014-0550-8#Fig2">2</a>B shows, the strongest LFCs are no longer exhibited by genes with weakest expression. Rather, the estimates are more evenly spread around zero, and for very weakly expressed genes (with less than one read per sample on average), LFCs hardly deviate from zero, reflecting that accurate LFC estimates are not possible here.</p><p>The strength of shrinkage does not depend simply on the mean count, but rather on the amount of information available for the fold change estimation (as indicated by the observed Fisher information; see Materials and methods). Two genes with equal expression strength but different dispersions will experience a different amount of shrinkage (Figure <a href="/article/10.1186/s13059-014-0550-8#Fig2">2</a>C,D). The shrinkage of LFC estimates can be described as a bias-variance trade-off [<a data-test="citation-ref" aria-label="Reference 18" title="Hastie T, Tibshirani R, Friedman J: The Elements of Statistical Learning: Data Mining, Inference, and Prediction . 2009, Springer, New York City, USA" href="/article/10.1186/s13059-014-0550-8#ref-CR18" id="ref-link-section-d203557095e1183">18</a>]: for genes with little information for LFC estimation, a reduction of the strong variance is bought at the cost of accepting a bias toward zero, and this can result in an overall reduction in mean squared error, e.g., when comparing to LFC estimates from a new dataset. Genes with high information for LFC estimation will have, in our approach, LFCs with both low bias and low variance. Furthermore, as the degrees of freedom increase, and the experiment provides more information for LFC estimation, the shrunken estimates will converge to the unshrunken estimates. We note that other Bayesian efforts toward moderating fold changes for RNA-seq include hierarchical models [<a data-test="citation-ref" aria-label="Reference 8" title="Van De Wiel MA, Leday GGR, Pardo L, Rue H, Van Der Vaart AW, Van Wieringen WN: Bayesian analysis of RNA sequencing data by estimating multiple shrinkage priors . Biostatistics. 2013, 14: 113-128. 10.1093/biostatistics/kxs031." href="/article/10.1186/s13059-014-0550-8#ref-CR8" id="ref-link-section-d203557095e1186">8</a>],[<a data-test="citation-ref" aria-label="Reference 19" title="Bi Y, Davuluri R: NPEBseq: nonparametric empirical Bayesian-based procedure for differential expression analysis of RNA-seq data . BMC Bioinformatics. 2013, 14: 262-10.1186/1471-2105-14-262." href="/article/10.1186/s13059-014-0550-8#ref-CR19" id="ref-link-section-d203557095e1189">19</a>] and the <i>GFOLD</i> (or generalized fold change) tool [<a data-test="citation-ref" aria-label="Reference 20" title="Feng J, Meyer CA, Wang Q, Liu JS, Liu XS, Zhang Y: GFOLD: a generalized fold change for ranking differentially expressed genes from RNA-seq data . Bioinformatics. 2012, 28: 2782-2788. 10.1093/bioinformatics/bts515." href="/article/10.1186/s13059-014-0550-8#ref-CR20" id="ref-link-section-d203557095e1196">20</a>], which uses a posterior distribution of LFCs.</p><p>The shrunken MAP LFCs offer a more reproducible quantification of transcriptional differences than standard MLE LFCs. To demonstrate this, we split the Bottomly <i>et al.</i> samples equally into two groups, I and II, such that each group contained a balanced split of the strains, simulating a scenario where an experiment (samples in group I) is performed, analyzed and reported, and then independently replicated (samples in group II). Within each group, we estimated LFCs between the strains and compared between groups I and II, using the MLE LFCs (Figure <a href="/article/10.1186/s13059-014-0550-8#Fig3">3</a>A) and using the MAP LFCs (Figure <a href="/article/10.1186/s13059-014-0550-8#Fig3">3</a>B). Because the shrinkage moves large LFCs that are not well supported by the data toward zero, the agreement between the two independent sample groups increases considerably. Therefore, shrunken fold-change estimates offer a more reliable basis for quantitative conclusions than normal MLEs.</p><div class="c-article-section__figure js-c-reading-companion-figures-item" data-test="figure" data-container-section="figure" id="figure-3" data-title="Figure 3"><figure><figcaption><b id="Fig3" class="c-article-section__figure-caption" data-test="figure-caption-text">Figure 3</b></figcaption><div class="c-article-section__figure-content"><div class="c-article-section__figure-item"><picture class="c-article-section__figure-picture"><img aria-describedby="figure-3-desc" src="//media.springernature.com/lw685/springer-static/image/art%3A10.1186%2Fs13059-014-0550-8/MediaObjects/13059_2014_Article_550_Fig3_HTML.jpg" alt="Figure 3" loading="lazy"></picture><div class="c-article-section__figure-link"><a class="c-article__pill-button" data-test="article-link" href="/article/10.1186/s13059-014-0550-8/figures/3" aria-label="Full size image figure 3" rel="nofollow"><span>Full size image</span></a></div></div><div class="c-article-section__figure-description" data-test="bottom-caption" id="figure-3-desc"><p>
+                                       <b>Stability of logarithmic fold changes.</b>
+                                       <i>DESeq2</i> is run on equally split halves of the data of Bottomly <i>et al.</i> [<a data-test="citation-ref" aria-label="Reference 16" title="Bottomly D, Walter NAR, Hunter JE, Darakjian P, Kawane S, Buck KJ, Searles RP, Mooney M, McWeeney SK, Hitzemann R: Evaluating gene expression in C57BL/6J and DBA/2J mouse striatum using RNA-seq and microarrays . PLoS ONE. 2011, 6: 17820-10.1371/journal.pone.0017820." href="/article/10.1186/s13059-014-0550-8#ref-CR16" id="ref-link-section-d203557095e1231">16</a>], and the LFCs from the halves are plotted against each other. <b>(A)</b> MLEs, i.e., without LFC shrinkage. <b>(B)</b> MAP estimates, i.e., with shrinkage. Points in the top left and bottom right quadrants indicate genes with a change of sign of LFC. Red points indicate genes with adjusted <i>P</i> value &lt;0.1. The legend displays the root-mean-square error of the estimates in group I compared to those in group II. LFC, logarithmic fold change; MAP, maximum <i>a posteriori</i>; MLE, maximum-likelihood estimate; RMSE, root-mean-square error.</p></div></div></figure></div>
+                        <p>This makes shrunken LFCs also suitable for ranking genes, e.g., to prioritize them for follow-up experiments. For example, if we sort the genes in the two sample groups of Figure <a href="/article/10.1186/s13059-014-0550-8#Fig3">3</a> by unshrunken LFC estimates, and consider the 100 genes with the strongest up- or down-regulation in group I, we find only 21 of these again among the top 100 up- or down-regulated genes in group II. However, if we rank the genes by shrunken LFC estimates, the overlap improves to 81 of 100 genes (Additional file <a href="/article/10.1186/s13059-014-0550-8#MOESM1">1</a>: Figure S3).</p><p>A simpler often used method is to add a fixed number (pseudocount) to all counts before forming ratios. However, this requires the choice of a tuning parameter and only reacts to one of the sources of uncertainty, low counts, but not to gene-specific dispersion differences or sample size. We demonstrate this in the <i>Benchmarks</i> section below.</p><h3 class="c-article__sub-heading" id="Sec6">Hypothesis tests for differential expression</h3><p>After GLMs are fit for each gene, one may test whether each model coefficient differs significantly from zero. <i>DESeq2</i> reports the standard error for each shrunken LFC estimate, obtained from the curvature of the coefficient’s posterior (dashed lines in Figure <a href="/article/10.1186/s13059-014-0550-8#Fig2">2</a>D) at its maximum. For significance testing, <i>DESeq2</i> uses a Wald test: the shrunken estimate of LFC is divided by its standard error, resulting in a <i>z</i>-statistic, which is compared to a standard normal distribution. (See Materials and methods for details.) The Wald test allows testing of individual coefficients, or contrasts of coefficients, without the need to fit a reduced model as with the likelihood ratio test, though the likelihood ratio test is also available as an option in <i>DESeq2</i>. The Wald test <i>P</i> values from the subset of genes that pass an independent filtering step, described in the next section, are adjusted for multiple testing using the procedure of Benjamini and Hochberg [<a data-test="citation-ref" aria-label="Reference 21" title="Benjamini Y, Hochberg Y: Controlling the false discovery rate: a practical and powerful approach to multiple testing . J R Stat Soc Ser B Methodol. 1995, 57: 289-300." href="/article/10.1186/s13059-014-0550-8#ref-CR21" id="ref-link-section-d203557095e1298">21</a>].</p><h3 class="c-article__sub-heading" id="Sec7">Automatic independent filtering</h3><p>Due to the large number of tests performed in the analysis of RNA-seq and other genome-wide experiments, the multiple testing problem needs to be addressed. A popular objective is control or estimation of the FDR. Multiple testing adjustment tends to be associated with a loss of power, in the sense that the FDR for a set of genes is often higher than the individual <i>P</i> values of these genes. However, the loss can be reduced if genes that have little or no chance of being detected as differentially expressed are omitted from the testing, provided that the criterion for omission is independent of the test statistic under the null hypothesis [<a data-test="citation-ref" aria-label="Reference 22" title="Bourgon R, Gentleman R, Huber W: Independent filtering increases detection power for high-throughput experiments . Proc Natl Acad Sci USA. 2010, 107: 9546-9551. 10.1073/pnas.0914005107." href="/article/10.1186/s13059-014-0550-8#ref-CR22" id="ref-link-section-d203557095e1313">22</a>] (see Materials and methods). <i>DESeq2</i> uses the average expression strength of each gene, across all samples, as its filter criterion, and it omits all genes with mean normalized counts below a filtering threshold from multiple testing adjustment. <i>DESeq2</i> by default will choose a threshold that maximizes the number of genes found at a user-specified target FDR. In Figures <a href="/article/10.1186/s13059-014-0550-8#Fig2">2</a>A,B and <a href="/article/10.1186/s13059-014-0550-8#Fig3">3</a>, genes found in this way to be significant at an estimated FDR of 10% are depicted in red. Depending on the distribution of the mean normalized counts, the resulting increase in power can be substantial, sometimes making the difference in whether or not any differentially expressed genes are detected.</p><h3 class="c-article__sub-heading" id="Sec8">Hypothesis tests with thresholds on effect size</h3><h4 class="c-article__sub-heading c-article__sub-heading--small" id="Sec9">Specifying minimum effect size</h4><p>Most approaches to testing for differential expression, including the default approach of <i>DESeq2</i>, test against the null hypothesis of <i>zero</i> LFC. However, if any biological processes are genuinely affected by the difference in experimental treatment, this null hypothesis implies that the gene under consideration is <i>perfectly</i> decoupled from these processes. Due to the high interconnectedness of cells’ regulatory networks, this hypothesis is, in fact, implausible, and arguably wrong for many if not most genes. Consequently, with sufficient sample size, even genes with a very small but non-zero LFC will eventually be detected as differentially expressed. A change should therefore be of sufficient magnitude to be considered <i>biologically significant</i>. For small-scale experiments, statistical significance is often a much stricter requirement than biological significance, thereby relieving the researcher from the need to decide on a threshold for biological significance.</p><p>For well-powered experiments, however, a statistical test against the conventional null hypothesis of zero LFC may report genes with statistically significant changes that are so weak in effect strength that they could be considered irrelevant or distracting. A common procedure is to disregard genes whose estimated LFC <i>β</i>
+                              <sub>
+                                 <i>ir</i>
+                              </sub> is below some threshold, |<i>β</i>
+                              <sub>
+                                 <i>ir</i>
+                              </sub>|≤<i>θ</i>. However, this approach loses the benefit of an easily interpretable FDR, as the reported <i>P</i> value and adjusted <i>P</i> value still correspond to the test of <i>zero</i> LFC. It is therefore desirable to include the threshold in the statistical testing procedure directly, i.e., not to filter post hoc on a reported fold-change <i>estimate</i>, but rather to evaluate statistically directly whether there is sufficient evidence that the LFC is above the chosen threshold.</p><p>
+                              <i>DESeq2</i> offers tests for composite null hypotheses of the form |<i>β</i>
+                              <sub>
+                                 <i>ir</i>
+                              </sub>|≤<i>θ</i>, where <i>β</i>
+                              <sub>
+                                 <i>ir</i>
+                              </sub> is the shrunken LFC from the estimation procedure described above. (See Materials and methods for details.) Figure <a href="/article/10.1186/s13059-014-0550-8#Fig4">4</a>A demonstrates how such a thresholded test gives rise to a curved decision boundary: to reach significance, the estimated LFC has to exceed the specified threshold by an amount that depends on the available information. We note that related approaches to generate gene lists that satisfy both statistical and biological significance criteria have been previously discussed for microarray data [<a data-test="citation-ref" aria-label="Reference 23" title="McCarthy DJ, Smyth GK: Testing significance relative to a fold-change threshold is a TREAT . Bioinformatics. 2009, 25: 765-771. 10.1093/bioinformatics/btp053." href="/article/10.1186/s13059-014-0550-8#ref-CR23" id="ref-link-section-d203557095e1421">23</a>] and recently for sequencing data [<a data-test="citation-ref" aria-label="Reference 19" title="Bi Y, Davuluri R: NPEBseq: nonparametric empirical Bayesian-based procedure for differential expression analysis of RNA-seq data . BMC Bioinformatics. 2013, 14: 262-10.1186/1471-2105-14-262." href="/article/10.1186/s13059-014-0550-8#ref-CR19" id="ref-link-section-d203557095e1424">19</a>].</p><div class="c-article-section__figure js-c-reading-companion-figures-item" data-test="figure" data-container-section="figure" id="figure-4" data-title="Figure 4"><figure><figcaption><b id="Fig4" class="c-article-section__figure-caption" data-test="figure-caption-text">Figure 4</b></figcaption><div class="c-article-section__figure-content"><div class="c-article-section__figure-item"><picture class="c-article-section__figure-picture"><img aria-describedby="figure-4-desc" src="//media.springernature.com/lw685/springer-static/image/art%3A10.1186%2Fs13059-014-0550-8/MediaObjects/13059_2014_Article_550_Fig4_HTML.jpg" alt="Figure 4" loading="lazy"></picture><div class="c-article-section__figure-link"><a class="c-article__pill-button" data-test="article-link" href="/article/10.1186/s13059-014-0550-8/figures/4" aria-label="Full size image figure 4" rel="nofollow"><span>Full size image</span></a></div></div><div class="c-article-section__figure-description" data-test="bottom-caption" id="figure-4-desc"><p>
+                                          <b>Hypothesis testing involving non-zero thresholds.</b> Shown are plots of the estimated fold change over average expression strength (“minus over average”, or MA-plots) for a ten vs eleven comparison using the Bottomly <i>et al.</i> [<a data-test="citation-ref" aria-label="Reference 16" title="Bottomly D, Walter NAR, Hunter JE, Darakjian P, Kawane S, Buck KJ, Searles RP, Mooney M, McWeeney SK, Hitzemann R: Evaluating gene expression in C57BL/6J and DBA/2J mouse striatum using RNA-seq and microarrays . PLoS ONE. 2011, 6: 17820-10.1371/journal.pone.0017820." href="/article/10.1186/s13059-014-0550-8#ref-CR16" id="ref-link-section-d203557095e1443">16</a>] dataset, with highlighted points indicating low adjusted <i>P</i> values. The alternate hypotheses are that logarithmic (base 2) fold changes are <b>(A)</b> greater than 1 in absolute value or <b>(B)</b> less than 1 in absolute value. adj., adjusted.</p></div></div></figure></div>
+                           <h4 class="c-article__sub-heading c-article__sub-heading--small" id="Sec10">Specifying maximum effect size</h4><p>Sometimes, a researcher is interested in finding genes that are not, or only very weakly, affected by the treatment or experimental condition. This amounts to a setting similar to the one just discussed, but the roles of the null and alternative hypotheses are swapped. We are here asking for evidence of the effect being weak, not for evidence of the effect being zero, because the latter question is rarely tractable. The meaning of <i>weak</i> needs to be quantified for the biological question at hand by choosing a suitable threshold <i>θ</i> for the LFC. For such analyses, <i>DESeq2</i> offers a test of the composite null hypothesis |<i>β</i>
+                              <sub>
+                                 <i>ir</i>
+                              </sub>|≥<i>θ</i>, which will report genes as significant for which there is evidence that their LFC is weaker than <i>θ</i>. Figure <a href="/article/10.1186/s13059-014-0550-8#Fig4">4</a>B shows the outcome of such a test. For genes with very low read count, even an estimate of zero LFC is not significant, as the large uncertainty of the estimate does not allow us to exclude that the gene may in truth be more than weakly affected by the experimental condition. Note the lack of LFC shrinkage: to find genes with weak differential expression, <i>DESeq2</i> requires that the LFC shrinkage has been disabled. This is because the zero-centered prior used for LFC shrinkage embodies a <i>prior</i> belief that LFCs tend to be small, and hence is inappropriate here.</p><h3 class="c-article__sub-heading" id="Sec11">Detection of count outliers</h3><p>Parametric methods for detecting differential expression can have gene-wise estimates of LFC overly influenced by individual outliers that do not fit the distributional assumptions of the model [<a data-test="citation-ref" aria-label="Reference 24" title="Li J, Tibshirani R: Finding consistent patterns: a nonparametric approach for identifying differential expression in RNA-seq data . Stat Methods Med Res. 2013, 22: 519-536. 10.1177/0962280211428386." href="/article/10.1186/s13059-014-0550-8#ref-CR24" id="ref-link-section-d203557095e1516">24</a>]. An example of such an outlier would be a gene with single-digit counts for all samples, except one sample with a count in the thousands. As the aim of differential expression analysis is typically to find <i>consistently</i> up- or down-regulated genes, it is useful to consider diagnostics for detecting individual observations that overly influence the LFC estimate and <i>P</i> value for a gene. A standard outlier diagnostic is Cook’s distance [<a data-test="citation-ref" aria-label="Reference 25" title="Cook RD: Detection of influential observation in linear regression . Technometrics. 1977, 19: 15-18. 10.2307/1268249." href="/article/10.1186/s13059-014-0550-8#ref-CR25" id="ref-link-section-d203557095e1525">25</a>], which is defined within each gene for each sample as the scaled distance that the coefficient vector, <math display="inline"><msub xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mover accent="true">
+                                             <mrow>
+                                                <mi>β</mi>
+                                             </mrow>
+                                             <mo>→</mo>
+                                          </mover>
+                                       </mrow>
+                                       <mrow>
+                                          <mi>i</mi>
+                                       </mrow>
+                                    </msub></math>, of a linear model or GLM would move if the sample were removed and the model refit.</p><p>
+                           <i>DESeq2</i> flags, for each gene, those samples that have a Cook’s distance greater than the 0.99 quantile of the <i>F</i>(<i>p</i>,<i>m</i>−<i>p</i>) distribution, where <i>p</i> is the number of model parameters including the intercept, and <i>m</i> is the number of samples. The use of the <i>F</i> distribution is motivated by the heuristic reasoning that removing a single sample should not move the vector <math display="inline"><msub xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mover accent="true">
+                                             <mrow>
+                                                <mi>β</mi>
+                                             </mrow>
+                                             <mo>→</mo>
+                                          </mover>
+                                       </mrow>
+                                       <mrow>
+                                          <mi>i</mi>
+                                       </mrow>
+                                    </msub></math> outside of a 99% confidence region around <math display="inline"><msub xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mover accent="true">
+                                             <mrow>
+                                                <mi>β</mi>
+                                             </mrow>
+                                             <mo>→</mo>
+                                          </mover>
+                                       </mrow>
+                                       <mrow>
+                                          <mi>i</mi>
+                                       </mrow>
+                                    </msub></math> fit using all the samples [<a data-test="citation-ref" aria-label="Reference 25" title="Cook RD: Detection of influential observation in linear regression . Technometrics. 1977, 19: 15-18. 10.2307/1268249." href="/article/10.1186/s13059-014-0550-8#ref-CR25" id="ref-link-section-d203557095e1661">25</a>]. However, if there are two or fewer replicates for a condition, these samples do not contribute to outlier detection, as there are insufficient replicates to determine outlier status.</p><p>How should one deal with flagged outliers? In an experiment with many replicates, discarding the outlier and proceeding with the remaining data might make best use of the available data. In a small experiment with few samples, however, the presence of an outlier can impair inference regarding the affected gene, and merely ignoring the outlier may even be considered data cherry-picking – and therefore, it is more prudent to exclude the whole gene from downstream analysis.</p><p>Hence, <i>DESeq2</i> offers two possible responses to flagged outliers. By default, outliers in conditions with six or fewer replicates cause the whole gene to be flagged and removed from subsequent analysis, including <i>P</i> value adjustment for multiple testing. For conditions that contain seven or more replicates, <i>DESeq2</i> replaces the outlier counts with an imputed value, namely the trimmed mean over all samples, scaled by the size factor, and then re-estimates the dispersion, LFCs and <i>P</i> values for these genes. As the outlier is replaced with the value predicted by the null hypothesis of no differential expression, this is a more conservative choice than simply omitting the outlier. When there are many degrees of freedom, the second approach avoids discarding genes that might contain true differential expression.</p><p>Additional file <a href="/article/10.1186/s13059-014-0550-8#MOESM1">1</a>: Figure S4 displays the outlier replacement procedure for a single gene in a seven by seven comparison of the Bottomly <i>et al.</i> [<a data-test="citation-ref" aria-label="Reference 16" title="Bottomly D, Walter NAR, Hunter JE, Darakjian P, Kawane S, Buck KJ, Searles RP, Mooney M, McWeeney SK, Hitzemann R: Evaluating gene expression in C57BL/6J and DBA/2J mouse striatum using RNA-seq and microarrays . PLoS ONE. 2011, 6: 17820-10.1371/journal.pone.0017820." href="/article/10.1186/s13059-014-0550-8#ref-CR16" id="ref-link-section-d203557095e1691">16</a>] dataset. While the original fitted means are heavily influenced by a single sample with a large count, the corrected LFCs provide a better fit to the majority of the samples.</p><h3 class="c-article__sub-heading" id="Sec12">Regularized logarithm transformation</h3><p>For certain analyses, it is useful to transform data to render them homoskedastic. As an example, consider the task of assessing sample similarities in an unsupervised manner using a clustering or ordination algorithm. For RNA-seq data, the problem of heteroskedasticity arises: if the data are given to such an algorithm on the original count scale, the result will be dominated by highly expressed, highly variable genes; if logarithm-transformed data are used, undue weight will be given to weakly expressed genes, which show exaggerated LFCs, as discussed above. Therefore, we use the shrinkage approach of <i>DESeq2</i> to implement a <i>regularized logarithm</i> transformation (rlog), which behaves similarly to a log2 transformation for genes with high counts, while shrinking together the values for different samples for genes with low counts. It therefore avoids a commonly observed property of the standard logarithm transformation, the spreading apart of data for genes with low counts, where random noise is likely to dominate any biologically meaningful signal. When we consider the variance of each gene, computed across samples, these variances are stabilized – i.e., approximately the same, or homoskedastic – after the rlog transformation, while they would otherwise strongly depend on the mean counts. It thus facilitates multivariate visualization and ordinations such as clustering or principal component analysis that tend to work best when the variables have similar dynamic range. Note that while the rlog transformation builds upon on our LFC shrinkage approach, it is distinct from and not part of the statistical inference procedure for differential expression analysis described above, which employs the raw counts, not transformed data.</p><p>The rlog transformation is calculated by fitting for each gene a GLM with a baseline expression (i.e., intercept only) and, computing for each sample, shrunken LFCs with respect to the baseline, using the same empirical Bayes procedure as before (Materials and methods). Here, however, the sample covariate information (e.g. treatment or control) is not used, so that all samples are treated equally. The rlog transformation accounts for variation in sequencing depth across samples as it represents the logarithm of <i>q</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub> after accounting for the size factors <i>s</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub>. This is in contrast to the variance-stabilizing transformation (VST) for overdispersed counts introduced in <i>DESeq</i> [<a data-test="citation-ref" aria-label="Reference 4" title="Anders S, Huber W: Differential expression analysis for sequence count data . Genome Biol. 2010, 11: 106-10.1186/gb-2010-11-10-r106." href="/article/10.1186/s13059-014-0550-8#ref-CR4" id="ref-link-section-d203557095e1733">4</a>]: while the VST is also effective at stabilizing variance, it does not directly take into account differences in size factors; and in datasets with large variation in sequencing depth (dynamic range of size factors <math display="inline"><mo xmlns="http://www.w3.org/1998/Math/MathML">≳</mo></math>4) we observed undesirable artifacts in the performance of the VST. A disadvantage of the rlog transformation with respect to the VST is, however, that the ordering of genes within a sample will change if neighboring genes undergo shrinkage of different strength. As with the VST, the value of rlog(<i>K</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub>) for large counts is approximately equal to log2(<i>K</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub>/<i>s</i>
+                           <sub>
+                              <i>j</i>
+                           </sub>). Both the rlog transformation and the VST are provided in the <i>DESeq2</i> package.</p><p>We demonstrate the use of the rlog transformation on the RNA-seq dataset of Hammer <i>et al.</i> [<a data-test="citation-ref" aria-label="Reference 26" title="Hammer P, Banck MS, Amberg R, Wang C, Petznick G, Luo S, Khrebtukova I, Schroth GP, Beyerlein P, Beutler AS: mRNA-seq with agnostic splice site discovery for nervous system transcriptomics tested in chronic pain . Genome Res. 2010, 20: 847-860. 10.1101/gr.101204.109." href="/article/10.1186/s13059-014-0550-8#ref-CR26" id="ref-link-section-d203557095e1789">26</a>], wherein RNA was sequenced from the dorsal root ganglion of rats that had undergone spinal nerve ligation and controls, at 2 weeks and at 2 months after the ligation. The count matrix for this dataset was downloaded from the ReCount online resource [<a data-test="citation-ref" aria-label="Reference 27" title="Frazee A, Langmead B, Leek J: ReCount: a multi-experiment resource of analysis-ready RNA-seq gene count datasets . BMC Bioinformatics. 2011, 12: 449-10.1186/1471-2105-12-449." href="/article/10.1186/s13059-014-0550-8#ref-CR27" id="ref-link-section-d203557095e1792">27</a>]. This dataset offers more subtle differences between conditions than the Bottomly <i>et al.</i> [<a data-test="citation-ref" aria-label="Reference 16" title="Bottomly D, Walter NAR, Hunter JE, Darakjian P, Kawane S, Buck KJ, Searles RP, Mooney M, McWeeney SK, Hitzemann R: Evaluating gene expression in C57BL/6J and DBA/2J mouse striatum using RNA-seq and microarrays . PLoS ONE. 2011, 6: 17820-10.1371/journal.pone.0017820." href="/article/10.1186/s13059-014-0550-8#ref-CR16" id="ref-link-section-d203557095e1798">16</a>] dataset. Figure <a href="/article/10.1186/s13059-014-0550-8#Fig5">5</a> provides diagnostic plots of the normalized counts under the ordinary logarithm with a pseudocount of 1 and the rlog transformation, showing that the rlog both stabilizes the variance through the range of the mean of counts and helps to find meaningful patterns in the data.</p><div class="c-article-section__figure js-c-reading-companion-figures-item" data-test="figure" data-container-section="figure" id="figure-5" data-title="Figure 5"><figure><figcaption><b id="Fig5" class="c-article-section__figure-caption" data-test="figure-caption-text">Figure 5</b></figcaption><div class="c-article-section__figure-content"><div class="c-article-section__figure-item"><picture class="c-article-section__figure-picture"><img aria-describedby="figure-5-desc" src="//media.springernature.com/lw685/springer-static/image/art%3A10.1186%2Fs13059-014-0550-8/MediaObjects/13059_2014_Article_550_Fig5_HTML.jpg" alt="Figure 5" loading="lazy"></picture><div class="c-article-section__figure-link"><a class="c-article__pill-button" data-test="article-link" href="/article/10.1186/s13059-014-0550-8/figures/5" aria-label="Full size image figure 5" rel="nofollow"><span>Full size image</span></a></div></div><div class="c-article-section__figure-description" data-test="bottom-caption" id="figure-5-desc"><p>
+                                       <b>Variance stabilization and clustering after rlog transformation.</b> Two transformations were applied to the counts of the Hammer <i>et al.</i> [<a data-test="citation-ref" aria-label="Reference 26" title="Hammer P, Banck MS, Amberg R, Wang C, Petznick G, Luo S, Khrebtukova I, Schroth GP, Beyerlein P, Beutler AS: mRNA-seq with agnostic splice site discovery for nervous system transcriptomics tested in chronic pain . Genome Res. 2010, 20: 847-860. 10.1101/gr.101204.109." href="/article/10.1186/s13059-014-0550-8#ref-CR26" id="ref-link-section-d203557095e1821">26</a>] dataset: the logarithm of normalized counts plus a pseudocount, i.e. <i>f</i>(<i>K</i>
+                                       <sub>
+                                          <i>ij</i>
+                                       </sub>)= log2(<i>K</i>
+                                       <sub>
+                                          <i>ij</i>
+                                       </sub>/<i>s</i>
+                                       <sub>
+                                          <i>j</i>
+                                       </sub>+1), and the rlog. The gene-wise standard deviation of transformed values is variable across the range of the mean of counts using the logarithm <b>(A)</b>, while relatively stable using the rlog <b>(B)</b>. A hierarchical clustering on Euclidean distances and complete linkage using the rlog <b>(D)</b> transformed data clusters the samples into the groups defined by treatment and time, while using the logarithm-transformed counts <b>(C)</b> produces a more ambiguous result. sd, standard deviation.</p></div></div></figure></div>
+                        <h3 class="c-article__sub-heading" id="Sec13">Gene-level analysis</h3><p>We here present <i>DESeq2</i> for the analysis of per-gene counts, i.e., the total number of reads that can be uniquely assigned to a gene. In contrast, several algorithms [<a data-test="citation-ref" aria-label="Reference 28" title="Trapnell C, Hendrickson DG, Sauvageau M, Goff L, Rinn JL, Pachter L: Differential analysis of gene regulation at transcript resolution with RNA-seq . Nat Biotechnol. 2012, 31: 46-53. 10.1038/nbt.2450." href="/article/10.1186/s13059-014-0550-8#ref-CR28" id="ref-link-section-d203557095e1888">28</a>],[<a data-test="citation-ref" aria-label="Reference 29" title="Glaus P, Honkela A, Rattray M: Identifying differentially expressed transcripts from RNA-seq data with biological variation . Bioinformatics. 2012, 28: 1721-1728. 10.1093/bioinformatics/bts260." href="/article/10.1186/s13059-014-0550-8#ref-CR29" id="ref-link-section-d203557095e1891">29</a>] work with probabilistic assignments of reads to transcripts, where multiple, overlapping transcripts can originate from each gene. It has been noted that the total read count approach can result in false detection of differential expression when in fact only transcript isoform lengths change, and even in a wrong sign of LFCs in extreme cases [<a data-test="citation-ref" aria-label="Reference 28" title="Trapnell C, Hendrickson DG, Sauvageau M, Goff L, Rinn JL, Pachter L: Differential analysis of gene regulation at transcript resolution with RNA-seq . Nat Biotechnol. 2012, 31: 46-53. 10.1038/nbt.2450." href="/article/10.1186/s13059-014-0550-8#ref-CR28" id="ref-link-section-d203557095e1894">28</a>]. However, in our benchmark, discussed in the following section, we found that LFC sign disagreements between total read count and probabilistic-assignment-based methods were rare for genes that were differentially expressed according to either method (Additional file <a href="/article/10.1186/s13059-014-0550-8#MOESM1">1</a>: Figure S5). Furthermore, if estimates for average transcript length are available for the conditions, these can be incorporated into the <i>DESeq2</i> framework as gene- and sample-specific normalization factors. In addition, the approach used in <i>DESeq2</i> can be extended to isoform-specific analysis, either through generalized linear modeling at the exon level with a gene-specific mean as in the <i>DEXSeq</i> package [<a data-test="citation-ref" aria-label="Reference 30" title="Anders S, Reyes A, Huber W: Detecting differential usage of exons from RNA-seq data . Genome Res. 2012, 22: 2008-2017. 10.1101/gr.133744.111." href="/article/10.1186/s13059-014-0550-8#ref-CR30" id="ref-link-section-d203557095e1910">30</a>] or through counting evidence for alternative isoforms in splice graphs [<a data-test="citation-ref" aria-label="Reference 31" title="Sammeth M: Complete alternative splicing events are bubbles in splicing graphs . J Comput Biol. 2009, 16: 1117-1140. 10.1089/cmb.2009.0108." href="/article/10.1186/s13059-014-0550-8#ref-CR31" id="ref-link-section-d203557095e1913">31</a>],[<a data-test="citation-ref" aria-label="Reference 32" title="Pagès H, Bindreither D, Carlson M, Morgan M: SplicingGraphs: create, manipulate, visualize splicing graphs, and assign RNA-seq reads to them2013. Bioconductor package [
+                              http://www.bioconductor.org
+                           ]" href="/article/10.1186/s13059-014-0550-8#ref-CR32" id="ref-link-section-d203557095e1916">32</a>]. In fact, the latest release version of <i>DEXSeq</i> now uses <i>DESeq2</i> as its inferential engine and so offers shrinkage estimation of dispersion and effect sizes for an exon-level analysis, too.</p></div></div></section><section data-title="Conclusions"><div class="c-article-section" id="Sec17-section"><h2 class="c-article-section__title js-section-title js-c-reading-companion-sections-item" id="Sec17">Conclusions</h2><div class="c-article-section__content" id="Sec17-content"><p>
+                        <i>DESeq2</i> offers a comprehensive and general solution for gene-level analysis of RNA-seq data. Shrinkage estimators substantially improve the stability and reproducibility of analysis results compared to maximum-likelihood-based solutions. Empirical Bayes priors provide automatic control of the amount of shrinkage based on the amount of information for the estimated quantity available in the data. This allows <i>DESeq2</i> to offer consistent performance over a large range of data types and makes it applicable for small studies with few replicates as well as for large observational studies. <i>DESeq2</i>’s heuristics for outlier detection help to recognize genes for which the modeling assumptions are unsuitable and so avoids type-I errors caused by these. The embedding of these strategies in the framework of GLMs enables the treatment of both simple and complex designs.</p><p>A critical advance is the shrinkage estimator for fold changes for differential expression analysis, which offers a sound and statistically well-founded solution to the practically relevant problem of comparing fold change across the wide dynamic range of RNA-seq experiments. This is of value for many downstream analysis tasks, including the ranking of genes for follow-up studies and association of fold changes with other variables of interest. In addition, the rlog transformation, which implements shrinkage of fold changes on a per-sample basis, facilitates visualization of differences, for example in heat maps, and enables the application of a wide range of techniques that require homoskedastic input data, including machine-learning or ordination techniques such as principal component analysis and clustering.</p><p>
+                        <i>DESeq2</i> hence offers to practitioners a wide set of features with state-of-the-art inferential power. Its use cases are not limited to RNA-seq data or other transcriptomics assays; rather, many kinds of high-throughput count data can be used. Other areas for which <i>DESeq</i> or <i>DESeq2</i> have been used include chromatin immunoprecipitation sequencing assays (e.g., [<a data-test="citation-ref" aria-label="Reference 40" title="Asangani IA, Dommeti VL, Wang X, Malik R, Cieslik M, Yang R, Escara-Wilke J, Wilder-Romans K, Dhanireddy S, Engelke C, Iyer MK, Jing X, Wu Y-M, Cao X, Qin ZS, Wang S, Feng FY, Chinnaiyan AM: Therapeutic targeting of BET bromodomain proteins in castration-resistant prostate cancer . Nature. 2014, 510: 278-282. 10.1038/nature13229." href="/article/10.1186/s13059-014-0550-8#ref-CR40" id="ref-link-section-d203557095e2493">40</a>]; see also the <i>DiffBind</i> package [<a data-test="citation-ref" aria-label="Reference 41" title="Stark R, Brown G: DiffBind: differential binding analysis of ChIP-seq peak data2013. Bioconductor package [
+                              http://www.bioconductor.org
+                           ]" href="/article/10.1186/s13059-014-0550-8#ref-CR41" id="ref-link-section-d203557095e2500">41</a>],[<a data-test="citation-ref" aria-label="Reference 42" title="Ross-Innes CS, Stark R, Teschendorff AE, Holmes KA, Ali HR, Dunning MJ, Brown GD, Gojis O, Ellis IO, Green AR, Ali S, Chin S-F, Palmieri C, Caldas C, Carroll JS: Differential oestrogen receptor binding is associated with clinical outcome in breast cancer . Nature. 2012, 481: 389-393." href="/article/10.1186/s13059-014-0550-8#ref-CR42" id="ref-link-section-d203557095e2503">42</a>]), barcode-based assays (e.g., [<a data-test="citation-ref" aria-label="Reference 43" title="Robinson DG, Chen W, Storey JD, Gresham D: Design and analysis of bar-seq experiments . G3 (Bethesda). 2013, 4: 11-18. 10.1534/g3.113.008565." href="/article/10.1186/s13059-014-0550-8#ref-CR43" id="ref-link-section-d203557095e2506">43</a>]), metagenomics data (e.g., [<a data-test="citation-ref" aria-label="Reference 44" title="McMurdie PJ, Holmes S: Waste not, want not: why rarefying microbiome data is inadmissible . PLoS Comput Biol. 2014, 10: 1003531-10.1371/journal.pcbi.1003531." href="/article/10.1186/s13059-014-0550-8#ref-CR44" id="ref-link-section-d203557095e2509">44</a>]), ribosome profiling [<a data-test="citation-ref" aria-label="Reference 45" title="Vasquez J, Hon C, Vanselow JT, Schlosser A, Siegel TN: Comparative ribosome profiling reveals extensive translational complexity in different Trypanosoma brucei life cycle stages . Nucleic Acids Res. 2014, 42: 3623-3637. 10.1093/nar/gkt1386." href="/article/10.1186/s13059-014-0550-8#ref-CR45" id="ref-link-section-d203557095e2512">45</a>] and CRISPR/Cas-library assays [<a data-test="citation-ref" aria-label="Reference 46" title="Zhou Y, Zhu S, Cai C, Yuan P, Li C, Huang Y, Wei W: High-throughput screening of a CRISPR/Cas9 library for functional genomics in human cells . Nature. 2014, 509: 487-491. 10.1038/nature13166." href="/article/10.1186/s13059-014-0550-8#ref-CR46" id="ref-link-section-d203557095e2515">46</a>]. Finally, the <i>DESeq2</i> package is integrated well in the Bioconductor infrastructure [<a data-test="citation-ref" aria-label="Reference 11" title="Gentleman RC, Carey VJ, Bates DM, Bolstad B, Dettling M, Dudoit S, Ellis B, Gautier L, Ge Y, Gentry J, Hornik K, Hothorn T, Huber W, Iacus S, Irizarry R, Leisch F, Li C, Maechler M, Rossini AJ, Sawitzki G, Smith C, Smyth G, Tierney L, Yang JY, Zhang J: Bioconductor: open software development for computational biology and bioinformatics . Genome Biol. 2004, 5: R80-10.1186/gb-2004-5-10-r80." href="/article/10.1186/s13059-014-0550-8#ref-CR11" id="ref-link-section-d203557095e2522">11</a>] and comes with extensive documentation, including a vignette that demonstrates a complete analysis step by step and discusses advanced use cases.</p></div></div></section><section data-title="Materials and methods"><div class="c-article-section" id="Sec18-section"><h2 class="c-article-section__title js-section-title js-c-reading-companion-sections-item" id="Sec18">Materials and methods</h2><div class="c-article-section__content" id="Sec18-content"><p>A summary of the notation used in the following section is provided in Additional file <a href="/article/10.1186/s13059-014-0550-8#MOESM1">1</a>: Table S1.</p><h3 class="c-article__sub-heading" id="Sec19">Model and normalization</h3><p>The read count <i>K</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub> for gene <i>i</i> in sample <i>j</i> is described with a GLM of the negative binomial family with a logarithmic link: </p><div id="Equ1" class="c-article-equation"><div class="c-article-equation__content"><math display="block"><mtable xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mtr>
+                                          <mtd>
+                                             <msub>
+                                                <mrow>
+                                                   <mi>K</mi>
+                                                </mrow>
+                                                <mrow>
+                                                   <mtext mathvariant="italic">ij</mtext>
+                                                </mrow>
+                                             </msub>
+                                          </mtd>
+                                          <mtd>
+                                             <mo>∼</mo>
+                                             <mtext>NB</mtext>
+                                             <mo>(</mo>
+                                             <mtext>mean</mtext>
+                                             <mo>=</mo>
+                                             <msub>
+                                                <mrow>
+                                                   <mi>μ</mi>
+                                                </mrow>
+                                                <mrow>
+                                                   <mtext mathvariant="italic">ij</mtext>
+                                                </mrow>
+                                             </msub>
+                                             <mo>,</mo>
+                                             <mtext>dispersion</mtext>
+                                             <mo>=</mo>
+                                             <msub>
+                                                <mrow>
+                                                   <mi>α</mi>
+                                                </mrow>
+                                                <mrow>
+                                                   <mi>i</mi>
+                                                </mrow>
+                                             </msub>
+                                             <mo>)</mo>
+                                          </mtd>
+                                       </mtr>
+                                       <mtr>
+                                          <mtd>
+                                             <msub>
+                                                <mrow>
+                                                   <mi>μ</mi>
+                                                </mrow>
+                                                <mrow>
+                                                   <mtext mathvariant="italic">ij</mtext>
+                                                </mrow>
+                                             </msub>
+                                          </mtd>
+                                          <mtd>
+                                             <mo>=</mo>
+                                             <msub>
+                                                <mrow>
+                                                   <mi>s</mi>
+                                                </mrow>
+                                                <mrow>
+                                                   <mtext mathvariant="italic">ij</mtext>
+                                                </mrow>
+                                             </msub>
+                                             <msub>
+                                                <mrow>
+                                                   <mi>q</mi>
+                                                </mrow>
+                                                <mrow>
+                                                   <mtext mathvariant="italic">ij</mtext>
+                                                </mrow>
+                                             </msub>
+                                          </mtd>
+                                       </mtr>
+                                    </mtable></math></div><div class="c-article-equation__number">
+                    (1)
+                </div></div>
+                           <div id="Equ2" class="c-article-equation"><div class="c-article-equation__content"><math display="block"><mo xmlns="http://www.w3.org/1998/Math/MathML">log</mo><msub xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mi>q</mi>
+                                       </mrow>
+                                       <mrow>
+                                          <mtext mathvariant="italic">ij</mtext>
+                                       </mrow>
+                                    </msub><mo xmlns="http://www.w3.org/1998/Math/MathML">=</mo><munder xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mo>∑</mo>
+                                       </mrow>
+                                       <mrow>
+                                          <mi>r</mi>
+                                       </mrow>
+                                    </munder><msub xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mi>x</mi>
+                                       </mrow>
+                                       <mrow>
+                                          <mtext mathvariant="italic">jr</mtext>
+                                       </mrow>
+                                    </msub><msub xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mi>β</mi>
+                                       </mrow>
+                                       <mrow>
+                                          <mtext mathvariant="italic">ir</mtext>
+                                       </mrow>
+                                    </msub><mi xmlns="http://www.w3.org/1998/Math/MathML">.</mi></math></div><div class="c-article-equation__number">
+                    (2)
+                </div></div>
+                        <p>For notational simplicity, the equations here use the natural logarithm as the link function, though the <i>DESeq2</i> software reports estimated model coefficients and their estimated standard errors on the log2 scale.</p><p>By default, the normalization constants <i>s</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub> are considered constant within a sample, <i>s</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub>=<i>s</i>
+                           <sub>
+                              <i>j</i>
+                           </sub>, and are estimated with the median-of-ratios method previously described and used in <i>DESeq</i> [<a data-test="citation-ref" aria-label="Reference 4" title="Anders S, Huber W: Differential expression analysis for sequence count data . Genome Biol. 2010, 11: 106-10.1186/gb-2010-11-10-r106." href="/article/10.1186/s13059-014-0550-8#ref-CR4" id="ref-link-section-d203557095e2818">4</a>] and <i>DEXSeq</i> [<a data-test="citation-ref" aria-label="Reference 30" title="Anders S, Reyes A, Huber W: Detecting differential usage of exons from RNA-seq data . Genome Res. 2012, 22: 2008-2017. 10.1101/gr.133744.111." href="/article/10.1186/s13059-014-0550-8#ref-CR30" id="ref-link-section-d203557095e2824">30</a>]: </p><div id="Equ3" class="c-article-equation"><div class="c-article-equation__content"><math display="block"><mrow xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <msub>
+                                          <mrow>
+                                             <mi>s</mi>
+                                          </mrow>
+                                          <mrow>
+                                             <mi>j</mi>
+                                          </mrow>
+                                       </msub>
+                                       <mo>=</mo>
+                                       <munder>
+                                          <mrow>
+                                             <mtext>median</mtext>
+                                          </mrow>
+                                          <mrow>
+                                             <mi>i</mi>
+                                             <mo>:</mo>
+                                             <mspace width="0.3em"></mspace>
+                                             <msubsup>
+                                                <mrow>
+                                                   <mi>K</mi>
+                                                </mrow>
+                                                <mrow>
+                                                   <mi>i</mi>
+                                                </mrow>
+                                                <mrow>
+                                                   <mtext>R</mtext>
+                                                </mrow>
+                                             </msubsup>
+                                             <mo>≠</mo>
+                                             <mn>0</mn>
+                                          </mrow>
+                                       </munder>
+                                       <mspace width="0.3em"></mspace>
+                                       <mfrac>
+                                          <mrow>
+                                             <msub>
+                                                <mrow>
+                                                   <mi>K</mi>
+                                                </mrow>
+                                                <mrow>
+                                                   <mtext mathvariant="italic">ij</mtext>
+                                                </mrow>
+                                             </msub>
+                                          </mrow>
+                                          <mrow>
+                                             <msubsup>
+                                                <mrow>
+                                                   <mi>K</mi>
+                                                </mrow>
+                                                <mrow>
+                                                   <mi>i</mi>
+                                                </mrow>
+                                                <mrow>
+                                                   <mtext>R</mtext>
+                                                </mrow>
+                                             </msubsup>
+                                          </mrow>
+                                       </mfrac>
+                                       <mspace width="1em"></mspace>
+                                       <mtext>with</mtext>
+                                       <mspace width="1em"></mspace>
+                                       <msubsup>
+                                          <mrow>
+                                             <mi>K</mi>
+                                          </mrow>
+                                          <mrow>
+                                             <mi>i</mi>
+                                          </mrow>
+                                          <mrow>
+                                             <mtext>R</mtext>
+                                          </mrow>
+                                       </msubsup>
+                                       <mo>=</mo>
+                                       <msup>
+                                          <mrow>
+                                             <mfenced close=")" open="(" separators="">
+                                                <mrow>
+                                                   <munderover accent="false" accentunder="false">
+                                                      <mrow>
+                                                         <mo mathsize="big">∏</mo>
+                                                      </mrow>
+                                                      <mrow>
+                                                         <mi>j</mi>
+                                                         <mo>=</mo>
+                                                         <mn>1</mn>
+                                                      </mrow>
+                                                      <mrow>
+                                                         <mi>m</mi>
+                                                      </mrow>
+                                                   </munderover>
+                                                   <msub>
+                                                      <mrow>
+                                                         <mi>K</mi>
+                                                      </mrow>
+                                                      <mrow>
+                                                         <mtext mathvariant="italic">ij</mtext>
+                                                      </mrow>
+                                                   </msub>
+                                                </mrow>
+                                             </mfenced>
+                                          </mrow>
+                                          <mrow>
+                                             <mn>1</mn>
+                                             <mo>/</mo>
+                                             <mi>m</mi>
+                                          </mrow>
+                                       </msup>
+                                       <mi>.</mi>
+                                    </mrow></math></div></div>
+                        <p>Alternatively, the user can supply normalization constants <i>s</i>
+                           <sub>
+                              <i>ij</i>
+                           </sub> calculated using other methods (e.g., using <i>cqn</i> [<a data-test="citation-ref" aria-label="Reference 13" title="Hansen KD, Irizarry RA, Wu Z: Removing technical variability in RNA-seq data using conditional quantile normalization . Biostatistics. 2012, 13: 204-216. 10.1093/biostatistics/kxr054." href="/article/10.1186/s13059-014-0550-8#ref-CR13" id="ref-link-section-d203557095e3045">13</a>] or <i>EDASeq</i> [<a data-test="citation-ref" aria-label="Reference 14" title="Risso D, Schwartz K, Sherlock G, Dudoit S: GC-content normalization for RNA-seq data . BMC Bioinformatics. 2011, 12: 480-10.1186/1471-2105-12-480." href="/article/10.1186/s13059-014-0550-8#ref-CR14" id="ref-link-section-d203557095e3052">14</a>]), which may differ from gene to gene.</p><h3 class="c-article__sub-heading" id="Sec24">Wald test</h3><p>The Wald test compares the beta estimate <i>β</i>
+                           <sub>
+                              <i>ir</i>
+                           </sub> divided by its estimated standard error SE(<i>β</i>
+                           <sub>
+                              <i>ir</i>
+                           </sub>) to a standard normal distribution. The estimated standard errors are the square root of the diagonal elements of the estimated covariance matrix, <i>Σ</i>
+                           <sub>
+                              <i>i</i>
+                           </sub>, for the coefficients, i.e., <math display="inline"><mo xmlns="http://www.w3.org/1998/Math/MathML">SE</mo><mo xmlns="http://www.w3.org/1998/Math/MathML">(</mo><msub xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <mi>β</mi>
+                                       </mrow>
+                                       <mrow>
+                                          <mtext mathvariant="italic">ir</mtext>
+                                       </mrow>
+                                    </msub><mo xmlns="http://www.w3.org/1998/Math/MathML">)</mo><mo xmlns="http://www.w3.org/1998/Math/MathML">=</mo><msqrt xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mrow>
+                                          <msub>
+                                             <mrow>
+                                                <mi>Σ</mi>
+                                             </mrow>
+                                             <mrow>
+                                                <mi>i</mi>
+                                                <mo>,</mo>
+                                                <mtext mathvariant="italic">rr</mtext>
+                                             </mrow>
+                                          </msub>
+                                       </mrow>
+                                    </msqrt></math>. Contrasts of coefficients are tested similarly by forming a Wald statistics using (<a href="/article/10.1186/s13059-014-0550-8#Equ3">3</a>) and (<a href="/article/10.1186/s13059-014-0550-8#Equ4">4</a>). We use the following formula for the coefficient covariance matrix for a GLM with normal prior on coefficients [<a data-test="citation-ref" aria-label="Reference 56" title="Park MY: Generalized linear models with regularization. PhD thesis.Stanford University, Department of Statistics; 2006." href="/article/10.1186/s13059-014-0550-8#ref-CR56" id="ref-link-section-d203557095e8672">56</a>], [<a data-test="citation-ref" aria-label="Reference 58" title="Cule E, Vineis P, De Iorio M: Significance testing in ridge regression for genetic data . BMC Bioinformatics. 2011, 12: 372-10.1186/1471-2105-12-372." href="/article/10.1186/s13059-014-0550-8#ref-CR58" id="ref-link-section-d203557095e8675">58</a>]: </p><div id="Equ25" class="c-article-equation"><div class="c-article-equation__content"><math display="block"><mrow xmlns="http://www.w3.org/1998/Math/MathML">
+                                       <mspace width="-14.0pt"></mspace>
+                                       <msub>
+                                          <mrow>
+                                             <mi>Σ</mi>
+                                          </mrow>
+                                          <mrow>
+                                             <mi>i</mi>
+                                          </mrow>
+                                       </msub>
+                                       <mo>=</mo>
+                                       <mo>Cov</mo>
+                                       <mo>(</mo>
+                                       <msub>
+                                          <mrow>
+                                             <mover accent="true">
+                                                <mrow>
+                                                   <mi>β</mi>
+                                                </mrow>
+                                                <mo>→</mo>
+                                             </mover>
+                                          </mrow>
+                                          <mrow>
+                                             <mi>i</mi>
+                                          </mrow>
+                                       </msub>
+                                       <mo>)</mo>
+                                       <mo>=</mo>
+                                       <msup>
+                                          <mrow>
+                                             <mo>(</mo>
+                                             <msup>
+                                                <mrow>
+                                                   <mi>X</mi>
+                                                </mrow>
+                                                <mrow>
+                                                   <mi>t</mi>
+                                                </mrow>
+                                             </msup>
+                                             <mtext mathvariant="italic">WX</mtext>
+                                             <mo>+</mo>
+                                             <mover accent="true">
+                                                <mrow>
+                                                   <mi>λ</mi>
+                                                </mrow>
+                                                <mo>→</mo>
+                                             </mover>
+                                             <mi>I</mi>
+                                             <mo>)</mo>
+                                          </mrow>
+                                          <mrow>
+                                             <mo>−</mo>
+                                             <mn>1</mn>
+                                          </mrow>
+                                       </msup>
+                                       <mo>(</mo>
+                                       <msup>
+                                          <mrow>
+                                             <mi>X</mi>
+                                          </mrow>
+                                          <mrow>
+                                             <mi>t</mi>
+                                          </mrow>
+                                       </msup>
+                                       <mtext mathvariant="italic">WX</mtext>
+                                       <mo>)</mo>
+                                       <msup>
+                                          <mrow>
+                                             <mo>(</mo>
+                                             <msup>
+                                                <mrow>
+                                                   <mi>X</mi>
+                                                </mrow>
+                                                <mrow>
+                                                   <mi>t</mi>
+                                                </mrow>
+                                             </msup>
+                                             <mtext mathvariant="italic">WX</mtext>
+                                             <mo>+</mo>
+                                             <mover accent="true">
+                                                <mrow>
+                                                   <mi>λ</mi>
+                                                </mrow>
+                                                <mo>→</mo>
+                                             </mover>
+                                             <mi>I</mi>
+                                             <mo>)</mo>
+                                          </mrow>
+                                          <mrow>
+                                             <mo>−</mo>
+                                             <mn>1</mn>
+                                          </mrow>
+                                       </msup>
+                                       <mi>.</mi>
+                                    </mrow></math></div></div>
+                        <p>The tail integrals of the standard normal distribution are multiplied by 2 to achieve a two-tailed test. The Wald test <i>P</i> values from the subset of genes that pass the independent filtering step are adjusted for multiple testing using the procedure of Benjamini and Hochberg [<a data-test="citation-ref" aria-label="Reference 21" title="Benjamini Y, Hochberg Y: Controlling the false discovery rate: a practical and powerful approach to multiple testing . J R Stat Soc Ser B Methodol. 1995, 57: 289-300." href="/article/10.1186/s13059-014-0550-8#ref-CR21" id="ref-link-section-d203557095e8868">21</a>].</p><h3 class="c-article__sub-heading" id="Sec30">R/Bioconductor package</h3><p>
+                           <i>DESeq2</i> is implemented as a package for the R statistical environment and is available [<a data-test="citation-ref" aria-label="Reference 10" title="DESeq2. [
+                              http://www.bioconductor.org/packages/release/bioc/html/DESeq2.html
+                           ]" href="/article/10.1186/s13059-014-0550-8#ref-CR10" id="ref-link-section-d203557095e10540">10</a>] as part of the Bioconductor project [<a data-test="citation-ref" aria-label="Reference 11" title="Gentleman RC, Carey VJ, Bates DM, Bolstad B, Dettling M, Dudoit S, Ellis B, Gautier L, Ge Y, Gentry J, Hornik K, Hothorn T, Huber W, Iacus S, Irizarry R, Leisch F, Li C, Maechler M, Rossini AJ, Sawitzki G, Smith C, Smyth G, Tierney L, Yang JY, Zhang J: Bioconductor: open software development for computational biology and bioinformatics . Genome Biol. 2004, 5: R80-10.1186/gb-2004-5-10-r80." href="/article/10.1186/s13059-014-0550-8#ref-CR11" id="ref-link-section-d203557095e10543">11</a>]. The count matrix and metadata, including the gene model and sample information, are stored in an S4 class derived from the <i>SummarizedExperiment</i> class of the <i>GenomicRanges</i> package [<a data-test="citation-ref" aria-label="Reference 60" title="Lawrence M, Huber W, Pagès H, Aboyoun P, Carlson M, Gentleman R, Morgan MT, Carey VJ: Software for computing and annotating genomic ranges . PLoS Comput Biol. 2013, 9: 1003118-10.1371/journal.pcbi.1003118." href="/article/10.1186/s13059-014-0550-8#ref-CR60" id="ref-link-section-d203557095e10553">60</a>]. <i>SummarizedExperiment</i> objects containing count matrices can be easily generated using the <i>summarizeOverlaps</i> function of the <i>GenomicAlignments</i> package [<a data-test="citation-ref" aria-label="Reference 61" title="Pagès H, Obenchain V, Morgan M: GenomicAlignments: Representation and manipulation of short genomic alignments2013. Bioconductor package [
+                              http://www.bioconductor.org
+                           ]" href="/article/10.1186/s13059-014-0550-8#ref-CR61" id="ref-link-section-d203557095e10565">61</a>]. This workflow automatically stores the gene model as metadata and additionally other information such as the genome and gene annotation versions. Other methods to obtain count matrices include the <i>htseq-count</i> script [<a data-test="citation-ref" aria-label="Reference 62" title="Anders S, Pyl PT, Huber W: HTSeq - A Python framework to work with high-throughput sequencing data . Bioinformatics. 2015, 31: 166-10.1093/bioinformatics/btu638." href="/article/10.1186/s13059-014-0550-8#ref-CR62" id="ref-link-section-d203557095e10572">62</a>] and the Bioconductor packages <i>easyRNASeq</i> [<a data-test="citation-ref" aria-label="Reference 63" title="Delhomme N, Padioleau I, Furlong EE, Steinmetz LM: easyRNASeq: a Bioconductor package for processing RNA-seq data . Bioinformatics. 2012, 28: 2532-2533. 10.1093/bioinformatics/bts477." href="/article/10.1186/s13059-014-0550-8#ref-CR63" id="ref-link-section-d203557095e10578">63</a>] and <i>featureCount</i> [<a data-test="citation-ref" aria-label="Reference 64" title="Liao Y, Smyth GK, Shi W: featureCounts: an efficient general purpose program for assigning sequence reads to genomic features . Bioinformatics. 2014, 30: 923-930. 10.1093/bioinformatics/btt656." href="/article/10.1186/s13059-014-0550-8#ref-CR64" id="ref-link-section-d203557095e10584">64</a>].</p><p>The <i>DESeq2</i> package comes with a detailed vignette, which works through a number of example differential expression analyses on real datasets, and the use of the rlog transformation for quality assessment and visualization. A single function, called <i>DESeq</i>, is used to run the default analysis, while lower-level functions are also available for advanced users.</p></div></div></section><section data-title="Additional file"><div class="c-article-section" id="Sec33-section"><h2 class="c-article-section__title js-section-title js-c-reading-companion-sections-item" id="Sec33">Additional file</h2><div class="c-article-section__content" id="Sec33-content"></div></div></section>
+                                </div>
+                    <section data-title="Abbreviations"><div class="c-article-section" id="abbreviations-section"><h2 class="c-article-section__title js-section-title js-c-reading-companion-sections-item" id="abbreviations">Abbreviations</h2><div class="c-article-section__content" id="abbreviations-content"><dl class="c-abbreviation_list"><dt class="c-abbreviation_list__term u-text-bold u-float-left u-pr-16"><dfn>FDR:</dfn></dt><dd class="c-abbreviation_list__description u-mb-24">
+                              <p>False discovery rate</p>
+                           </dd><dt class="c-abbreviation_list__term u-text-bold u-float-left u-pr-16"><dfn>GLM:</dfn></dt><dd class="c-abbreviation_list__description u-mb-24">
+                              <p>Generalized linear model</p>
+                           </dd><dt class="c-abbreviation_list__term u-text-bold u-float-left u-pr-16"><dfn>HTS:</dfn></dt><dd class="c-abbreviation_list__description u-mb-24">
+                              <p>High-throughput sequencing</p>
+                           </dd><dt class="c-abbreviation_list__term u-text-bold u-float-left u-pr-16"><dfn>LFC:</dfn></dt><dd class="c-abbreviation_list__description u-mb-24">
+                              <p>Logarithmic fold change</p>
+                           </dd><dt class="c-abbreviation_list__term u-text-bold u-float-left u-pr-16"><dfn>MAP:</dfn></dt><dd class="c-abbreviation_list__description u-mb-24">
+                              <p>Maximum <i>a posteriori</i>
+                              </p>
+                           </dd><dt class="c-abbreviation_list__term u-text-bold u-float-left u-pr-16"><dfn>MLE:</dfn></dt><dd class="c-abbreviation_list__description u-mb-24">
+                              <p>Maximum-likelihood estimate</p>
+                           </dd><dt class="c-abbreviation_list__term u-text-bold u-float-left u-pr-16"><dfn>RNA-seq:</dfn></dt><dd class="c-abbreviation_list__description u-mb-24">
+                              <p>RNA sequencing</p>
+                           </dd><dt class="c-abbreviation_list__term u-text-bold u-float-left u-pr-16"><dfn>VST:</dfn></dt><dd class="c-abbreviation_list__description u-mb-24">
+                              <p>Variance-stabilizing transformation</p>
+                           </dd></dl></div></div></section><div id="MagazineFulltextArticleBodySuffix"><section aria-labelledby="Bib1" data-title="References"><div class="c-article-section" id="Bib1-section"><h2 class="c-article-section__title js-section-title js-c-reading-companion-sections-item" id="Bib1">References</h2><div class="c-article-section__content" id="Bib1-content"><div data-container-section="references"><ol class="c-article-references"><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="1."><p class="c-article-references__text" id="ref-CR1">Lönnstedt I, Speed T: Replicated microarray data . Stat Sinica. 2002, 12: 31-46.</p><p class="c-article-references__links u-hide-print">&nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="2."><p class="c-article-references__text" id="ref-CR2">Robinson MD, Smyth GK: Moderated statistical tests for assessing differences in tag abundance . Bioinformatics. 2007, 23: 2881-2887. 10.1093/bioinformatics/btm453.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbioinformatics%2Fbtm453" aria-label="Article reference 2" data-doi="10.1093/bioinformatics/btm453">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=17881408" aria-label="PubMed reference 2">PubMed</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="3."><p class="c-article-references__text" id="ref-CR3">McCarthy DJ, Chen Y, Smyth GK: Differential expression analysis of multifactor RNA-seq experiments with respect to biological variation . Nucleic Acids Res. 2012, 40: 4288-4297. 10.1093/nar/gks042.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fnar%2Fgks042" aria-label="Article reference 3" data-doi="10.1093/nar/gks042">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=22287627" aria-label="PubMed reference 3">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3378882" aria-label="PubMed Central reference 3">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="4."><p class="c-article-references__text" id="ref-CR4">Anders S, Huber W: Differential expression analysis for sequence count data . Genome Biol. 2010, 11: 106-10.1186/gb-2010-11-10-r106.</p><p class="c-article-references__links u-hide-print"><a rel="noopener" href="https://link.springer.com/article/10.1186/gb-2010-11-10-r106" aria-label="Article reference 4" data-doi="10.1186/gb-2010-11-10-r106">Article</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="5."><p class="c-article-references__text" id="ref-CR5">Zhou Y-H, Xia K, Wright FA: A powerful and flexible approach to the analysis of RNA sequence count data . Bioinformatics. 2011, 27: 2672-2678. 10.1093/bioinformatics/btr449.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbioinformatics%2Fbtr449" aria-label="Article reference 5" data-doi="10.1093/bioinformatics/btr449">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=21810900" aria-label="PubMed reference 5">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3179656" aria-label="PubMed Central reference 5">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="6."><p class="c-article-references__text" id="ref-CR6">Wu H, Wang C, Wu Z: A new shrinkage estimator for dispersion improves differential expression detection in RNA-seq data . Biostatistics. 2013, 14: 232-243. 10.1093/biostatistics/kxs033.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbiostatistics%2Fkxs033" aria-label="Article reference 6" data-doi="10.1093/biostatistics/kxs033">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=23001152" aria-label="PubMed reference 6">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3590927" aria-label="PubMed Central reference 6">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="7."><p class="c-article-references__text" id="ref-CR7">Hardcastle T, Kelly K: baySeq: empirical Bayesian methods for identifying differential expression in sequence count data . BMC Bioinformatics. 2010, 11: 422-10.1186/1471-2105-11-422.</p><p class="c-article-references__links u-hide-print"><a rel="noopener" href="https://link.springer.com/article/10.1186/1471-2105-11-422" aria-label="Article reference 7" data-doi="10.1186/1471-2105-11-422">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=20698981" aria-label="PubMed reference 7">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2928208" aria-label="PubMed Central reference 7">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="8."><p class="c-article-references__text" id="ref-CR8">Van De Wiel MA, Leday GGR, Pardo L, Rue H, Van Der Vaart AW, Van Wieringen WN: Bayesian analysis of RNA sequencing data by estimating multiple shrinkage priors . Biostatistics. 2013, 14: 113-128. 10.1093/biostatistics/kxs031.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbiostatistics%2Fkxs031" aria-label="Article reference 8" data-doi="10.1093/biostatistics/kxs031">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=22988280" aria-label="PubMed reference 8">PubMed</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="9."><p class="c-article-references__text" id="ref-CR9">Boer JM, Huber WK, Sültmann H, Wilmer F, von Heydebreck A, Haas S, Korn B, Gunawan B, Vente A, Füzesi L, Vingron M, Poustka A: Identification and classification of differentially expressed genes in renal cell carcinoma by expression profiling on a global human 31,500-element cDNA array . Genome Res. 2001, 11: 1861-1870.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=11691851" aria-label="PubMed reference 9">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC311168" aria-label="PubMed Central reference 9">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="10."><p class="c-article-references__text" id="ref-CR10">DESeq2. [<a href="http://www.bioconductor.org/packages/release/bioc/html/DESeq2.html">http://www.bioconductor.org/packages/release/bioc/html/DESeq2.html</a>]</p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="11."><p class="c-article-references__text" id="ref-CR11">Gentleman RC, Carey VJ, Bates DM, Bolstad B, Dettling M, Dudoit S, Ellis B, Gautier L, Ge Y, Gentry J, Hornik K, Hothorn T, Huber W, Iacus S, Irizarry R, Leisch F, Li C, Maechler M, Rossini AJ, Sawitzki G, Smith C, Smyth G, Tierney L, Yang JY, Zhang J: Bioconductor: open software development for computational biology and bioinformatics . Genome Biol. 2004, 5: R80-10.1186/gb-2004-5-10-r80.</p><p class="c-article-references__links u-hide-print"><a rel="noopener" href="https://link.springer.com/article/10.1186/gb-2004-5-10-r80" aria-label="Article reference 11" data-doi="10.1186/gb-2004-5-10-r80">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=15461798" aria-label="PubMed reference 11">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC545600" aria-label="PubMed Central reference 11">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="12."><p class="c-article-references__text" id="ref-CR12">McCullagh P, Nelder JA: Generalized linear models . Monographs on Statistics &amp; Applied Probability . 1989, Chapman &amp; Hall/CRC, London, UK,</p><p class="c-article-references__links u-hide-print">&nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="13."><p class="c-article-references__text" id="ref-CR13">Hansen KD, Irizarry RA, Wu Z: Removing technical variability in RNA-seq data using conditional quantile normalization . Biostatistics. 2012, 13: 204-216. 10.1093/biostatistics/kxr054.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbiostatistics%2Fkxr054" aria-label="Article reference 13" data-doi="10.1093/biostatistics/kxr054">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=22285995" aria-label="PubMed reference 13">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3297825" aria-label="PubMed Central reference 13">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="14."><p class="c-article-references__text" id="ref-CR14">Risso D, Schwartz K, Sherlock G, Dudoit S: GC-content normalization for RNA-seq data . BMC Bioinformatics. 2011, 12: 480-10.1186/1471-2105-12-480.</p><p class="c-article-references__links u-hide-print"><a rel="noopener" href="https://link.springer.com/article/10.1186/1471-2105-12-480" aria-label="Article reference 14" data-doi="10.1186/1471-2105-12-480">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=22177264" aria-label="PubMed reference 14">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3315510" aria-label="PubMed Central reference 14">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="15."><p class="c-article-references__text" id="ref-CR15">Smyth GK: Linear models and empirical Bayes methods for assessing differential expression in microarray experiments . Stat Appl Genet Mol Biol. 2004, 3: 1-25.</p><p class="c-article-references__links u-hide-print">&nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="16."><p class="c-article-references__text" id="ref-CR16">Bottomly D, Walter NAR, Hunter JE, Darakjian P, Kawane S, Buck KJ, Searles RP, Mooney M, McWeeney SK, Hitzemann R: Evaluating gene expression in C57BL/6J and DBA/2J mouse striatum using RNA-seq and microarrays . PLoS ONE. 2011, 6: 17820-10.1371/journal.pone.0017820.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1371%2Fjournal.pone.0017820" aria-label="Article reference 16" data-doi="10.1371/journal.pone.0017820">Article</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="17."><p class="c-article-references__text" id="ref-CR17">Pickrell JK, Marioni JC, Pai AA, Degner JF, Engelhardt BE, Nkadori E, Veyrieras J-B, Stephens M, Gilad Y, Pritchard JK: Understanding mechanisms underlying human gene expression variation with RNA sequencing . Nature. 2010, 464: 768-772. 10.1038/nature08872.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1038%2Fnature08872" aria-label="Article reference 17" data-doi="10.1038/nature08872">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=20220758" aria-label="PubMed reference 17">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3089435" aria-label="PubMed Central reference 17">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="18."><p class="c-article-references__text" id="ref-CR18">Hastie T, Tibshirani R, Friedman J: The Elements of Statistical Learning: Data Mining, Inference, and Prediction . 2009, Springer, New York City, USA</p><p class="c-article-references__links u-hide-print"><a rel="noopener" href="https://link.springer.com/book/10.1007/978-0-387-84858-7" aria-label="Book reference 18" data-doi="10.1007/978-0-387-84858-7">Book</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="19."><p class="c-article-references__text" id="ref-CR19">Bi Y, Davuluri R: NPEBseq: nonparametric empirical Bayesian-based procedure for differential expression analysis of RNA-seq data . BMC Bioinformatics. 2013, 14: 262-10.1186/1471-2105-14-262.</p><p class="c-article-references__links u-hide-print"><a rel="noopener" href="https://link.springer.com/article/10.1186/1471-2105-14-262" aria-label="Article reference 19" data-doi="10.1186/1471-2105-14-262">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=23981227" aria-label="PubMed reference 19">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3765716" aria-label="PubMed Central reference 19">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="20."><p class="c-article-references__text" id="ref-CR20">Feng J, Meyer CA, Wang Q, Liu JS, Liu XS, Zhang Y: GFOLD: a generalized fold change for ranking differentially expressed genes from RNA-seq data . Bioinformatics. 2012, 28: 2782-2788. 10.1093/bioinformatics/bts515.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbioinformatics%2Fbts515" aria-label="Article reference 20" data-doi="10.1093/bioinformatics/bts515">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=22923299" aria-label="PubMed reference 20">PubMed</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="21."><p class="c-article-references__text" id="ref-CR21">Benjamini Y, Hochberg Y: Controlling the false discovery rate: a practical and powerful approach to multiple testing . J R Stat Soc Ser B Methodol. 1995, 57: 289-300.</p><p class="c-article-references__links u-hide-print">&nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="22."><p class="c-article-references__text" id="ref-CR22">Bourgon R, Gentleman R, Huber W: Independent filtering increases detection power for high-throughput experiments . Proc Natl Acad Sci USA. 2010, 107: 9546-9551. 10.1073/pnas.0914005107.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1073%2Fpnas.0914005107" aria-label="Article reference 22" data-doi="10.1073/pnas.0914005107">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=20460310" aria-label="PubMed reference 22">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2906865" aria-label="PubMed Central reference 22">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="23."><p class="c-article-references__text" id="ref-CR23">McCarthy DJ, Smyth GK: Testing significance relative to a fold-change threshold is a TREAT . Bioinformatics. 2009, 25: 765-771. 10.1093/bioinformatics/btp053.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbioinformatics%2Fbtp053" aria-label="Article reference 23" data-doi="10.1093/bioinformatics/btp053">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=19176553" aria-label="PubMed reference 23">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2654802" aria-label="PubMed Central reference 23">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="24."><p class="c-article-references__text" id="ref-CR24">Li J, Tibshirani R: Finding consistent patterns: a nonparametric approach for identifying differential expression in RNA-seq data . Stat Methods Med Res. 2013, 22: 519-536. 10.1177/0962280211428386.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1177%2F0962280211428386" aria-label="Article reference 24" data-doi="10.1177/0962280211428386">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=22127579" aria-label="PubMed reference 24">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC4605138" aria-label="PubMed Central reference 24">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="25."><p class="c-article-references__text" id="ref-CR25">Cook RD: Detection of influential observation in linear regression . Technometrics. 1977, 19: 15-18. 10.2307/1268249.</p><p class="c-article-references__links u-hide-print">&nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="26."><p class="c-article-references__text" id="ref-CR26">Hammer P, Banck MS, Amberg R, Wang C, Petznick G, Luo S, Khrebtukova I, Schroth GP, Beyerlein P, Beutler AS: mRNA-seq with agnostic splice site discovery for nervous system transcriptomics tested in chronic pain . Genome Res. 2010, 20: 847-860. 10.1101/gr.101204.109.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1101%2Fgr.101204.109" aria-label="Article reference 26" data-doi="10.1101/gr.101204.109">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=20452967" aria-label="PubMed reference 26">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2877581" aria-label="PubMed Central reference 26">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="27."><p class="c-article-references__text" id="ref-CR27">Frazee A, Langmead B, Leek J: ReCount: a multi-experiment resource of analysis-ready RNA-seq gene count datasets . BMC Bioinformatics. 2011, 12: 449-10.1186/1471-2105-12-449.</p><p class="c-article-references__links u-hide-print"><a rel="noopener" href="https://link.springer.com/article/10.1186/1471-2105-12-449" aria-label="Article reference 27" data-doi="10.1186/1471-2105-12-449">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=22087737" aria-label="PubMed reference 27">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3229291" aria-label="PubMed Central reference 27">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="28."><p class="c-article-references__text" id="ref-CR28">Trapnell C, Hendrickson DG, Sauvageau M, Goff L, Rinn JL, Pachter L: Differential analysis of gene regulation at transcript resolution with RNA-seq . Nat Biotechnol. 2012, 31: 46-53. 10.1038/nbt.2450.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1038%2Fnbt.2450" aria-label="Article reference 28" data-doi="10.1038/nbt.2450">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=23222703" aria-label="PubMed reference 28">PubMed</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="29."><p class="c-article-references__text" id="ref-CR29">Glaus P, Honkela A, Rattray M: Identifying differentially expressed transcripts from RNA-seq data with biological variation . Bioinformatics. 2012, 28: 1721-1728. 10.1093/bioinformatics/bts260.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbioinformatics%2Fbts260" aria-label="Article reference 29" data-doi="10.1093/bioinformatics/bts260">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=22563066" aria-label="PubMed reference 29">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3381971" aria-label="PubMed Central reference 29">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="30."><p class="c-article-references__text" id="ref-CR30">Anders S, Reyes A, Huber W: Detecting differential usage of exons from RNA-seq data . Genome Res. 2012, 22: 2008-2017. 10.1101/gr.133744.111.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1101%2Fgr.133744.111" aria-label="Article reference 30" data-doi="10.1101/gr.133744.111">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=22722343" aria-label="PubMed reference 30">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3460195" aria-label="PubMed Central reference 30">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="31."><p class="c-article-references__text" id="ref-CR31">Sammeth M: Complete alternative splicing events are bubbles in splicing graphs . J Comput Biol. 2009, 16: 1117-1140. 10.1089/cmb.2009.0108.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1089%2Fcmb.2009.0108" aria-label="Article reference 31" data-doi="10.1089/cmb.2009.0108">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=19689216" aria-label="PubMed reference 31">PubMed</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="32."><p class="c-article-references__text" id="ref-CR32">Pagès H, Bindreither D, Carlson M, Morgan M: SplicingGraphs: create, manipulate, visualize splicing graphs, and assign RNA-seq reads to them2013. Bioconductor package [<a href="http://www.bioconductor.org">http://www.bioconductor.org</a>]</p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="33."><p class="c-article-references__text" id="ref-CR33">Robinson MD, McCarthy DJ, Smyth GK: edgeR: a Bioconductor package for differential expression analysis of digital gene expression data . Bioinformatics. 2009, 26: 139-140. 10.1093/bioinformatics/btp616.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbioinformatics%2Fbtp616" aria-label="Article reference 33" data-doi="10.1093/bioinformatics/btp616">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=19910308" aria-label="PubMed reference 33">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2796818" aria-label="PubMed Central reference 33">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="34."><p class="c-article-references__text" id="ref-CR34">Zhou X, Lindsay H, Robinson MD: Robustly detecting differential expression in RNA sequencing data using observation weights . Nucleic Acids Res. 2014, 42: e91-10.1093/nar/gku310.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fnar%2Fgku310" aria-label="Article reference 34" data-doi="10.1093/nar/gku310">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=24753412" aria-label="PubMed reference 34">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC4066750" aria-label="PubMed Central reference 34">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="35."><p class="c-article-references__text" id="ref-CR35">Leng N, Dawson JA, Thomson JA, Ruotti V, Rissman AI, Smits BMG, Haag JD, Gould MN, Stewart RM, Kendziorski C: EBSeq: an empirical Bayes hierarchical model for inference in RNA-seq experiments . Bioinformatics. 2013, 29: 1035-1043. 10.1093/bioinformatics/btt087.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbioinformatics%2Fbtt087" aria-label="Article reference 35" data-doi="10.1093/bioinformatics/btt087">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=23428641" aria-label="PubMed reference 35">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3624807" aria-label="PubMed Central reference 35">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="36."><p class="c-article-references__text" id="ref-CR36">Law CW, Chen Y, Shi W, Smyth GK: Voom: precision weights unlock linear model analysis tools for RNA-seq read counts . Genome Biol. 2014, 15: 29-10.1186/gb-2014-15-2-r29.</p><p class="c-article-references__links u-hide-print"><a rel="noopener" href="https://link.springer.com/article/10.1186/gb-2014-15-2-r29" aria-label="Article reference 36" data-doi="10.1186/gb-2014-15-2-r29">Article</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="37."><p class="c-article-references__text" id="ref-CR37">Hubert L, Arabie P: Comparing partitions . J Classif. 1985, 2: 193-218. 10.1007/BF01908075.</p><p class="c-article-references__links u-hide-print"><a rel="noopener" href="https://link.springer.com/article/10.1007/BF01908075" aria-label="Article reference 37" data-doi="10.1007/BF01908075">Article</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="38."><p class="c-article-references__text" id="ref-CR38">Witten DM: Classification and clustering of sequencing data using a Poisson model . Ann Appl Stat. 2011, 5: 2493-2518. 10.1214/11-AOAS493.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1214%2F11-AOAS493" aria-label="Article reference 38" data-doi="10.1214/11-AOAS493">Article</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="39."><p class="c-article-references__text" id="ref-CR39">Irizarry RA, Wu Z, Jaffee HA: Comparison of affymetrix GeneChip expression measures . Bioinformatics. 2006, 22: 789-794. 10.1093/bioinformatics/btk046.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbioinformatics%2Fbtk046" aria-label="Article reference 39" data-doi="10.1093/bioinformatics/btk046">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=16410320" aria-label="PubMed reference 39">PubMed</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="40."><p class="c-article-references__text" id="ref-CR40">Asangani IA, Dommeti VL, Wang X, Malik R, Cieslik M, Yang R, Escara-Wilke J, Wilder-Romans K, Dhanireddy S, Engelke C, Iyer MK, Jing X, Wu Y-M, Cao X, Qin ZS, Wang S, Feng FY, Chinnaiyan AM: Therapeutic targeting of BET bromodomain proteins in castration-resistant prostate cancer . Nature. 2014, 510: 278-282. 10.1038/nature13229.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1038%2Fnature13229" aria-label="Article reference 40" data-doi="10.1038/nature13229">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=24759320" aria-label="PubMed reference 40">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC4075966" aria-label="PubMed Central reference 40">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="41."><p class="c-article-references__text" id="ref-CR41">Stark R, Brown G: DiffBind: differential binding analysis of ChIP-seq peak data2013. Bioconductor package [<a href="http://www.bioconductor.org">http://www.bioconductor.org</a>]</p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="42."><p class="c-article-references__text" id="ref-CR42">Ross-Innes CS, Stark R, Teschendorff AE, Holmes KA, Ali HR, Dunning MJ, Brown GD, Gojis O, Ellis IO, Green AR, Ali S, Chin S-F, Palmieri C, Caldas C, Carroll JS: Differential oestrogen receptor binding is associated with clinical outcome in breast cancer . Nature. 2012, 481: 389-393.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=22217937" aria-label="PubMed reference 42">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3272464" aria-label="PubMed Central reference 42">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="43."><p class="c-article-references__text" id="ref-CR43">Robinson DG, Chen W, Storey JD, Gresham D: Design and analysis of bar-seq experiments . G3 (Bethesda). 2013, 4: 11-18. 10.1534/g3.113.008565.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1534%2Fg3.113.008565" aria-label="Article reference 43" data-doi="10.1534/g3.113.008565">Article</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="44."><p class="c-article-references__text" id="ref-CR44">McMurdie PJ, Holmes S: Waste not, want not: why rarefying microbiome data is inadmissible . PLoS Comput Biol. 2014, 10: 1003531-10.1371/journal.pcbi.1003531.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1371%2Fjournal.pcbi.1003531" aria-label="Article reference 44" data-doi="10.1371/journal.pcbi.1003531">Article</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="45."><p class="c-article-references__text" id="ref-CR45">Vasquez J, Hon C, Vanselow JT, Schlosser A, Siegel TN: Comparative ribosome profiling reveals extensive translational complexity in different Trypanosoma brucei life cycle stages . Nucleic Acids Res. 2014, 42: 3623-3637. 10.1093/nar/gkt1386.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fnar%2Fgkt1386" aria-label="Article reference 45" data-doi="10.1093/nar/gkt1386">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=24442674" aria-label="PubMed reference 45">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3973304" aria-label="PubMed Central reference 45">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="46."><p class="c-article-references__text" id="ref-CR46">Zhou Y, Zhu S, Cai C, Yuan P, Li C, Huang Y, Wei W: High-throughput screening of a CRISPR/Cas9 library for functional genomics in human cells . Nature. 2014, 509: 487-491. 10.1038/nature13166.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1038%2Fnature13166" aria-label="Article reference 46" data-doi="10.1038/nature13166">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=24717434" aria-label="PubMed reference 46">PubMed</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="47."><p class="c-article-references__text" id="ref-CR47">Cox DR, Reid N: Parameter orthogonality and approximate conditional inference . J R Stat Soc Ser B Methodol. 1987, 49: 1-39.</p><p class="c-article-references__links u-hide-print">&nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="48."><p class="c-article-references__text" id="ref-CR48">Robinson MD, Smyth GK: Small-sample estimation of negative binomial dispersion, with applications to SAGE data . Biostatistics. 2007, 9: 321-332. 10.1093/biostatistics/kxm030.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbiostatistics%2Fkxm030" aria-label="Article reference 48" data-doi="10.1093/biostatistics/kxm030">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=17728317" aria-label="PubMed reference 48">PubMed</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="49."><p class="c-article-references__text" id="ref-CR49">Pawitan Y: In All Likelihood: Statistical Modelling and Inference Using Likelihood . 2001, Oxford University Press, New York City, USA</p><p class="c-article-references__links u-hide-print">&nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="50."><p class="c-article-references__text" id="ref-CR50">Armijo L: Minimization of functions having Lipschitz continuous first partial derivatives . Pac J Math. 1966, 16: 1-3. 10.2140/pjm.1966.16.1.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.2140%2Fpjm.1966.16.1" aria-label="Article reference 50" data-doi="10.2140/pjm.1966.16.1">Article</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="51."><p class="c-article-references__text" id="ref-CR51">Di Y, Schafer DW, Cumbie JS, Chang JH: The NBP negative binomial model for assessing differential gene expression from RNA-seq . Stat Appl Genet Mol Biol. 2011, 10: 1-28.</p><p class="c-article-references__links u-hide-print">&nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="52."><p class="c-article-references__text" id="ref-CR52">Abramowitz M, Stegun I: Handbook of Mathematical Functions . 1965, Dover Publications, New York, USA</p><p class="c-article-references__links u-hide-print">&nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="53."><p class="c-article-references__text" id="ref-CR53">Newton M, Kendziorski C, Richmond C, Blattner F, Tsui K: On differential variability of expression ratios: improving statistical inference about gene expression changes from microarray data . J Comput Biol. 2001, 8: 37-52. 10.1089/106652701300099074.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1089%2F106652701300099074" aria-label="Article reference 53" data-doi="10.1089/106652701300099074">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=11339905" aria-label="PubMed reference 53">PubMed</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="54."><p class="c-article-references__text" id="ref-CR54">Huber W, von Heydebreck A, Sultmann H, Poustka A, Vingron M: Variance stabilization applied to microarray data calibration and to the quantification of differential expression . Bioinformatics. 2002, 18: 96-104. 10.1093/bioinformatics/18.suppl_1.S96.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbioinformatics%2F18.suppl_1.S96" aria-label="Article reference 54" data-doi="10.1093/bioinformatics/18.suppl_1.S96">Article</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="55."><p class="c-article-references__text" id="ref-CR55">Durbin BP, Hardin JS, Hawkins DM, Rocke DM: A variance-stabilizing transformation for gene-expression microarray data . Bioinformatics. 2002, 18: 105-110. 10.1093/bioinformatics/18.suppl_1.S105.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbioinformatics%2F18.suppl_1.S105" aria-label="Article reference 55" data-doi="10.1093/bioinformatics/18.suppl_1.S105">Article</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="56."><p class="c-article-references__text" id="ref-CR56">Park MY: Generalized linear models with regularization. <i>PhD thesis.</i>Stanford University, Department of Statistics; 2006.</p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="57."><p class="c-article-references__text" id="ref-CR57">Friedman J, Hastie T, Tibshirani R: Regularization paths for generalized linear models via coordinate descent . J Stat Softw. 2010, 33: 1-22.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.18637%2Fjss.v033.i01" aria-label="Article reference 57" data-doi="10.18637/jss.v033.i01">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=20808728" aria-label="PubMed reference 57">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2929880" aria-label="PubMed Central reference 57">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="58."><p class="c-article-references__text" id="ref-CR58">Cule E, Vineis P, De Iorio M: Significance testing in ridge regression for genetic data . BMC Bioinformatics. 2011, 12: 372-10.1186/1471-2105-12-372.</p><p class="c-article-references__links u-hide-print"><a rel="noopener" href="https://link.springer.com/article/10.1186/1471-2105-12-372" aria-label="Article reference 58" data-doi="10.1186/1471-2105-12-372">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=21929786" aria-label="PubMed reference 58">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3228544" aria-label="PubMed Central reference 58">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="59."><p class="c-article-references__text" id="ref-CR59">Cook RD, Weisberg S: Residuals and Influence in Regression . 1982, Chapman and Hall/CRC, New York, USA</p><p class="c-article-references__links u-hide-print">&nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="60."><p class="c-article-references__text" id="ref-CR60">Lawrence M, Huber W, Pagès H, Aboyoun P, Carlson M, Gentleman R, Morgan MT, Carey VJ: Software for computing and annotating genomic ranges . PLoS Comput Biol. 2013, 9: 1003118-10.1371/journal.pcbi.1003118.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1371%2Fjournal.pcbi.1003118" aria-label="Article reference 60" data-doi="10.1371/journal.pcbi.1003118">Article</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="61."><p class="c-article-references__text" id="ref-CR61">Pagès H, Obenchain V, Morgan M: GenomicAlignments: Representation and manipulation of short genomic alignments2013. Bioconductor package [<a href="http://www.bioconductor.org">http://www.bioconductor.org</a>]</p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="62."><p class="c-article-references__text" id="ref-CR62">Anders S, Pyl PT, Huber W: HTSeq - A Python framework to work with high-throughput sequencing data . Bioinformatics. 2015, 31: 166-10.1093/bioinformatics/btu638.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbioinformatics%2Fbtu638" aria-label="Article reference 62" data-doi="10.1093/bioinformatics/btu638">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=25260700" aria-label="PubMed reference 62">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287950" aria-label="PubMed Central reference 62">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="63."><p class="c-article-references__text" id="ref-CR63">Delhomme N, Padioleau I, Furlong EE, Steinmetz LM: easyRNASeq: a Bioconductor package for processing RNA-seq data . Bioinformatics. 2012, 28: 2532-2533. 10.1093/bioinformatics/bts477.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbioinformatics%2Fbts477" aria-label="Article reference 63" data-doi="10.1093/bioinformatics/bts477">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=22847932" aria-label="PubMed reference 63">PubMed</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3463124" aria-label="PubMed Central reference 63">PubMed Central</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="64."><p class="c-article-references__text" id="ref-CR64">Liao Y, Smyth GK, Shi W: featureCounts: an efficient general purpose program for assigning sequence reads to genomic features . Bioinformatics. 2014, 30: 923-930. 10.1093/bioinformatics/btt656.</p><p class="c-article-references__links u-hide-print"><a rel="nofollow noopener" href="https://doi.org/10.1093%2Fbioinformatics%2Fbtt656" aria-label="Article reference 64" data-doi="10.1093/bioinformatics/btt656">Article</a>&nbsp;
+    <a rel="nofollow noopener" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;dopt=Abstract&amp;list_uids=24227677" aria-label="PubMed reference 64">PubMed</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="65."><p class="c-article-references__text" id="ref-CR65">Kim D, Pertea G, Trapnell C, Pimentel H, Kelley R, Salzberg S: TopHat2: accurate alignment of transcriptomes in the presence of insertions, deletions and gene fusions . Genome Biol. 2013, 14: 36-10.1186/gb-2013-14-4-r36.</p><p class="c-article-references__links u-hide-print"><a rel="noopener" href="https://link.springer.com/article/10.1186/gb-2013-14-4-r36" aria-label="Article reference 65" data-doi="10.1186/gb-2013-14-4-r36">Article</a>&nbsp;
+    &nbsp;
+                </p></li><li class="c-article-references__item js-c-reading-companion-references-item" data-counter="66."><p class="c-article-references__text" id="ref-CR66">DESeq2paper. [<a href="http://www-huber.embl.de/DESeq2paper">http://www-huber.embl.de/DESeq2paper</a>]</p></li></ol><p class="c-article-references__download u-hide-print"><a rel="nofollow" href="https://citation-needed.springer.com/v2/references/10.1186/s13059-014-0550-8?format=refman&amp;flavour=references">Download references</a></p></div></div></div></section></div><section data-title="Acknowledgements"><div class="c-article-section" id="Ack1-section"><h2 class="c-article-section__title js-section-title js-c-reading-companion-sections-item" id="Ack1">Acknowledgements</h2><div class="c-article-section__content" id="Ack1-content"><p>The authors thank all users of DESeq and DESeq2 who provided valuable feedback. We thank Judith Zaugg for helpful comments on the manuscript. MIL acknowledges funding via a stipend from the International Max Planck Research School for Computational Biology and Scientific Computing and a grant from the National Institutes of Health (5T32CA009337-33). WH and SA acknowledge funding from the European Union’s 7th Framework Programme (Health) via Project <i>Radiant</i>. We thank an anonymous reviewer for raising the question of estimation biases in the dispersion-mean trend fitting.</p></div></div></section><section aria-labelledby="author-information" data-title="Author information"><div class="c-article-section" id="author-information-section"><h2 class="c-article-section__title js-section-title js-c-reading-companion-sections-item" id="author-information">Author information</h2><div class="c-article-section__content" id="author-information-content"><h3 class="c-article__sub-heading" id="affiliations">Authors and Affiliations</h3><ol class="c-article-author-affiliation__list"><li id="Aff1"><p class="c-article-author-affiliation__address">Department of Biostatistics and Computational Biology, Dana Farber Cancer Institute and Department of Biostatistics, Harvard School of Public Health, 450 Brookline Avenue, Boston, 02215, MA, USA</p><p class="c-article-author-affiliation__authors-list">Michael I Love</p></li><li id="Aff2"><p class="c-article-author-affiliation__address">Genome Biology Unit, European Molecular Biology Laboratory, Meyerhofstrasse 1, Heidelberg, 69117, Germany</p><p class="c-article-author-affiliation__authors-list">Michael I Love,&nbsp;Wolfgang Huber&nbsp;&amp;&nbsp;Simon Anders</p></li><li id="Aff3"><p class="c-article-author-affiliation__address">Department of Computational Molecular Biology, Max Planck Institute for Molecular Genetics, Ihnestrasse, 63-7314195, Berlin, Germany</p><p class="c-article-author-affiliation__authors-list">Michael I Love</p></li></ol><div class="u-js-hide u-hide-print" data-test="author-info"><span class="c-article__sub-heading">Authors</span></div><h3 class="c-article__sub-heading" id="corresponding-author">Corresponding author</h3><p id="corresponding-author-list">Correspondence to
+                <a id="corresp-c1" aria-label="email Simon Anders" href="mailto:sanders@fs.tum.de">Simon Anders</a>.</p></div></div></section><section data-title="Additional information"><div class="c-article-section" id="additional-information-section"><h2 class="c-article-section__title js-section-title js-c-reading-companion-sections-item" id="additional-information">Additional information</h2><div class="c-article-section__content" id="additional-information-content"><h3 class="c-article__sub-heading">Competing interests</h3><p>The authors declare that they have no competing interests.</p><h3 class="c-article__sub-heading">Authors’ contributions</h3><p>All authors developed the method and wrote the manuscript. MIL implemented the method and performed the analyses. All authors read and approved the final manuscript.</p></div></div></section><section data-title="Electronic supplementary material"><div class="c-article-section" id="Sec34-section"><h2 class="c-article-section__title js-section-title js-c-reading-companion-sections-item" id="Sec34">Electronic supplementary material</h2><div class="c-article-section__content" id="Sec34-content"><div data-test="supplementary-info"><div id="figshareContainer" class="c-article-figshare-container" data-test="figshare-container"></div><div class="c-article-supplementary__item" data-test="supp-item" id="MOESM1"><h3 class="c-article-supplementary__title u-h3"><a data-test="supp-info-link" class="print-link" href="https://media.springernature.com/original/springer-static/esm/art%3A10.1186%2Fs13059-014-0550-8/MediaObjects/13059_2014_550_MOESM1_ESM.pdf" data-supp-info-image="">Additional file 1: Supplementary methods, tables and figures. (PDF 1 MB) (download PDF )</a></h3></div></div></div></div></section><section data-title="Rights and permissions"><div class="c-article-section" id="rightslink-section"><h2 class="c-article-section__title js-section-title js-c-reading-companion-sections-item" id="rightslink">Rights and permissions</h2><div class="c-article-section__content" id="rightslink-content">
+                        <p>
+                           <b>Open Access</b>  This article is licensed under a Creative Commons Attribution 4.0 International License, which permits use, sharing, adaptation, distribution and reproduction in any medium or format, as long as you give appropriate credit to the original author(s) and the source, provide a link to the Creative Commons licence, and indicate if changes were made.</p>
+                        <p>The images or other third party material in this article are included in the article’s Creative Commons licence, unless indicated otherwise in a credit line to the material. If material is not included in the article’s Creative Commons licence and your intended use is not permitted by statutory regulation or exceeds the permitted use, you will need to obtain permission directly from the copyright holder.</p>
+                        <p>To view a copy of this licence, visit <a href="http://creativecommons.org/licenses/by/4.0/" rel="license">http://creativecommons.org/licenses/by/4.0/</a>.</p>
+                     <p class="c-article-rights"><a href="https://s100.copyright.com/AppDispatchServlet?title=Moderated%20estimation%20of%20fold%20change%20and%20dispersion%20for%20RNA-seq%20data%20with%20DESeq2&amp;author=Michael%20I%20Love%20et%20al&amp;contentID=10.1186%2Fs13059-014-0550-8&amp;copyright=Love%20et%20al.%3B%20licensee%20BioMed%20Central.&amp;publication=1474-760X&amp;publicationDate=2014-12-05&amp;publisherName=SpringerNature&amp;orderBeanReset=true&amp;oa=CC%20BY">Reprints and permissions</a></p></div></div></section><section aria-labelledby="article-info" data-title="About this article"><div class="c-article-section" id="article-info-section"><h2 class="c-article-section__title js-section-title js-c-reading-companion-sections-item" id="article-info">About this article</h2><div class="c-article-section__content" id="article-info-content"><div class="c-bibliographic-information"><div class="u-hide-print c-bibliographic-information__column c-bibliographic-information__column--border"><a data-crossmark="10.1186/s13059-014-0550-8" target="_blank" rel="noopener" href="https://crossmark.crossref.org/dialog/?doi=10.1186/s13059-014-0550-8" data-test="crossmark"><img loading="lazy" width="57" height="81" alt="Check for updates. Verify currency and authenticity via CrossMark" src="data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjgxIiB3aWR0aD0iNTciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJtMTcuMzUgMzUuNDUgMjEuMy0xNC4ydi0xNy4wM2gtMjEuMyIgZmlsbD0iIzk4OTg5OCIvPjxwYXRoIGQ9Im0zOC42NSAzNS40NS0yMS4zLTE0LjJ2LTE3LjAzaDIxLjMiIGZpbGw9IiM3NDc0NzQiLz48cGF0aCBkPSJtMjggLjVjLTEyLjk4IDAtMjMuNSAxMC41Mi0yMy41IDIzLjVzMTAuNTIgMjMuNSAyMy41IDIzLjUgMjMuNS0xMC41MiAyMy41LTIzLjVjMC02LjIzLTIuNDgtMTIuMjEtNi44OC0xNi42Mi00LjQxLTQuNC0xMC4zOS02Ljg4LTE2LjYyLTYuODh6bTAgNDEuMjVjLTkuOCAwLTE3Ljc1LTcuOTUtMTcuNzUtMTcuNzVzNy45NS0xNy43NSAxNy43NS0xNy43NSAxNy43NSA3Ljk1IDE3Ljc1IDE3Ljc1YzAgNC43MS0xLjg3IDkuMjItNS4yIDEyLjU1cy03Ljg0IDUuMi0xMi41NSA1LjJ6IiBmaWxsPSIjNTM1MzUzIi8+PHBhdGggZD0ibTQxIDM2Yy01LjgxIDYuMjMtMTUuMjMgNy40NS0yMi40MyAyLjktNy4yMS00LjU1LTEwLjE2LTEzLjU3LTcuMDMtMjEuNWwtNC45Mi0zLjExYy00Ljk1IDEwLjctMS4xOSAyMy40MiA4Ljc4IDI5LjcxIDkuOTcgNi4zIDIzLjA3IDQuMjIgMzAuNi00Ljg2eiIgZmlsbD0iIzljOWM5YyIvPjxwYXRoIGQ9Im0uMiA1OC40NWMwLS43NS4xMS0xLjQyLjMzLTIuMDFzLjUyLTEuMDkuOTEtMS41Yy4zOC0uNDEuODMtLjczIDEuMzQtLjk0LjUxLS4yMiAxLjA2LS4zMiAxLjY1LS4zMi41NiAwIDEuMDYuMTEgMS41MS4zNS40NC4yMy44MS41IDEuMS44MWwtLjkxIDEuMDFjLS4yNC0uMjQtLjQ5LS40Mi0uNzUtLjU2LS4yNy0uMTMtLjU4LS4yLS45My0uMi0uMzkgMC0uNzMuMDgtMS4wNS4yMy0uMzEuMTYtLjU4LjM3LS44MS42Ni0uMjMuMjgtLjQxLjYzLS41MyAxLjA0LS4xMy40MS0uMTkuODgtLjE5IDEuMzkgMCAxLjA0LjIzIDEuODYuNjggMi40Ni40NS41OSAxLjA2Ljg4IDEuODQuODguNDEgMCAuNzctLjA3IDEuMDctLjIzcy41OS0uMzkuODUtLjY4bC45MSAxYy0uMzguNDMtLjguNzYtMS4yOC45OS0uNDcuMjItMSAuMzQtMS41OC4zNC0uNTkgMC0xLjEzLS4xLTEuNjQtLjMxLS41LS4yLS45NC0uNTEtMS4zMS0uOTEtLjM4LS40LS42Ny0uOS0uODgtMS40OC0uMjItLjU5LS4zMy0xLjI2LS4zMy0yLjAyem04LjQtNS4zM2gxLjYxdjIuNTRsLS4wNSAxLjMzYy4yOS0uMjcuNjEtLjUxLjk2LS43MnMuNzYtLjMxIDEuMjQtLjMxYy43MyAwIDEuMjcuMjMgMS42MS43MS4zMy40Ny41IDEuMTQuNSAyLjAydjQuMzFoLTEuNjF2LTQuMWMwLS41Ny0uMDgtLjk3LS4yNS0xLjIxLS4xNy0uMjMtLjQ1LS4zNS0uODMtLjM1LS4zIDAtLjU2LjA4LS43OS4yMi0uMjMuMTUtLjQ5LjM2LS43OC42NHY0LjhoLTEuNjF6bTcuMzcgNi40NWMwLS41Ni4wOS0xLjA2LjI2LTEuNTEuMTgtLjQ1LjQyLS44My43MS0xLjE0LjI5LS4zLjYzLS41NCAxLjAxLS43MS4zOS0uMTcuNzgtLjI1IDEuMTgtLjI1LjQ3IDAgLjg4LjA4IDEuMjMuMjQuMzYuMTYuNjUuMzguODkuNjdzLjQyLjYzLjU0IDEuMDNjLjEyLjQxLjE4Ljg0LjE4IDEuMzIgMCAuMzItLjAyLjU3LS4wNy43NmgtNC4zNmMuMDcuNjIuMjkgMS4xLjY1IDEuNDQuMzYuMzMuODIuNSAxLjM4LjUuMjkgMCAuNTctLjA0LjgzLS4xM3MuNTEtLjIxLjc2LS4zN2wuNTUgMS4wMWMtLjMzLjIxLS42OS4zOS0xLjA5LjUzLS40MS4xNC0uODMuMjEtMS4yNi4yMS0uNDggMC0uOTItLjA4LTEuMzQtLjI1LS40MS0uMTYtLjc2LS40LTEuMDctLjctLjMxLS4zMS0uNTUtLjY5LS43Mi0xLjEzLS4xOC0uNDQtLjI2LS45NS0uMjYtMS41MnptNC42LS42MmMwLS41NS0uMTEtLjk4LS4zNC0xLjI4LS4yMy0uMzEtLjU4LS40Ny0xLjA2LS40Ny0uNDEgMC0uNzcuMTUtMS4wNy40NS0uMzEuMjktLjUuNzMtLjU4IDEuM3ptMi41LjYyYzAtLjU3LjA5LTEuMDguMjgtMS41My4xOC0uNDQuNDMtLjgyLjc1LTEuMTNzLjY5LS41NCAxLjEtLjcxYy40Mi0uMTYuODUtLjI0IDEuMzEtLjI0LjQ1IDAgLjg0LjA4IDEuMTcuMjNzLjYxLjM0Ljg1LjU3bC0uNzcgMS4wMmMtLjE5LS4xNi0uMzgtLjI4LS41Ni0uMzctLjE5LS4wOS0uMzktLjE0LS42MS0uMTQtLjU2IDAtMS4wMS4yMS0xLjM1LjYzLS4zNS40MS0uNTIuOTctLjUyIDEuNjcgMCAuNjkuMTcgMS4yNC41MSAxLjY2LjM0LjQxLjc4LjYyIDEuMzIuNjIuMjggMCAuNTQtLjA2Ljc4LS4xNy4yNC0uMTIuNDUtLjI2LjY0LS40MmwuNjcgMS4wM2MtLjMzLjI5LS42OS41MS0xLjA4LjY1LS4zOS4xNS0uNzguMjMtMS4xOC4yMy0uNDYgMC0uOS0uMDgtMS4zMS0uMjQtLjQtLjE2LS43NS0uMzktMS4wNS0uN3MtLjUzLS42OS0uNy0xLjEzYy0uMTctLjQ1LS4yNS0uOTYtLjI1LTEuNTN6bTYuOTEtNi40NWgxLjU4djYuMTdoLjA1bDIuNTQtMy4xNmgxLjc3bC0yLjM1IDIuOCAyLjU5IDQuMDdoLTEuNzVsLTEuNzctMi45OC0xLjA4IDEuMjN2MS43NWgtMS41OHptMTMuNjkgMS4yN2MtLjI1LS4xMS0uNS0uMTctLjc1LS4xNy0uNTggMC0uODcuMzktLjg3IDEuMTZ2Ljc1aDEuMzR2MS4yN2gtMS4zNHY1LjZoLTEuNjF2LTUuNmgtLjkydi0xLjJsLjkyLS4wN3YtLjcyYzAtLjM1LjA0LS42OC4xMy0uOTguMDgtLjMxLjIxLS41Ny40LS43OXMuNDItLjM5LjcxLS41MWMuMjgtLjEyLjYzLS4xOCAxLjA0LS4xOC4yNCAwIC40OC4wMi42OS4wNy4yMi4wNS40MS4xLjU3LjE3em0uNDggNS4xOGMwLS41Ny4wOS0xLjA4LjI3LTEuNTMuMTctLjQ0LjQxLS44Mi43Mi0xLjEzLjMtLjMxLjY1LS41NCAxLjA0LS43MS4zOS0uMTYuOC0uMjQgMS4yMy0uMjRzLjg0LjA4IDEuMjQuMjRjLjQuMTcuNzQuNCAxLjA0Ljcxcy41NC42OS43MiAxLjEzYy4xOS40NS4yOC45Ni4yOCAxLjUzcy0uMDkgMS4wOC0uMjggMS41M2MtLjE4LjQ0LS40Mi44Mi0uNzIgMS4xM3MtLjY0LjU0LTEuMDQuNy0uODEuMjQtMS4yNC4yNC0uODQtLjA4LTEuMjMtLjI0LS43NC0uMzktMS4wNC0uN2MtLjMxLS4zMS0uNTUtLjY5LS43Mi0xLjEzLS4xOC0uNDUtLjI3LS45Ni0uMjctMS41M3ptMS42NSAwYzAgLjY5LjE0IDEuMjQuNDMgMS42Ni4yOC40MS42OC42MiAxLjE4LjYyLjUxIDAgLjktLjIxIDEuMTktLjYyLjI5LS40Mi40NC0uOTcuNDQtMS42NiAwLS43LS4xNS0xLjI2LS40NC0xLjY3LS4yOS0uNDItLjY4LS42My0xLjE5LS42My0uNSAwLS45LjIxLTEuMTguNjMtLjI5LjQxLS40My45Ny0uNDMgMS42N3ptNi40OC0zLjQ0aDEuMzNsLjEyIDEuMjFoLjA1Yy4yNC0uNDQuNTQtLjc5Ljg4LTEuMDIuMzUtLjI0LjctLjM2IDEuMDctLjM2LjMyIDAgLjU5LjA1Ljc4LjE0bC0uMjggMS40LS4zMy0uMDljLS4xMS0uMDEtLjIzLS4wMi0uMzgtLjAyLS4yNyAwLS41Ni4xLS44Ni4zMXMtLjU1LjU4LS43NyAxLjF2NC4yaC0xLjYxem0tNDcuODcgMTVoMS42MXY0LjFjMCAuNTcuMDguOTcuMjUgMS4yLjE3LjI0LjQ0LjM1LjgxLjM1LjMgMCAuNTctLjA3LjgtLjIyLjIyLS4xNS40Ny0uMzkuNzMtLjczdi00LjdoMS42MXY2Ljg3aC0xLjMybC0uMTItMS4wMWgtLjA0Yy0uMy4zNi0uNjMuNjQtLjk4Ljg2LS4zNS4yMS0uNzYuMzItMS4yNC4zMi0uNzMgMC0xLjI3LS4yNC0xLjYxLS43MS0uMzMtLjQ3LS41LTEuMTQtLjUtMi4wMnptOS40NiA3LjQzdjIuMTZoLTEuNjF2LTkuNTloMS4zM2wuMTIuNzJoLjA1Yy4yOS0uMjQuNjEtLjQ1Ljk3LS42My4zNS0uMTcuNzItLjI2IDEuMS0uMjYuNDMgMCAuODEuMDggMS4xNS4yNC4zMy4xNy42MS40Ljg0LjcxLjI0LjMxLjQxLjY4LjUzIDEuMTEuMTMuNDIuMTkuOTEuMTkgMS40NCAwIC41OS0uMDkgMS4xMS0uMjUgMS41Ny0uMTYuNDctLjM4Ljg1LS42NSAxLjE2LS4yNy4zMi0uNTguNTYtLjk0LjczLS4zNS4xNi0uNzIuMjUtMS4xLjI1LS4zIDAtLjYtLjA3LS45LS4ycy0uNTktLjMxLS44Ny0uNTZ6bTAtMi4zYy4yNi4yMi41LjM3LjczLjQ1LjI0LjA5LjQ2LjEzLjY2LjEzLjQ2IDAgLjg0LS4yIDEuMTUtLjYuMzEtLjM5LjQ2LS45OC40Ni0xLjc3IDAtLjY5LS4xMi0xLjIyLS4zNS0xLjYxLS4yMy0uMzgtLjYxLS41Ny0xLjEzLS41Ny0uNDkgMC0uOTkuMjYtMS41Mi43N3ptNS44Ny0xLjY5YzAtLjU2LjA4LTEuMDYuMjUtMS41MS4xNi0uNDUuMzctLjgzLjY1LTEuMTQuMjctLjMuNTgtLjU0LjkzLS43MXMuNzEtLjI1IDEuMDgtLjI1Yy4zOSAwIC43My4wNyAxIC4yLjI3LjE0LjU0LjMyLjgxLjU1bC0uMDYtMS4xdi0yLjQ5aDEuNjF2OS44OGgtMS4zM2wtLjExLS43NGgtLjA2Yy0uMjUuMjUtLjU0LjQ2LS44OC42NC0uMzMuMTgtLjY5LjI3LTEuMDYuMjctLjg3IDAtMS41Ni0uMzItMi4wNy0uOTVzLS43Ni0xLjUxLS43Ni0yLjY1em0xLjY3LS4wMWMwIC43NC4xMyAxLjMxLjQgMS43LjI2LjM4LjY1LjU4IDEuMTUuNTguNTEgMCAuOTktLjI2IDEuNDQtLjc3di0zLjIxYy0uMjQtLjIxLS40OC0uMzYtLjctLjQ1LS4yMy0uMDgtLjQ2LS4xMi0uNy0uMTItLjQ1IDAtLjgyLjE5LTEuMTMuNTktLjMxLjM5LS40Ni45NS0uNDYgMS42OHptNi4zNSAxLjU5YzAtLjczLjMyLTEuMy45Ny0xLjcxLjY0LS40IDEuNjctLjY4IDMuMDgtLjg0IDAtLjE3LS4wMi0uMzQtLjA3LS41MS0uMDUtLjE2LS4xMi0uMy0uMjItLjQzcy0uMjItLjIyLS4zOC0uM2MtLjE1LS4wNi0uMzQtLjEtLjU4LS4xLS4zNCAwLS42OC4wNy0xIC4ycy0uNjMuMjktLjkzLjQ3bC0uNTktMS4wOGMuMzktLjI0LjgxLS40NSAxLjI4LS42My40Ny0uMTcuOTktLjI2IDEuNTQtLjI2Ljg2IDAgMS41MS4yNSAxLjkzLjc2cy42MyAxLjI1LjYzIDIuMjF2NC4wN2gtMS4zMmwtLjEyLS43NmgtLjA1Yy0uMy4yNy0uNjMuNDgtLjk4LjY2cy0uNzMuMjctMS4xNC4yN2MtLjYxIDAtMS4xLS4xOS0xLjQ4LS41Ni0uMzgtLjM2LS41Ny0uODUtLjU3LTEuNDZ6bTEuNTctLjEyYzAgLjMuMDkuNTMuMjcuNjcuMTkuMTQuNDIuMjEuNzEuMjEuMjggMCAuNTQtLjA3Ljc3LS4ycy40OC0uMzEuNzMtLjU2di0xLjU0Yy0uNDcuMDYtLjg2LjEzLTEuMTguMjMtLjMxLjA5LS41Ny4xOS0uNzYuMzFzLS4zMy4yNS0uNDEuNGMtLjA5LjE1LS4xMy4zMS0uMTMuNDh6bTYuMjktMy42M2gtLjk4di0xLjJsMS4wNi0uMDcuMi0xLjg4aDEuMzR2MS44OGgxLjc1djEuMjdoLTEuNzV2My4yOGMwIC44LjMyIDEuMi45NyAxLjIuMTIgMCAuMjQtLjAxLjM3LS4wNC4xMi0uMDMuMjQtLjA3LjM0LS4xMWwuMjggMS4xOWMtLjE5LjA2LS40LjEyLS42NC4xNy0uMjMuMDUtLjQ5LjA4LS43Ni4wOC0uNCAwLS43NC0uMDYtMS4wMi0uMTgtLjI3LS4xMy0uNDktLjMtLjY3LS41Mi0uMTctLjIxLS4zLS40OC0uMzctLjc4LS4wOC0uMy0uMTItLjY0LS4xMi0xLjAxem00LjM2IDIuMTdjMC0uNTYuMDktMS4wNi4yNy0xLjUxcy40MS0uODMuNzEtMS4xNGMuMjktLjMuNjMtLjU0IDEuMDEtLjcxLjM5LS4xNy43OC0uMjUgMS4xOC0uMjUuNDcgMCAuODguMDggMS4yMy4yNC4zNi4xNi42NS4zOC44OS42N3MuNDIuNjMuNTQgMS4wM2MuMTIuNDEuMTguODQuMTggMS4zMiAwIC4zMi0uMDIuNTctLjA3Ljc2aC00LjM3Yy4wOC42Mi4yOSAxLjEuNjUgMS40NC4zNi4zMy44Mi41IDEuMzguNS4zIDAgLjU4LS4wNC44NC0uMTMuMjUtLjA5LjUxLS4yMS43Ni0uMzdsLjU0IDEuMDFjLS4zMi4yMS0uNjkuMzktMS4wOS41M3MtLjgyLjIxLTEuMjYuMjFjLS40NyAwLS45Mi0uMDgtMS4zMy0uMjUtLjQxLS4xNi0uNzctLjQtMS4wOC0uNy0uMy0uMzEtLjU0LS42OS0uNzItMS4xMy0uMTctLjQ0LS4yNi0uOTUtLjI2LTEuNTJ6bTQuNjEtLjYyYzAtLjU1LS4xMS0uOTgtLjM0LTEuMjgtLjIzLS4zMS0uNTgtLjQ3LTEuMDYtLjQ3LS40MSAwLS43Ny4xNS0xLjA4LjQ1LS4zMS4yOS0uNS43My0uNTcgMS4zem0zLjAxIDIuMjNjLjMxLjI0LjYxLjQzLjkyLjU3LjMuMTMuNjMuMi45OC4yLjM4IDAgLjY1LS4wOC44My0uMjNzLjI3LS4zNS4yNy0uNmMwLS4xNC0uMDUtLjI2LS4xMy0uMzctLjA4LS4xLS4yLS4yLS4zNC0uMjgtLjE0LS4wOS0uMjktLjE2LS40Ny0uMjNsLS41My0uMjJjLS4yMy0uMDktLjQ2LS4xOC0uNjktLjMtLjIzLS4xMS0uNDQtLjI0LS42Mi0uNHMtLjMzLS4zNS0uNDUtLjU1Yy0uMTItLjIxLS4xOC0uNDYtLjE4LS43NSAwLS42MS4yMy0xLjEuNjgtMS40OS40NC0uMzggMS4wNi0uNTcgMS44My0uNTcuNDggMCAuOTEuMDggMS4yOS4yNXMuNzEuMzYuOTkuNTdsLS43NC45OGMtLjI0LS4xNy0uNDktLjMyLS43My0uNDItLjI1LS4xMS0uNTEtLjE2LS43OC0uMTYtLjM1IDAtLjYuMDctLjc2LjIxLS4xNy4xNS0uMjUuMzMtLjI1LjU0IDAgLjE0LjA0LjI2LjEyLjM2cy4xOC4xOC4zMS4yNmMuMTQuMDcuMjkuMTQuNDYuMjFsLjU0LjE5Yy4yMy4wOS40Ny4xOC43LjI5cy40NC4yNC42NC40Yy4xOS4xNi4zNC4zNS40Ni41OC4xMS4yMy4xNy41LjE3LjgyIDAgLjMtLjA2LjU4LS4xNy44My0uMTIuMjYtLjI5LjQ4LS41MS42OC0uMjMuMTktLjUxLjM0LS44NC40NS0uMzQuMTEtLjcyLjE3LTEuMTUuMTctLjQ4IDAtLjk1LS4wOS0xLjQxLS4yNy0uNDYtLjE5LS44Ni0uNDEtMS4yLS42OHoiIGZpbGw9IiM1MzUzNTMiLz48L2c+PC9zdmc+"></a></div><div class="c-bibliographic-information__column"><h3 class="c-article__sub-heading" id="citeas">Cite this article</h3><p class="c-bibliographic-information__citation">Love, M.I., Huber, W. &amp; Anders, S. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2.
+                    <i>Genome Biol</i> <b>15</b>, 550 (2014). https://doi.org/10.1186/s13059-014-0550-8</p><p class="c-bibliographic-information__download-citation u-hide-print"><a data-test="citation-link" rel="nofollow" href="https://citation-needed.springer.com/v2/references/10.1186/s13059-014-0550-8?format=refman&amp;flavour=citation">Download citation</a></p><ul class="c-bibliographic-information__list" data-test="publication-history"><li class="c-bibliographic-information__list-item"><p>Received<span class="u-hide">: </span><span class="c-bibliographic-information__value"><time datetime="2014-05-27">27 May 2014</time></span></p></li><li class="c-bibliographic-information__list-item"><p>Accepted<span class="u-hide">: </span><span class="c-bibliographic-information__value"><time datetime="2014-11-19">19 November 2014</time></span></p></li><li class="c-bibliographic-information__list-item"><p>Published<span class="u-hide">: </span><span class="c-bibliographic-information__value"><time datetime="2014-12-05">05 December 2014</time></span></p></li><li class="c-bibliographic-information__list-item c-bibliographic-information__list-item--full-width"><p><abbr title="Digital Object Identifier">DOI</abbr><span class="u-hide">: </span><span class="c-bibliographic-information__value">https://doi.org/10.1186/s13059-014-0550-8</span></p></li></ul><div data-component="share-box"><div class="c-article-share-box u-display-none" hidden=""><h3 class="c-article__sub-heading">Share this article</h3><p class="c-article-share-box__description">Anyone you share the following link with will be able to read this content:</p><button class="js-get-share-url c-article-share-box__button" type="button" id="get-share-url">Get shareable link</button><div class="js-no-share-url-container u-display-none" hidden=""><p class="js-c-article-share-box__no-sharelink-info c-article-share-box__no-sharelink-info">Sorry, a shareable link is not currently available for this article.</p></div><div class="js-share-url-container u-display-none" hidden=""><p class="js-share-url c-article-share-box__only-read-input" id="share-url"></p><button class="js-copy-share-url c-article-share-box__button--link-like" type="button" id="copy-share-url">Copy shareable link to clipboard</button></div><p class="js-c-article-share-box__additional-info c-article-share-box__additional-info">
+                            Provided by the Springer Nature SharedIt content-sharing initiative
+                        </p></div></div><h3 class="c-article__sub-heading">Keywords</h3><ul class="c-article-subject-list"><li class="c-article-subject-list__subject"><span><a href="/search?query=Read%20Count&amp;facet-discipline=&quot;Life%20Sciences&quot;">Read Count</a></span></li><li class="c-article-subject-list__subject"><span><a href="/search?query=Differential%20Expression%20Analysis&amp;facet-discipline=&quot;Life%20Sciences&quot;">Differential Expression Analysis</a></span></li><li class="c-article-subject-list__subject"><span><a href="/search?query=DESeq2%20Package&amp;facet-discipline=&quot;Life%20Sciences&quot;">DESeq2 Package</a></span></li><li class="c-article-subject-list__subject"><span><a href="/search?query=Observe%20Fisher%20Information&amp;facet-discipline=&quot;Life%20Sciences&quot;">Observe Fisher Information</a></span></li><li class="c-article-subject-list__subject"><span><a href="/search?query=Negative%20Binomial%20Generalize%20Linear%20Model&amp;facet-discipline=&quot;Life%20Sciences&quot;">Negative Binomial Generalize Linear Model</a></span></li></ul><div data-component="article-info-list"></div></div></div></div></div></section>
+                </div>
+            </main>
+    <div class="c-article-sidebar u-text-sm u-hide-print eds-l-with-sidebar__sidebar" id="sidebar" data-container-type="reading-companion">
+        <aside aria-label="reading companion" data-test="reading-companion">
+            <div data-test="editorial-summary">
+            </div>
+                <div data-test="collections">
+                </div>
+            <div class="c-reading-companion">
+                <div class="c-reading-companion__sticky" data-component="reading-companion-sticky" data-test="reading-companion-sticky">
+                    <div class="c-reading-companion__panel c-reading-companion__sections c-reading-companion__panel--active" id="tabpanel-sections">
+                        <div class="u-lazy-ad-wrapper u-mt-16 u-hide" data-component-mpu=""><div class="c-ad c-ad--300x250">
+    <div class="c-ad__inner">
+        <p class="c-ad__label">Advertisement</p>
+        <div id="div-gpt-ad-MPU1" class="div-gpt-ad grade-c-hide" data-pa11y-ignore="" data-gpt="" data-gpt-unitpath="/270604982/springerlink/13059/article" data-gpt-sizes="300x250" data-test="MPU1-ad" data-gpt-targeting="pos=MPU1;articleid=BMCs13059-014-0550-8;">
+        </div>
+    </div>
+</div>
+</div>
+                    </div>
+                    <div class="c-reading-companion__panel c-reading-companion__figures c-reading-companion__panel--full-width" id="tabpanel-figures"></div>
+                    <div class="c-reading-companion__panel c-reading-companion__references c-reading-companion__panel--full-width" id="tabpanel-references"></div>
+                </div>
+            </div>
+        </aside>
+    </div>
+        </div>
+    </article>
+</body></html>
