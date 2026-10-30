@@ -107,6 +107,11 @@ function verifyLocales(dist, manifest) {
     if (!en[k] || !zh[k]) errors.push(`manifest uses __MSG_${k}__ but a locale lacks it`);
   }
   if (manifest.default_locale !== 'en') errors.push('default_locale must be en');
+  // 商店限制：名称 ≤ 75 字符（Chrome 建议 45 以内显示完整），描述 ≤ 132 字符
+  for (const [loc, table] of [['en', en], ['zh_CN', zh]]) {
+    if (table.extName && Array.from(table.extName.message).length > 75) errors.push(`${loc} extName is longer than 75 characters`);
+    if (table.extDescription && Array.from(table.extDescription.message).length > 132) errors.push(`${loc} extDescription is longer than 132 characters`);
+  }
   return errors;
 }
 

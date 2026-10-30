@@ -1,7 +1,7 @@
 # 方案：在 M2+ 复用 arxiv-md 的 pdf-parse-core（L3 PDF 兜底）
 
-> 状态：**提案，未实施**。M1 不含任何 PDF 代码、PDF 后端域名或相关权限（PRD §2.7 把 PDF 兜底列为 P2）。
-> 涉及新权限和向第三方发送 PDF，实施前需要 Simon 确认（PRD §2.11、§4 第 2、4 条）。
+> 状态：**已在 1.0.0 实施**（M2）：内核原样放在 `vendor/pdf-parse-core/`（来源提交见其中 README），
+> 插件侧代码在 `src/pdf/`、`src/background/pdf-task.js`，权限见 `docs/permissions.md`。下面保留原提案，供对照。
 
 ## 1. 复用什么
 

@@ -1,0 +1,60 @@
+name: Release
+
+# 只在推送版本标签时运行；GitHub Release 只由这个工作流创建（不要手动建）。
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Check tag matches package.json and manifest
+        shell: bash
+        run: |
+          VERSION="$(node -p 'require("./package.json").version')"
+          MANIFEST="$(node -p 'require("./src/manifest.json").version')"
+          test "${GITHUB_REF_NAME}" = "v${VERSION}" || { echo "tag ${GITHUB_REF_NAME} != v${VERSION}"; exit 1; }
+          test "${MANIFEST}" = "${VERSION}" || { echo "manifest ${MANIFEST} != package ${VERSION}"; exit 1; }
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+
+      - name: Lint and test
+        run: |
+          npm run lint
+          npm test
+          npm run check:keys
+
+      # build + build:firefox + verify:dist（权限白名单、gecko id、locales、无 source map / Key）+ zip
+      - name: Build packages
+        run: npm run package
+
+      - name: Verify artifacts
+        shell: bash
+        run: |
+          test -f "build/journal-md-v${VERSION}-chrome.zip"
+          test -f "build/journal-md-v${VERSION}-firefox.zip"
+          (cd build && sha256sum journal-md-v${VERSION}-*.zip > SHA256SUMS.txt && cat SHA256SUMS.txt)
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            "build/journal-md-v${VERSION}-chrome.zip" \
+            "build/journal-md-v${VERSION}-firefox.zip" \
+            "build/SHA256SUMS.txt" \
+            --generate-notes \
+            --title "${GITHUB_REF_NAME}"

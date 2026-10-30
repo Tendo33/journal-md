@@ -3,7 +3,7 @@
     "message": "Journal to Markdown"
   },
   "extDescription": {
-    "message": "Export open-access journal articles from PMC, Europe PMC and PubMed as clean Markdown with formulas, tables and references."
+    "message": "Journal articles to clean Markdown with math, tables and references: PMC, PubMed, Springer, Nature, Frontiers, MDPI, PLOS, eLife."
   },
   "actionTitle": {
     "message": "Journal to Markdown — export this article"

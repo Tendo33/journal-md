@@ -1,8 +1,8 @@
 {
   "name": "journal-md",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
-  "description": "Browser extension that exports open-access journal articles (PMC, Europe PMC, PubMed) as clean Markdown",
+  "description": "Browser extension that exports journal articles (PMC, Europe PMC, PubMed, Springer/BMC, Nature, Frontiers, MDPI, PLOS, eLife) as clean Markdown",
   "author": "SimonSun",
   "license": "MIT",
   "scripts": {
@@ -40,6 +40,12 @@
     "markdown",
     "browser-extension",
     "academic",
-    "papers"
+    "papers",
+    "springer",
+    "nature",
+    "frontiers",
+    "mdpi",
+    "plos",
+    "elife"
   ]
 }

@@ -3,7 +3,7 @@
     "message": "期刊全文转 Markdown"
   },
   "extDescription": {
-    "message": "把 PMC、Europe PMC、PubMed 上的期刊全文导出为干净的 Markdown，保留公式、表格和参考文献。"
+    "message": "把期刊论文全文导出为干净的 Markdown，保留公式、表格和参考文献。支持 PMC、Europe PMC、PubMed、Springer/BMC、Nature、Frontiers、MDPI、PLOS、eLife。"
   },
   "actionTitle": {
     "message": "期刊全文转 Markdown：导出本文"
