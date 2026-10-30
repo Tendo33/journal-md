@@ -7,7 +7,6 @@ import { loadPdfSettings, savePdfSettings } from '../../pdf/settings';
 import { createPdfRegistry } from '../../pdf/providers';
 import { pdfErrorText, providerLabel } from '../shared/pdf-text';
 import { MSG } from '../../utils/messages';
-import { requestProviderPermission, withRequiredPermissions, requiredPermissionsOf } from '@pdf-core/permissions.js';
 
 const $ = (id) => document.getElementById(id);
 const SAMPLE_META = {
@@ -24,8 +23,6 @@ let settings;
 let pdfSettings;
 let lang = 'en';
 const pdfRegistry = createPdfRegistry();
-// Firefox 包里 DNR 已是必需权限：申请时去掉它（arxiv-md FF-01 方案 A）
-const permissionsApi = () => withRequiredPermissions(chrome.permissions, requiredPermissionsOf(chrome.runtime));
 let savedTimer = null;
 
 function announceSaved() {
@@ -105,7 +102,6 @@ function pdfStatus(text, state = '') {
 function renderPdf() {
   const id = pdfSettings.provider;
   const provider = pdfRegistry.get(id);
-  $('pdfEnabled').checked = pdfSettings.enabled;
   document.querySelectorAll('input[name="pdfProvider"]').forEach((r) => { r.checked = r.value === id; });
   $('pdf-provider-note').textContent = t(lang, `optPdfNote_${id}`);
   $('pdfToken-label').textContent = t(lang, 'optPdfToken', { provider: providerLabel(id) });
@@ -113,42 +109,9 @@ function renderPdf() {
   $('pdfKeyLink').href = provider.keyUrl;
 }
 
-/**
- * 必须在点击 / change 的同一个调用栈里申请权限（Firefox 强制要求用户手势）：requestProviderPermission 在第一个 await 之前就调用了 permissions.request
- */
-function requestPdfPermission(id) {
-  return requestProviderPermission(permissionsApi(), pdfRegistry.get(id));
-}
-
-async function onPdfToggle(e) {
-  const on = e.target.checked;
-  if (!on) {
-    pdfSettings = await savePdfSettings({ enabled: false });
-    renderPdf();
-    announceSaved();
-    return;
-  }
-  const granted = await requestPdfPermission(pdfSettings.provider);
-  if (!granted) {
-    e.target.checked = false;
-    pdfStatus(t(lang, 'optPdfDenied'), 'err');
-    return;
-  }
-  pdfSettings = await savePdfSettings({ enabled: true });
-  renderPdf();
-  pdfStatus(t(lang, 'optPdfGranted', { provider: providerLabel(pdfSettings.provider) }), 'ok');
-}
-
+// 换后端只是保存选择：两个后端的域名都在安装时授予，不再申请权限（Simon 2026-10-30 18:06）
 async function onPdfProvider(e) {
   const id = e.target.value;
-  if (pdfSettings.enabled) {
-    const granted = await requestPdfPermission(id);
-    if (!granted) {
-      renderPdf();
-      pdfStatus(t(lang, 'optPdfDenied'), 'err');
-      return;
-    }
-  }
   pdfSettings = await savePdfSettings({ provider: id });
   renderPdf();
   pdfStatus('');
@@ -200,7 +163,6 @@ async function main() {
   $('includeImages').addEventListener('change', (e) => update({ includeImages: e.target.checked }));
   $('preferJats').addEventListener('change', (e) => update({ preferJats: e.target.checked }));
   $('showFab').addEventListener('change', (e) => update({ showFab: e.target.checked }));
-  $('pdfEnabled').addEventListener('change', onPdfToggle);
   document.querySelectorAll('input[name="pdfProvider"]').forEach((r) => r.addEventListener('change', onPdfProvider));
   let tokenTimer = null;
   $('pdfToken').addEventListener('input', () => {

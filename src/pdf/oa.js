@@ -1,4 +1,4 @@
-// 开放获取判定（PRD §2.11）：默认只把 OA 的 PDF 发给第三方解析；非 OA 或拿不准的，要用户在弹窗里逐次确认。
+// 开放获取判定。Simon 2026-10-30 18:06 起只用于显示（弹窗里标「开放获取」），不再拦 PDF 发送、也不弹确认。
 // 免确认只有两种情况，并且 PDF 必须和文章页在同一个站点（审查 N2）：
 //   ①文章许可是 CC BY（任何版本）或 CC0（审查 N7：CC BY-NC / BY-ND / BY-SA / BY-NC-SA 等仍然要确认）；
 //   ②整站开放获取的出版商（BMC、SpringerOpen、Frontiers、MDPI、PLOS、eLife），页面上没有写出更严的许可。
@@ -33,9 +33,4 @@ export function isOpenAccessPdf(info) {
   } catch (_) {
     return false;
   }
-}
-
-/** PDF 可以发送：OA，或用户在弹窗里对这一篇确认过（不提供「总是允许」） */
-export function uploadAllowed(info, consent) {
-  return consent === true || isOpenAccessPdf(info);
 }

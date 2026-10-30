@@ -75,7 +75,11 @@ async function main() {
     if (url.startsWith('chrome-extension://') || url.startsWith('data:') || url.startsWith('blob:')) return route.continue();
     const hit = ROUTES[url];
     if (url.includes('/fullTextXML')) jatsHits.push(url);
-    if (/paddleocr\.aistudio-app\.com|bcebos\.com|mineru\.net|openxlab\.org\.cn/.test(url)) pdfBackendHits.push(url);
+    if (/paddleocr\.aistudio-app\.com|bcebos\.com|mineru\.net|openxlab\.org\.cn/.test(url)) {
+      pdfBackendHits.push(url);
+      // 模拟的后端（从不访问真实 PaddleOCR / MinerU）：一律回 401，任务以「Token 无效」结束
+      return route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ code: 401, msg: 'e2e mock: unauthorized' }) });
+    }
     if (hit) return route.fulfill({ status: 200, contentType: hit.type, body: hit.body });
     if (url.startsWith('https://www.ebi.ac.uk/europepmc/webservices/rest/search?')) {
       searchHits.push(url);
@@ -203,7 +207,7 @@ async function main() {
   await opt.setViewportSize({ width: 1280, height: 800 });
   const keyLink = await opt.locator('#pdfKeyLink').boundingBox();
   check('fix2b-2: #pdfKeyLink target is at least 24×24 (WCAG 2.5.8)', !!keyLink && keyLink.height >= 24 && keyLink.width >= 24, JSON.stringify(keyLink));
-  check('options: PDF parsing off by default, PaddleOCR preselected', !(await opt.isChecked('#pdfEnabled')) && (await opt.isChecked('input[name="pdfProvider"][value="paddleocr"]')));
+  check('options: PaddleOCR preselected; no PDF enable switch or permission step', (await opt.isChecked('input[name="pdfProvider"][value="paddleocr"]')) && (await opt.locator('#pdfEnabled').count()) === 0);
 
   // ---------- 1.0.0：设计 nit、悬浮按钮、出版商页面、ZIP、PDF 确认 ----------
   const deferredColor = await popup.$eval('.route[data-state="deferred"]', (el) => getComputedStyle(el).color);
@@ -330,29 +334,27 @@ async function main() {
   const nmd = newestZip ? (unzip(fs.readFileSync(newestZip.filename))['article.md'] || '').toString('utf8') : '';
   check('ZIP permission denied: images keep their remote links in article.md', /\]\(https:\/\/media\.springernature\.com\//.test(nmd) && !/\]\(images\//.test(nmd));
 
-  // PDF 解析：打开（直接写 storage.local，不经过浏览器权限弹窗）后，非 OA 文章先确认；拒绝 / 缺权限时不访问后端
-  await sw.evaluate(() => chrome.storage.local.set({ pdfSettings: { enabled: true, provider: 'paddleocr', tokens: { paddleocr: 'e2e-placeholder' } } }));
+  // PDF 解析（Simon 10-30 18:06）：没有启用开关、没有确认、不申请权限——给所选后端填了 Token 就有按钮，点了直接发（发给上面模拟的后端）
+  await sw.evaluate(() => chrome.storage.local.set({ pdfSettings: { provider: 'paddleocr', tokens: { paddleocr: 'e2e-placeholder' } } }));
   const closed = await ctx.newPage();
   await closed.goto(NATURE_CLOSED_URL);
   await closed.waitForTimeout(500);
   const closedTab = await sw.evaluate(async (url) => (await chrome.tabs.query({ url }))[0].id, NATURE_CLOSED_URL);
   const np = await openPopup(closedTab, NATURE_CLOSED_URL);
   await np.waitForSelector('#pdf-row:not([hidden])', { timeout: 3000 }).catch(() => {});
-  check('PDF: button offered when enabled and the page has a PDF', (await np.textContent('#pdf')) === 'Parse PDF with PaddleOCR', await np.textContent('#pdf'));
+  check('PDF: button offered once the selected backend has a token', (await np.textContent('#pdf')) === 'Parse PDF with PaddleOCR', await np.textContent('#pdf'));
+  check('PDF: no confirmation UI exists any more', (await np.locator('#pdf-confirm, #pdf-continue, #pdf-cancel').count()) === 0);
   await np.click('#pdf');
-  check('PDF: non-OA article asks first (PRD §2.11 wording)', (await np.isVisible('#pdf-confirm')) && (await np.textContent('#pdf-confirm-text')) === "This article is not open access. Uploading it to PaddleOCR may violate the publisher's terms. Continue?", await np.textContent('#pdf-confirm-text'));
-  check('PDF: focus moves to the confirmation', await np.evaluate(() => document.activeElement && document.activeElement.id === 'pdf-continue'));
-  await np.click('#pdf-cancel');
-  check('PDF: cancel sends nothing', pdfBackendHits.length === 0 && /Nothing was uploaded/.test(await np.textContent('#pdf-status')));
-  await np.click('#pdf');
-  await np.click('#pdf-continue');
-  await np.waitForSelector('#pdf-status[data-state="failed"]', { timeout: 5000 }).catch(() => {});
-  check('PDF: confirmed but permission not granted → clear error, no request to the backend', /Permission for paddleocr\.aistudio-app\.com is missing/.test(await np.textContent('#pdf-status')) && pdfBackendHits.length === 0, await np.textContent('#pdf-status'));
-  const op = await openPopup(eliTab, ELIFE_URL);
-  await op.waitForSelector('#pdf-row:not([hidden])', { timeout: 3000 }).catch(() => {});
-  await op.click('#pdf');
-  await op.waitForSelector('#pdf-status[data-state="failed"]', { timeout: 5000 }).catch(() => {});
-  check('PDF: open-access article (eLife) needs no confirmation', !(await op.isVisible('#pdf-confirm')) && pdfBackendHits.length === 0, await op.textContent('#pdf-status'));
+  await np.waitForSelector('#pdf-status[data-state="failed"], #pdf-status[data-state="done"]', { timeout: 15000 }).catch(() => {});
+  check('PDF: non-OA article is sent straight away to the (mocked) backend', pdfBackendHits.length >= 1 && /paddleocr\.aistudio-app\.com/.test(pdfBackendHits[0]), JSON.stringify(pdfBackendHits.slice(0, 2)));
+  check('PDF: backend refusal is shown clearly', /PaddleOCR rejected the token/.test(await np.textContent('#pdf-status')), await np.textContent('#pdf-status'));
+  check('fix2c: nothing called permissions.request in the popup', (await np.evaluate(() => window.__permCalls.length)) === 0);
+  const npNoToken = await (async () => {
+    await sw.evaluate(() => chrome.storage.local.set({ pdfSettings: { provider: 'paddleocr', tokens: {} } }));
+    return openPopup(closedTab, NATURE_CLOSED_URL);
+  })();
+  await npNoToken.waitForTimeout(500);
+  check('PDF: no token → no PDF button', !(await npNoToken.isVisible('#pdf')));
   await sw.evaluate(() => chrome.storage.local.remove(['pdfSettings', 'pdfTask']));
 
   check('no console errors', consoleErrors.length === 0, consoleErrors.join(' | '));

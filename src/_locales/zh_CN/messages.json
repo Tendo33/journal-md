@@ -213,7 +213,7 @@
     "message": "版本 {version}"
   },
   "optPrivacy": {
-    "message": "文章在浏览器内完成转换。只有在你导出或复制文章时，扩展才会向 Europe PMC（EMBL-EBI）请求开放获取全文，只发送 PMCID 或 DOI，不发送 Cookie 和页面地址。打开弹窗不会发出任何请求。PDF 解析默认关闭；打开后会发送哪些内容，见上方「PDF 解析」一节。"
+    "message": "文章在浏览器内完成转换。只有在你导出或复制文章时，扩展才会向 Europe PMC（EMBL-EBI）请求开放获取全文，只发送 PMCID 或 DOI，不发送 Cookie 和页面地址。打开弹窗不会发出任何请求。PDF 解析只在你点「解析 PDF」时发送 PDF 链接和你的 Token，见上方「PDF 解析」一节。"
   },
   "btnClose": {
     "message": "关闭"
@@ -278,18 +278,6 @@
   "pdfButtonTitle": {
     "message": "把这篇文章的 PDF 链接发给 {provider} 解析，结果下载为 ZIP"
   },
-  "pdfConfirmText": {
-    "message": "这篇不是开放获取文章，上传给 {provider} 可能违反出版商条款，是否继续？"
-  },
-  "pdfConfirmContinue": {
-    "message": "继续"
-  },
-  "pdfConfirmCancel": {
-    "message": "取消"
-  },
-  "pdfCancelled": {
-    "message": "已取消，没有上传任何内容。"
-  },
   "pdfStateSubmitting": {
     "message": "正在把 PDF 链接发给 {provider}…"
   },
@@ -318,19 +306,13 @@
     "message": "无法连接 {provider}。请检查网络后重试。"
   },
   "pdfErr_PERMISSION_MISSING": {
-    "message": "缺少访问 {host} 的权限。请在设置里重新打开 PDF 解析并授权。"
+    "message": "浏览器拦下了对 {host} 的访问。请在浏览器的扩展设置里检查本扩展的网站访问权限。"
   },
   "pdfErr_TIMEOUT": {
     "message": "{provider} 没能按时完成，请稍后重试。"
   },
   "pdfErr_PROVIDER_FAILED": {
     "message": "{provider} 没能解析这个 PDF。"
-  },
-  "pdfErr_CONSENT_REQUIRED": {
-    "message": "没有发送：这篇不是开放获取文章，且没有确认。"
-  },
-  "pdfErr_PDF_DISABLED": {
-    "message": "PDF 解析在设置里是关闭的。"
   },
   "pdfErr_BUSY": {
     "message": "还有一个 PDF 正在解析，请等它完成。"
@@ -354,13 +336,7 @@
     "message": "PDF 解析（可选）"
   },
   "optPdfHelp": {
-    "message": "页面上没有可用全文时，可以用你自己的 Token 让第三方服务解析文章 PDF。默认关闭。只有许可为 CC BY 或 CC0（或整站开放获取、页面没写更严许可）的 PDF 会直接发送；CC BY-NC / ND / SA 和其他文章每次都会在弹窗里先问你。"
-  },
-  "optPdfEnabled": {
-    "message": "启用 PDF 解析"
-  },
-  "optPdfEnabledHelp": {
-    "message": "打开时浏览器会请求访问所选服务的权限，只针对这一个服务。"
+    "message": "页面上没有可用全文时，可以用你自己的 Token 让第三方服务解析文章 PDF。给所选服务填上 Token 后，工具栏弹窗会在带 PDF 链接的文章页上显示「解析 PDF」。点击后会直接把这篇的 PDF 链接和你的 Token 发给所选服务，不再另外确认，所以只用于你有权分享给该服务的 PDF。"
   },
   "optPdfProvider": {
     "message": "PDF 解析服务"
@@ -394,12 +370,6 @@
   },
   "optPdfTestOk": {
     "message": "Token 可用。"
-  },
-  "optPdfDenied": {
-    "message": "没有获得浏览器权限，PDF 解析保持关闭。"
-  },
-  "optPdfGranted": {
-    "message": "已获得访问 {provider} 的权限。"
   },
   "optPdfNeedToken": {
     "message": "请先填写 Token。"

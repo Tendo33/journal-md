@@ -3,9 +3,9 @@
  */
 // L3 PDF 解析：只用 mock 的后端，不访问 PaddleOCR / MinerU。
 import { createPdfRunner, PDF_SOURCE_ROUTE } from '@/background/pdf-task';
-import { createPdfRegistry, journalMineruProvider } from '@/pdf/providers';
-import { normalizePdfSettings, savePdfSettings, loadPdfSettings, PDF_SETTINGS_KEY, PDF_TASK_KEY } from '@/pdf/settings';
-import { isOpenAccessPdf, uploadAllowed } from '@/pdf/oa';
+import { createPdfRegistry, journalMineruProvider, journalPaddleProvider } from '@/pdf/providers';
+import { normalizePdfSettings, savePdfSettings, loadPdfSettings, pdfReady, PDF_SETTINGS_KEY, PDF_TASK_KEY } from '@/pdf/settings';
+import * as oa from '@/pdf/oa';
 import { pdfErrorText, pdfStatusText } from '@/ui/shared/pdf-text';
 import { defineProvider } from '@pdf-core/provider.js';
 import { permissionsFor } from '@pdf-core/permissions.js';
@@ -21,7 +21,7 @@ function memoryArea(init = {}) {
 const NATURE = 'https://www.nature.com/articles/s41586-021-03819-2';
 const PLOS = 'https://journals.plos.org/plosone/article?id=10.1371/journal.pone.1';
 
-describe('OA gate (PRD §2.11)', () => {
+describe('open-access detection (display only since Simon 10-30 18:06)', () => {
   test.each([
     [{ pageUrl: PLOS, pdfUrl: 'https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.1&type=printable' }, true],
     [{ pageUrl: 'https://www.frontiersin.org/journals/x/articles/10.3389/a/full', pdfUrl: 'https://www.frontiersin.org/journals/x/articles/10.3389/a/pdf' }, true],
@@ -43,45 +43,52 @@ describe('OA gate (PRD §2.11)', () => {
     [{ pageUrl: PLOS, pdfUrl: 'https://journals.plos.org/x.pdf', license: 'CC-BY-NC-ND-4.0' }, false],
     // 审查 N2：CC BY 但 PDF 在别的站点
     [{ pageUrl: NATURE, pdfUrl: 'https://files.example.org/x.pdf?sig=1', license: 'CC-BY-4.0' }, false],
-  ])('%j → %s', (info, oa) => {
-    expect(isOpenAccessPdf(info)).toBe(oa);
+  ])('%j → %s', (info, expected) => {
+    expect(oa.isOpenAccessPdf(info)).toBe(expected);
   });
 
-  test('non-OA needs this request\'s explicit consent; there is no "always allow"', () => {
-    const info = { pageUrl: NATURE, pdfUrl: `${NATURE}.pdf` };
-    expect(uploadAllowed(info, false)).toBe(false);
-    expect(uploadAllowed(info, 'yes')).toBe(false);
-    expect(uploadAllowed(info, true)).toBe(true);
+  test('there is no consent gate any more', () => {
+    expect(oa.uploadAllowed).toBeUndefined();
   });
 });
 
 describe('providers and permissions', () => {
-  test('PaddleOCR is the default; both backends ask for optional permissions only', () => {
+  test('PaddleOCR is the default; both backends are install-time (no permission to request)', () => {
     const r = createPdfRegistry();
     expect(r.ids()).toEqual(['paddleocr', 'mineru']);
-    expect(normalizePdfSettings(null)).toEqual({ enabled: false, provider: 'paddleocr', tokens: {} });
-    expect(permissionsFor(r.get('paddleocr'))).toEqual({ origins: ['https://paddleocr.aistudio-app.com/*', 'https://*.bj.bcebos.com/*'], permissions: ['declarativeNetRequestWithHostAccess'] });
-    expect(permissionsFor(journalMineruProvider)).toEqual({ origins: ['https://mineru.net/*', 'https://cdn-mineru.openxlab.org.cn/*'], permissions: [] });
-    // vendored core unchanged: MinerU stays install-mode there
+    expect(normalizePdfSettings(null)).toEqual({ provider: 'paddleocr', tokens: {} });
+    expect(permissionsFor(r.get('paddleocr'))).toEqual({ origins: [], permissions: [] });
+    expect(permissionsFor(r.get('mineru'))).toEqual({ origins: [], permissions: [] });
+    expect(journalPaddleProvider.permissionMode).toBe('install');
+    expect(journalMineruProvider.permissionMode).toBe('install');
+    // vendored core unchanged
+    expect(paddleocrProvider.permissionMode).toBe('optional');
     expect(mineruProvider.permissionMode).toBe('install');
     // Simon 10-30 18:06：后端域名安装时授予
     expect(manifest.optional_host_permissions).toBeUndefined();
     for (const o of [...paddleocrProvider.hosts, ...mineruProvider.hosts]) expect(manifest.host_permissions).toContain(o);
   });
 
+  test('the popup offers PDF parsing once the selected backend has a token (no enable switch)', () => {
+    expect(pdfReady(normalizePdfSettings(null))).toBe(false);
+    expect(pdfReady(normalizePdfSettings({ provider: 'paddleocr', tokens: { paddleocr: 't' } }))).toBe(true);
+    expect(pdfReady(normalizePdfSettings({ provider: 'mineru', tokens: { paddleocr: 't' } }))).toBe(false);
+    expect(normalizePdfSettings({ enabled: true }).enabled).toBeUndefined();
+  });
+
   test('settings live in storage.local; tokens are trimmed and never synced', async () => {
     const local = memoryArea();
-    await savePdfSettings({ enabled: true, tokens: { paddleocr: '  t-1  ' } }, local);
-    expect(local.data[PDF_SETTINGS_KEY]).toEqual({ enabled: true, provider: 'paddleocr', tokens: { paddleocr: 't-1' } });
+    await savePdfSettings({ tokens: { paddleocr: '  t-1  ' } }, local);
+    expect(local.data[PDF_SETTINGS_KEY]).toEqual({ provider: 'paddleocr', tokens: { paddleocr: 't-1' } });
     await savePdfSettings({ provider: 'mineru', tokens: { paddleocr: '' } }, local);
-    expect(await loadPdfSettings(local)).toEqual({ enabled: true, provider: 'mineru', tokens: {} });
+    expect(await loadPdfSettings(local)).toEqual({ provider: 'mineru', tokens: {} });
   });
 });
 
 function fakeProvider(id, overrides = {}) {
   return defineProvider({
     id, label: id, hosts: [`https://${id}.example/*`], credentialFields: [], mode: 'async', input: 'url', cost: 'free',
-    permissionMode: 'optional', pollIntervalMs: 1, timeoutMs: 1000,
+    permissionMode: 'install', pollIntervalMs: 1, timeoutMs: 1000,
     submit: jest.fn(async () => ({ jobId: 'job-1' })),
     poll: jest.fn(async () => ({ state: 'done', result: { jsonUrl: 'x' } })),
     fetchResult: jest.fn(async () => ({ markdown: '# Parsed\n\nBody text from the PDF.', images: [], jsonUrl: 'x' })),
@@ -90,42 +97,38 @@ function fakeProvider(id, overrides = {}) {
   });
 }
 
-function setup({ settings = { enabled: true, provider: 'paddleocr', tokens: { paddleocr: 'tok' } }, granted = true, provider } = {}) {
+function setup({ settings = { provider: 'paddleocr', tokens: { paddleocr: 'tok' } }, provider } = {}) {
   const p = provider || fakeProvider('paddleocr');
   const registry = { get: (id) => (id === p.id ? p : null) };
   const storage = memoryArea({ [PDF_SETTINGS_KEY]: settings });
-  const permissions = { contains: jest.fn(async () => granted), request: jest.fn(), remove: jest.fn() };
   const saveDeliverable = jest.fn(async (result, base) => ({ id: 1, filename: `${base}.zip` }));
   const downloadUrl = jest.fn(async () => 2);
   const ensureRule = jest.fn(async () => {});
-  const runner = createPdfRunner({ registry, storage, permissions, runtime: { getManifest: () => ({ permissions: [] }) }, saveDeliverable, downloadUrl, ensureRule, keepAlive: (fn) => fn(), sleep: async () => {}, now: () => 1000, getFilenameTemplate: async () => '{title} ({year})' });
-  return { runner, provider: p, storage, permissions, saveDeliverable, downloadUrl, ensureRule };
+  const runner = createPdfRunner({ registry, storage, saveDeliverable, downloadUrl, ensureRule, keepAlive: (fn) => fn(), sleep: async () => {}, now: () => 1000, getFilenameTemplate: async () => '{title} ({year})' });
+  return { runner, provider: p, storage, saveDeliverable, downloadUrl, ensureRule };
 }
 
 const REQ = { pdfUrl: `${NATURE}.pdf`, pageUrl: NATURE, meta: { title: 'AlphaFold', year: 2021, authors: [{ name: 'J' }] }, license: '' };
 
 describe('PDF task runner', () => {
-  test('non-OA without consent: refused before any request', async () => {
+  test('fix2c: a non-OA (subscription) PDF is sent straight away — no confirmation, no permission check', async () => {
     const s = setup();
-    await expect(s.runner.start(REQ)).resolves.toEqual({ ok: false, code: 'CONSENT_REQUIRED' });
-    expect(s.provider.submit).not.toHaveBeenCalled();
-    expect(s.permissions.contains).not.toHaveBeenCalled();
+    expect(oa.isOpenAccessPdf({ pageUrl: REQ.pageUrl, pdfUrl: REQ.pdfUrl, license: REQ.license })).toBe(false);
+    await expect(s.runner.start(REQ)).resolves.toEqual({ ok: true, state: 'done' });
+    expect(s.provider.submit).toHaveBeenCalledTimes(1);
   });
 
-  test('disabled, bad URLs, missing token, missing permission', async () => {
-    await expect(setup({ settings: { enabled: false } }).runner.start({ ...REQ, consent: true })).resolves.toEqual({ ok: false, code: 'PDF_DISABLED' });
-    await expect(setup().runner.start({ ...REQ, pdfUrl: 'javascript:alert(1)', consent: true })).resolves.toEqual({ ok: false, code: 'FILE_UNSUPPORTED' });
-    const noKey = setup({ settings: { enabled: true, provider: 'paddleocr', tokens: {} } });
-    await expect(noKey.runner.start({ ...REQ, consent: true })).resolves.toEqual({ ok: false, code: 'AUTH_INVALID' });
+  test('bad URLs and a missing token stop before any request', async () => {
+    await expect(setup().runner.start({ ...REQ, pdfUrl: 'javascript:alert(1)' })).resolves.toEqual({ ok: false, code: 'FILE_UNSUPPORTED' });
+    const noKey = setup({ settings: { provider: 'paddleocr', tokens: {} } });
+    await expect(noKey.runner.start(REQ)).resolves.toEqual({ ok: false, code: 'AUTH_INVALID' });
     expect(noKey.storage.data[PDF_TASK_KEY]).toMatchObject({ state: 'failed', errorReason: 'key_not_on_device' });
-    const noPerm = setup({ granted: false });
-    await expect(noPerm.runner.start({ ...REQ, consent: true })).resolves.toEqual({ ok: false, code: 'PERMISSION_MISSING' });
-    expect(noPerm.provider.submit).not.toHaveBeenCalled();
+    expect(noKey.provider.submit).not.toHaveBeenCalled();
   });
 
-  test('confirmed: submit → poll → ZIP with our front matter (source_route pdf-paddleocr)', async () => {
+  test('submit → poll → ZIP with our front matter (source_route pdf-paddleocr)', async () => {
     const s = setup();
-    await expect(s.runner.start({ ...REQ, consent: true })).resolves.toEqual({ ok: true, state: 'done' });
+    await expect(s.runner.start(REQ)).resolves.toEqual({ ok: true, state: 'done' });
     expect(s.ensureRule).toHaveBeenCalledWith('paddleocr');
     expect(s.provider.submit).toHaveBeenCalledWith({ url: `${NATURE}.pdf` }, { token: 'tok' }, {});
     const [result, base] = s.saveDeliverable.mock.calls[0];
@@ -136,9 +139,9 @@ describe('PDF task runner', () => {
     expect(s.storage.data[PDF_TASK_KEY]).toMatchObject({ state: 'done', progress: 100, filename: 'AlphaFold (2021) (PDF).zip' });
   });
 
-  test('OA page needs no consent; MinerU result ZIP is downloaded as is', async () => {
+  test('MinerU result ZIP is downloaded as is', async () => {
     const p = fakeProvider('mineru', { fetchResult: jest.fn(async () => ({ zipUrl: 'https://cdn-mineru.openxlab.org.cn/r.zip' })) });
-    const s = setup({ provider: p, settings: { enabled: true, provider: 'mineru', tokens: { mineru: 'm' } } });
+    const s = setup({ provider: p, settings: { provider: 'mineru', tokens: { mineru: 'm' } } });
     await expect(s.runner.start({ ...REQ, pdfUrl: 'https://journals.plos.org/plosone/article/file?id=1', pageUrl: PLOS })).resolves.toEqual({ ok: true, state: 'done' });
     expect(s.downloadUrl).toHaveBeenCalledWith({ url: 'https://cdn-mineru.openxlab.org.cn/r.zip', filename: 'AlphaFold (2021) (PDF).zip' });
     expect(s.ensureRule).toHaveBeenCalledWith('mineru');
@@ -146,15 +149,15 @@ describe('PDF task runner', () => {
 
   test('empty result is not saved; provider failure is recorded; one task at a time', async () => {
     const empty = setup({ provider: fakeProvider('paddleocr', { fetchResult: jest.fn(async () => ({ markdown: '   ', images: [], jsonUrl: 'x' })) }) });
-    await expect(empty.runner.start({ ...REQ, consent: true })).resolves.toEqual({ ok: false, code: 'PROVIDER_FAILED' });
+    await expect(empty.runner.start(REQ)).resolves.toEqual({ ok: false, code: 'PROVIDER_FAILED' });
     expect(empty.saveDeliverable).not.toHaveBeenCalled();
     expect(empty.storage.data[PDF_TASK_KEY]).toMatchObject({ state: 'failed', errorReason: 'empty_result' });
 
     let release;
     const slow = setup({ provider: fakeProvider('paddleocr', { submit: jest.fn(() => new Promise((r) => { release = r; })) }) });
-    const first = slow.runner.start({ ...REQ, consent: true });
+    const first = slow.runner.start(REQ);
     await new Promise((r) => setTimeout(r, 0));
-    await expect(slow.runner.start({ ...REQ, consent: true })).resolves.toEqual({ ok: false, code: 'BUSY' });
+    await expect(slow.runner.start(REQ)).resolves.toEqual({ ok: false, code: 'BUSY' });
     release({ jobId: 'j' });
     await expect(first).resolves.toEqual({ ok: true, state: 'done' });
   });
@@ -173,10 +176,12 @@ describe('PDF task runner', () => {
 });
 
 describe('PDF texts', () => {
-  test('PRD §2.11 confirmation wording and error texts', () => {
-    const { t } = require('@/config/i18n');
-    expect(t('zh', 'pdfConfirmText', { provider: 'PaddleOCR' })).toBe('这篇不是开放获取文章，上传给 PaddleOCR 可能违反出版商条款，是否继续？');
-    expect(t('en', 'pdfConfirmText', { provider: 'MinerU' })).toBe("This article is not open access. Uploading it to MinerU may violate the publisher's terms. Continue?");
+  test('no confirmation texts remain; error texts', () => {
+    const { MESSAGES } = require('@/config/i18n');
+    for (const k of ['pdfConfirmText', 'pdfConfirmContinue', 'pdfConfirmCancel', 'pdfCancelled', 'optPdfEnabled', 'optPdfDenied', 'optPdfGranted', 'pdfErr_CONSENT_REQUIRED', 'pdfErr_PDF_DISABLED']) {
+      expect(MESSAGES.en[k]).toBeUndefined();
+      expect(MESSAGES.zh[k]).toBeUndefined();
+    }
     expect(pdfErrorText('en', { errorCode: 'PERMISSION_MISSING', provider: 'paddleocr' })).toContain('paddleocr.aistudio-app.com');
     expect(pdfErrorText('zh', { errorCode: 'PROVIDER_FAILED', errorReason: 'dnr_not_ready', provider: 'paddleocr' })).toContain('网络规则');
     expect(pdfErrorText('en', { errorCode: 'WHATEVER', provider: 'mineru' })).toBe('MinerU could not parse this PDF.');

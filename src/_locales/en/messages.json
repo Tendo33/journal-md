@@ -213,7 +213,7 @@
     "message": "Version {version}"
   },
   "optPrivacy": {
-    "message": "Articles are converted inside your browser. Only when you export or copy an article does the extension ask Europe PMC (EMBL-EBI) for its open-access full text, sending only the PMCID or DOI — no cookies or page address. Opening the popup sends nothing. PDF parsing is off by default; when you turn it on, see the PDF parsing section above for what is sent."
+    "message": "Articles are converted inside your browser. Only when you export or copy an article does the extension ask Europe PMC (EMBL-EBI) for its open-access full text, sending only the PMCID or DOI — no cookies or page address. Opening the popup sends nothing. PDF parsing sends a PDF link and your token only when you click Parse PDF; see the PDF section above."
   },
   "btnClose": {
     "message": "Close"
@@ -278,18 +278,6 @@
   "pdfButtonTitle": {
     "message": "Send this article's PDF link to {provider} and download the result as a ZIP"
   },
-  "pdfConfirmText": {
-    "message": "This article is not open access. Uploading it to {provider} may violate the publisher's terms. Continue?"
-  },
-  "pdfConfirmContinue": {
-    "message": "Continue"
-  },
-  "pdfConfirmCancel": {
-    "message": "Cancel"
-  },
-  "pdfCancelled": {
-    "message": "Not sent. Nothing was uploaded."
-  },
   "pdfStateSubmitting": {
     "message": "Sending the PDF link to {provider}…"
   },
@@ -318,19 +306,13 @@
     "message": "Could not reach {provider}. Check your connection and try again."
   },
   "pdfErr_PERMISSION_MISSING": {
-    "message": "Permission for {host} is missing. Turn PDF parsing on again in Settings to grant it."
+    "message": "The browser blocked access to {host}. Check the extension's site access in your browser settings."
   },
   "pdfErr_TIMEOUT": {
     "message": "{provider} did not finish in time. Try again later."
   },
   "pdfErr_PROVIDER_FAILED": {
     "message": "{provider} could not parse this PDF."
-  },
-  "pdfErr_CONSENT_REQUIRED": {
-    "message": "Not sent: this article is not open access and was not confirmed."
-  },
-  "pdfErr_PDF_DISABLED": {
-    "message": "PDF parsing is turned off in Settings."
   },
   "pdfErr_BUSY": {
     "message": "Another PDF is still being parsed. Wait for it to finish."
@@ -354,13 +336,7 @@
     "message": "PDF parsing (optional)"
   },
   "optPdfHelp": {
-    "message": "When a page has no usable full text, the article PDF can be parsed by a third-party service with your own token. Off by default. Only PDFs licensed CC BY or CC0 (or on a fully open-access site that states no stricter licence) are sent without asking; for CC BY-NC / ND / SA and any other article the popup asks you every time."
-  },
-  "optPdfEnabled": {
-    "message": "Enable PDF parsing"
-  },
-  "optPdfEnabledHelp": {
-    "message": "Turning it on asks the browser for access to the selected service only."
+    "message": "When a page has no usable full text, the article PDF can be parsed by a third-party service with your own token. Enter a token for the service you choose; the toolbar popup then offers \"Parse PDF\" on article pages that link a PDF. Clicking it sends that PDF link and your token to the chosen service straight away — there is no further confirmation, so only use it for PDFs you may share with that service."
   },
   "optPdfProvider": {
     "message": "PDF parsing service"
@@ -394,12 +370,6 @@
   },
   "optPdfTestOk": {
     "message": "The token works."
-  },
-  "optPdfDenied": {
-    "message": "The browser permission was not granted, so PDF parsing stays off."
-  },
-  "optPdfGranted": {
-    "message": "Access to {provider} granted."
   },
   "optPdfNeedToken": {
     "message": "Enter a token first."

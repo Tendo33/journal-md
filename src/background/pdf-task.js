@@ -1,19 +1,17 @@
 // L3 PDF 解析（PRD §2.2 / §2.11）：把当前文章的 PDF 地址交给用户自选的后端（PaddleOCR 默认，MinerU 可选），
 // 轮询到完成后下载结果。一次只跑一个任务；进度写在 chrome.storage.local 的 pdfTask 里，弹窗关掉也会继续。
 // 不申请 alarms：轮询期间用内核的 withKeepAlive 保活 service worker（每 20 秒一次扩展 API 调用）。
-// 规则：
-// - 默认只发开放获取的 PDF；非 OA 或拿不准的，必须由弹窗（扩展页面）带着本次确认发起，不提供「总是允许」；
-// - 发请求前确认已授予该后端的可选权限，没有就失败（PERMISSION_MISSING），不自动换后端；
-// - Token 只从 chrome.storage.local 读，只发给该后端。
+// 规则（Simon 2026-10-30 18:06 起）：
+// - 不再弹确认、也不在使用时申请权限：后端域名和 DNR 都在安装时授予，点了「解析 PDF」就直接发送（开放获取判断只用于显示）；
+// - 只能由扩展自己的页面（弹窗）发起；用户没填所选后端的 Token 时不发任何请求（AUTH_INVALID / key_not_on_device）；
+// - 失败不自动换后端；Token 只从 chrome.storage.local 读，只发给该后端。
 import { ParseError, isParseError, ERROR_REASONS } from '@pdf-core/errors.js';
-import { ensureProviderPermission, withRequiredPermissions, requiredPermissionsOf } from '@pdf-core/permissions.js';
 import { buildMineruLayout } from '@pdf-core/output/mineru-layout.js';
 import { assertSavableMarkdown } from '@pdf-core/output/pre-save.js';
 import { withKeepAlive } from '@pdf-core/keepalive.js';
 import { renderFrontMatter, formatExported } from '../core/render/frontmatter';
 import { buildFilename } from '../core/filename';
 import { loadPdfSettings, PDF_TASK_KEY } from '../pdf/settings';
-import { uploadAllowed } from '../pdf/oa';
 
 export const PDF_SOURCE_ROUTE = { paddleocr: 'pdf-paddleocr', mineru: 'pdf-mineru' };
 const sleepReal = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -31,15 +29,13 @@ function httpsUrl(u) {
  * @param {object} deps
  * @param {{get:(id:string)=>object|null}} deps.registry
  * @param {object} deps.storage chrome.storage.local
- * @param {object} deps.permissions chrome.permissions
- * @param {object} deps.runtime chrome.runtime（Firefox 的必需权限从 manifest 读）
  * @param {(opts:{url:string, filename:string})=>Promise<number>} deps.downloadUrl MinerU 原始 ZIP
  * @param {(result:object, baseName:string)=>Promise<{id:number, filename:string}>} deps.saveDeliverable PaddleOCR 整理后的 ZIP
  * @param {(providerId:string)=>Promise<void>} [deps.ensureRule] PaddleOCR 提交前确认 DNR 规则（去 Origin 头）
  * @param {(state:'run'|'ok'|'err')=>void} [deps.badge]
  */
 export function createPdfRunner(deps) {
-  const { registry, storage, permissions, runtime, downloadUrl, saveDeliverable, ensureRule = async () => {}, badge = () => {}, now = () => Date.now(), sleep = sleepReal, keepAlive = withKeepAlive, log = () => {}, getFilenameTemplate = async () => undefined } = deps;
+  const { registry, storage, downloadUrl, saveDeliverable, ensureRule = async () => {}, badge = () => {}, now = () => Date.now(), sleep = sleepReal, keepAlive = withKeepAlive, log = () => {}, getFilenameTemplate = async () => undefined } = deps;
   let running = null;
 
   async function write(patch) {
@@ -96,7 +92,7 @@ export function createPdfRunner(deps) {
   }
 
   /**
-   * @param {{pdfUrl:string, pageUrl:string, meta:object, license?:string, consent?:boolean}} req
+   * @param {{pdfUrl:string, pageUrl:string, meta:object, license?:string}} req
    * @returns {Promise<{ok:boolean, code?:string, state?:string}>}
    */
   async function start(req) {
@@ -105,11 +101,8 @@ export function createPdfRunner(deps) {
     const pageUrl = httpsUrl(req && req.pageUrl);
     if (!pdfUrl || !pageUrl) return { ok: false, code: 'FILE_UNSUPPORTED' };
     const settings = await loadPdfSettings(storage);
-    if (!settings.enabled) return { ok: false, code: 'PDF_DISABLED' };
     const provider = registry.get(settings.provider);
     if (!provider) return { ok: false, code: 'PROVIDER_FAILED' };
-    // PRD §2.11：非 OA / 拿不准 → 必须带本次确认；确认前不发任何请求
-    if (!uploadAllowed({ pageUrl, pdfUrl, license: req.license }, req.consent === true)) return { ok: false, code: 'CONSENT_REQUIRED' };
     const meta = req.meta && typeof req.meta === 'object' ? req.meta : {};
     const task = { id: `pdf-${now()}`, provider: provider.id, pdfUrl, pageUrl, meta: { title: String(meta.title || ''), year: meta.year || null, doi: String(meta.doi || ''), pmid: String(meta.pmid || ''), pmcid: String(meta.pmcid || ''), journal: String(meta.journal || ''), authors: Array.isArray(meta.authors) ? meta.authors.slice(0, 50).map((a) => ({ name: String((a && a.name) || a || '') })) : [], license: String(req.license || '') } };
     await storage.set({ [PDF_TASK_KEY]: { id: task.id, provider: provider.id, title: task.meta.title, pageUrl, state: 'checking', progress: 0, errorCode: null, errorReason: null, filename: null, updatedAt: now() } });
@@ -118,7 +111,6 @@ export function createPdfRunner(deps) {
     try {
       const token = settings.tokens[provider.id];
       if (!token) throw new ParseError('AUTH_INVALID', { provider: provider.id, reason: ERROR_REASONS.KEY_NOT_ON_DEVICE });
-      await ensureProviderPermission(withRequiredPermissions(permissions, requiredPermissionsOf(runtime)), provider);
       await ensureRule(provider.id);
       const filenameTemplate = await getFilenameTemplate();
       const filename = await keepAlive(() => run(task, provider, token, { filenameTemplate }));
@@ -150,7 +142,6 @@ export function createPdfRunner(deps) {
     const provider = registry.get(providerId);
     if (!provider || !provider.testConnection) return { ok: false, code: 'PROVIDER_FAILED' };
     try {
-      await ensureProviderPermission(withRequiredPermissions(permissions, requiredPermissionsOf(runtime)), provider);
       if (provider.id === 'paddleocr') await ensureRule(provider.id);
     } catch (e) {
       return { ok: false, ...failure(e, provider) };

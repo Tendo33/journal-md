@@ -50,8 +50,6 @@ function pdfBadge(state) {
 const pdf = createPdfRunner({
   registry: createPdfRegistry(),
   storage: chrome.storage.local,
-  permissions: chrome.permissions,
-  runtime: chrome.runtime,
   downloadUrl: (opts) => downloadPromise(opts),
   saveDeliverable: (result, base) => saveDeliverable(result, base, { download: (opts) => downloadPromise(opts) }),
   // PaddleOCR 网关拒绝带扩展 Origin 的请求：提交前确认 DNR 规则已装上（arxiv-md R5-01）。

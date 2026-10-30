@@ -3,7 +3,7 @@ import { applyI18n, resolveLanguage, t } from '../../config/i18n';
 import { MSG, ACTIONS } from '../../utils/messages';
 import { describeResult, errorText } from '../shared/result-text';
 import { quickCheck, emptyText, routeItems, shortcutText, requestZipImagePermission } from './popup-view';
-import { loadPdfSettings, PDF_TASK_KEY } from '../../pdf/settings';
+import { loadPdfSettings, pdfReady, PDF_TASK_KEY } from '../../pdf/settings';
 import { pdfStatusText, providerLabel } from '../shared/pdf-text';
 
 const $ = (id) => document.getElementById(id);
@@ -113,7 +113,7 @@ async function inspect(settings) {
   await setupPdf();
 }
 
-// ---- L3 PDF 解析（默认关闭；设置页打开后才显示按钮）----
+// ---- L3 PDF 解析：设置里给所选后端填了 Token 才显示按钮；点了直接发送，不弹确认（Simon 2026-10-30 18:06）----
 function setPdfStatus(task) {
   const el = $('pdf-status');
   el.dataset.state = (task && task.state) || '';
@@ -125,7 +125,7 @@ function setPdfStatus(task) {
 async function setupPdf() {
   pdfSettings = await loadPdfSettings();
   const pdf = pageInfo && pageInfo.pdf;
-  if (!pdfSettings.enabled || !pdf || !pdf.url) return;
+  if (!pdfReady(pdfSettings) || !pdf || !pdf.url) return;
   const name = providerLabel(pdfSettings.provider);
   $('pdf').textContent = t(lang, 'pdfButton', { provider: name });
   $('pdf').title = t(lang, 'pdfButtonTitle', { provider: name });
@@ -139,7 +139,7 @@ async function setupPdf() {
   });
 }
 
-async function startPdf(consent) {
+async function startPdf() {
   const pdf = pageInfo.pdf;
   $('pdf').setAttribute('aria-disabled', 'true');
   setPdfStatus({ state: 'checking', provider: pdfSettings.provider });
@@ -147,38 +147,23 @@ async function startPdf(consent) {
   try {
     r = await chrome.runtime.sendMessage({
       type: MSG.PDF_START,
-      request: { pdfUrl: pdf.url, pageUrl: tab.url, license: pdf.license, consent, meta: pageInfo.meta },
+      request: { pdfUrl: pdf.url, pageUrl: tab.url, license: pdf.license, meta: pageInfo.meta },
     });
   } catch (_) {
     r = { ok: false, code: 'NETWORK' };
   }
   $('pdf').removeAttribute('aria-disabled');
   if (r && r.ok) return;
-  // 任务过程中的状态由 storage 变化推送；最后再读一次，没开始就失败（另一个任务在跑、没确认……）时用返回的错误码
+  // 任务过程中的状态由 storage 变化推送；最后再读一次，没开始就失败（另一个任务在跑、地址不对……）时用返回的错误码
   const got = await chrome.storage.local.get(PDF_TASK_KEY);
   const task = got && got[PDF_TASK_KEY];
   if (task && task.pageUrl === tab.url && task.state === 'failed') setPdfStatus(task);
   else setPdfStatus({ state: 'failed', errorCode: (r && r.code) || 'PROVIDER_FAILED', provider: pdfSettings.provider });
 }
 
-/** PRD §2.11：非 OA 或拿不准的先确认，每次都问，没有「总是允许」 */
-function askPdfConsent() {
-  $('pdf-confirm-text').textContent = t(lang, 'pdfConfirmText', { provider: providerLabel(pdfSettings.provider) });
-  show('pdf-confirm', true);
-  $('pdf').hidden = true;
-  $('pdf-continue').focus();
-}
-
-function closePdfConsent() {
-  show('pdf-confirm', false);
-  $('pdf').hidden = false;
-  $('pdf').focus();
-}
-
 function onPdfClick() {
   if ($('pdf').getAttribute('aria-disabled') === 'true') return;
-  if (pageInfo.pdf.openAccess) startPdf(false);
-  else askPdfConsent();
+  startPdf();
 }
 
 async function run(action, permission = null) {
@@ -229,9 +214,6 @@ async function main() {
     run(ACTIONS.ZIP, permission);
   });
   $('pdf').addEventListener('click', onPdfClick);
-  $('pdf-continue').addEventListener('click', () => { closePdfConsent(); startPdf(true); });
-  $('pdf-cancel').addEventListener('click', () => { closePdfConsent(); setPdfStatus(null); $('pdf-status').textContent = t(lang, 'pdfCancelled'); });
-  $('pdf-confirm').addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.preventDefault(); $('pdf-cancel').click(); } });
   chrome.commands.getAll().then((cmds) => { $('shortcuts').textContent = shortcutText(lang, cmds); }, () => {});
   [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   await inspect(settings);
