@@ -43,6 +43,21 @@ A sibling of [arXiv to Markdown](https://github.com/Tendo33/arxiv-md) for journa
 
 Chrome first; Edge / Firefox planned.
 
+## Development
+
+Requires Node 22 (see `.nvmrc`).
+
+```bash
+npm ci
+npm run lint && npm test          # unit tests use tests/fixtures only, no network
+npm run build                     # Chrome / Edge → dist/
+npm run build:firefox             # Firefox → dist-firefox/
+npm run verify:dist               # permission allowlist, gecko id, locales, no source maps / keys
+npm run package                   # build/*.zip
+```
+
+Load `dist/` via "Load unpacked" in `chrome://extensions` (developer mode). For the end-to-end smoke test see `scripts/e2e-smoke.js`.
+
 ## License
 
 [MIT](./LICENSE)

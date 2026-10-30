@@ -43,6 +43,21 @@
 
 计划先支持 Chrome，Edge / Firefox 计划中。
 
+## 开发
+
+需要 Node 22（见 `.nvmrc`）。
+
+```bash
+npm ci
+npm run lint && npm test          # 单元测试只用 tests/fixtures，不访问网络
+npm run build                     # Chrome / Edge → dist/
+npm run build:firefox             # Firefox → dist-firefox/
+npm run verify:dist               # 权限白名单、gecko id、locales、无 source map / Key
+npm run package                   # build/*.zip
+```
+
+在 `chrome://extensions` 打开开发者模式，「加载已解压的扩展程序」选 `dist/`。端到端冒烟见 `scripts/e2e-smoke.js`。
+
 ## License
 
 [MIT](./LICENSE)
