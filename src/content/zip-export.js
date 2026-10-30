@@ -61,8 +61,13 @@ export async function buildArticleZip(result, { fetchInPage = fetchImageInPage, 
   async function worker() {
     while (next < assets.length) {
       const i = next++;
-      const { url } = assets[i];
-      const bytes = (await fetchInPage(url)) || (await fetchImageViaBackground(url, sendMessage));
+      const { url, alts = [] } = assets[i];
+      let bytes = null;
+      // 先试页面上的地址，再试备选（PMC）；每个地址先在页面里按 CORS 取，再请后台代取
+      for (const u of [url, ...alts]) {
+        bytes = (await fetchInPage(u)) || (await fetchImageViaBackground(u, sendMessage));
+        if (bytes) break;
+      }
       if (bytes && total + bytes.length <= MAX_ZIP_BYTES) {
         total += bytes.length;
         files[i] = bytes;
@@ -74,7 +79,8 @@ export async function buildArticleZip(result, { fetchInPage = fetchImageInPage, 
   const markdown = restoreRemoteImages(result.markdown, failed);
   const entries = [{ name: 'article.md', data: markdown }];
   assets.forEach((a, i) => { if (files[i]) entries.push({ name: a.path, data: files[i] }); });
-  return { bytes: createZip(entries), packed: assets.length - failed.length, total: assets.length, failed };
+  const failedHosts = [...new Set(failed.map((a) => { try { return new URL(a.url).hostname; } catch (_) { return ''; } }).filter(Boolean))];
+  return { bytes: createZip(entries), packed: assets.length - failed.length, total: assets.length, failed, failedHosts };
 }
 
 export function zipFilename(mdFilename) {

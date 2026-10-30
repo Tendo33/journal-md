@@ -28,7 +28,7 @@ describe('ZIP plan', () => {
   test('eLife export: image links point into images/, one entry per remote image', async () => {
     const r = await exportArticle({ doc: html('elife-09560.html'), url: 'https://elifesciences.org/articles/09560', fetchJats: async () => ({ ok: false }), settings: { preferJats: false }, now: NOW, format: 'zip' });
     expect(r.assets.length).toBe(4);
-    expect(r.assets[0]).toEqual({ url: 'https://iiif.elifesciences.org/lax/09560%2Felife-09560-fig1-v1.tif/full/617,/0/default.jpg', path: 'images/01-elife-09560-fig1-v1.jpg' });
+    expect(r.assets[0]).toEqual({ url: 'https://iiif.elifesciences.org/lax/09560%2Felife-09560-fig1-v1.tif/full/617,/0/default.jpg', path: 'images/01-elife-09560-fig1-v1.jpg', alts: [] });
     expect(r.markdown).toContain('![Figure 1 Dinaledi skeletal specimens.](images/01-elife-09560-fig1-v1.jpg)');
     expect(r.markdown).not.toContain('iiif.elifesciences.org');
     expect(new Set(r.assets.map((a) => a.path)).size).toBe(r.assets.length);
@@ -103,5 +103,51 @@ describe('background: ZIP download and asset proxy', () => {
     const img = jest.fn(async () => ({ ok: true, headers: { get: () => 'image/png' }, arrayBuffer: async () => new Uint8Array([1, 2]).buffer }));
     await expect(fetchAsset('https://www.frontiersin.org/a.png', { fetchImpl: img })).resolves.toEqual({ ok: true, base64: 'AQI=', type: 'image/png' });
     await expect(fetchAsset('https://evil.example/a.png', { fetchImpl: img })).resolves.toEqual({ ok: false, error: 'not_allowed' });
+  });
+});
+
+describe('QA JM-M2-01: images on publisher pages come from the publisher, PMC as fallback', () => {
+  const XML = fs.readFileSync(path.join(__dirname, 'fixtures/jats/europepmc-PMC4559886-trimmed.xml'), 'utf8');
+  const exportElife = (format) => exportArticle({
+    doc: html('elife-09560.html'), url: 'https://elifesciences.org/articles/09560', now: NOW, format,
+    fetchJats: async () => ({ ok: true, xml: XML }),
+    services: { lookupDoi: async () => ({ ok: true, pmcid: 'PMC4559886' }) },
+  });
+
+  test('Europe PMC JATS on eLife: figure links use iiif.elifesciences.org, PMC instance URL kept as alternate', async () => {
+    const r = await exportElife('zip');
+    expect(r.route).toBe('jats-europepmc');
+    const fig1 = r.assets.find((a) => /fig1-v1/.test(a.url));
+    expect(fig1).toEqual({ url: 'https://iiif.elifesciences.org/lax/09560%2Felife-09560-fig1-v1.tif/full/617,/0/default.jpg', path: expect.stringMatching(/^images\/\d\d-elife-09560-fig1-v1\.jpg$/), alts: ['https://pmc.ncbi.nlm.nih.gov/articles/instance/4559886/bin/elife09560f001.jpg'] });
+    // 裁剪后的页面 fixture 里还剩 4 张图，这 4 张都换成了 iiif
+    expect(r.assets.filter((a) => a.url.startsWith('https://iiif.elifesciences.org/')).length).toBe(4);
+    const md = await exportElife('md');
+    expect(md.markdown).toContain('![Figure 1. Dinaledi skeletal specimens.](https://iiif.elifesciences.org/lax/09560%2Felife-09560-fig1-v1.tif/full/617,/0/default.jpg)');
+  });
+
+  test('QA sample: PMC instance URLs fail (CORS / PoW page) but iiif works → images are packed', async () => {
+    const r = await exportElife('zip');
+    const fetchInPage = async (u) => (u.startsWith('https://iiif.elifesciences.org/') ? new Uint8Array([1]) : null);
+    const z = await buildArticleZip(r, { fetchInPage, sendMessage: async () => ({ ok: false, error: 'not_image' }) });
+    const onIiif = r.assets.filter((a) => a.url.startsWith('https://iiif.')).length;
+    expect(z.packed).toBe(onIiif);
+    expect(z.failedHosts).toEqual(z.packed === z.total ? [] : ['pmc.ncbi.nlm.nih.gov']);
+  });
+
+  test('alternate URL is tried when the first one fails', async () => {
+    const result = { markdown: '![A](images/01-a.jpg)', assets: [{ url: 'https://media.springernature.com/a.jpg', path: 'images/01-a.jpg', alts: ['https://pmc.ncbi.nlm.nih.gov/articles/PMC1/bin/a.jpg'] }] };
+    const z = await buildArticleZip(result, { fetchInPage: async (u) => (u.includes('pmc') ? new Uint8Array([7]) : null), sendMessage: async () => null });
+    expect(z).toMatchObject({ packed: 1, total: 1, failedHosts: [] });
+  });
+
+  test('failure message names the blocking host', () => {
+    const { describeResult } = require('@/ui/shared/result-text');
+    const r = { ok: true, saved: true, filename: 'x.zip', markdown: '', zip: { packed: 0, total: 5, failedHosts: ['media.springernature.com'] } };
+    expect(describeResult(r, 'en', 'zip').notes[0]).toBe('No images could be packed: media.springernature.com does not let extensions download them. The ZIP has article.md only, with web links to all 5 images.');
+    expect(describeResult({ ...r, zip: { packed: 3, total: 5, failedHosts: ['pmc.ncbi.nlm.nih.gov'] } }, 'zh', 'zip').notes[0]).toBe('已打包 3/5 张图片。其余 2 张在 pmc.ncbi.nlm.nih.gov 上，该网站不允许扩展下载，article.md 里保留网络链接。');
+  });
+
+  test('background proxy also accepts the PMC image CDN (it sends CORS *)', () => {
+    expect(assetAllowed('https://cdn.ncbi.nlm.nih.gov/pmc/blobs/c7c2/4559886/18e9f983c26c/elife09560f001.jpg')).toBe(true);
   });
 });

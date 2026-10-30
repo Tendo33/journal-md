@@ -237,7 +237,7 @@
     "message": "All {total} images are in the ZIP; links point to images/."
   },
   "noticeZipPartial": {
-    "message": "{packed} of {total} images are in the ZIP. The others could not be downloaded from their site and keep their web links."
+    "message": "{packed} of {total} images are in the ZIP. The other {failed} are on {hosts}, which does not let extensions download them; they keep their web links in article.md."
   },
   "fabButton": {
     "message": "Export as Markdown (menu)"
@@ -403,5 +403,8 @@
   },
   "optPdfNeedToken": {
     "message": "Enter a token first."
+  },
+  "noticeZipNone": {
+    "message": "No images could be packed: {hosts} does not let extensions download them. The ZIP has article.md only, with web links to all {total} images."
   }
 }

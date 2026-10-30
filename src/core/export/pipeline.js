@@ -16,7 +16,7 @@ import { buildFilename } from '../filename';
 import { normalizeSettings } from '../../config/settings';
 import { ERR, NOTICE } from '../errors';
 import { normalizePmcid } from '../ids';
-import { planAssets } from './zip-plan';
+import { planAssets, assetAlternates } from './zip-plan';
 import { isOpenAccessPdf } from '../../pdf/oa';
 
 const DOM_ADAPTERS = {
@@ -67,6 +67,36 @@ export function inspectPage(doc, url, rawSettings) {
   };
 }
 
+const FLOAT_KEY = /^\s*(extended data\s+|supplementary\s+)?(fig(?:ure)?|table|box)\.?\s*(S?\d+[A-Za-z]?)\b/i;
+
+/** 「Fig. 1」「Figure 1」「Extended Data Table 2」→ fig:1 / table:2 / extended:table:2，用来对齐 JATS 和页面上的同一张图 */
+export function floatKey(label) {
+  const m = String(label || '').match(FLOAT_KEY);
+  if (!m) return '';
+  const kind = /^fig/i.test(m[2]) ? 'fig' : m[2].toLowerCase();
+  return `${m[1] ? 'extended:' : ''}${kind}:${m[3].toUpperCase()}`;
+}
+
+/**
+ * 出版商页面走 Europe PMC JATS 时，图片地址默认是 PMC 的 instance/bin：从别的网站请求时 PMC 返回的 301 没有 CORS 头，
+ * 扩展后台请求又会拿到 PMC 的防爬验证页，ZIP 一张都打不进（QA JM-M2-01）。所以按图号换成页面上出版商自己的图片地址
+ * （如 eLife 的 iiif），PMC 地址留作备选。
+ */
+export function preferPageImages(ir, dom) {
+  const byKey = new Map();
+  for (const x of [...dom.figures, ...dom.tables]) {
+    const k = floatKey(x.label);
+    if (k && x.src && !byKey.has(k)) byKey.set(k, x.src);
+  }
+  for (const x of [...ir.figures, ...ir.tables]) {
+    const pageSrc = byKey.get(floatKey(x.label));
+    if (!x.src || !pageSrc || pageSrc === x.src) continue;
+    x.altSrc = x.src;
+    x.src = pageSrc;
+  }
+  return ir;
+}
+
 function finish(ir, settings, notices, now, format = 'md') {
   // ZIP：图片链接先写成包内路径（images/…），由调用方下载图片并打包
   const plan = format === 'zip' && settings.includeImages ? planAssets(ir) : null;
@@ -81,7 +111,7 @@ function finish(ir, settings, notices, now, format = 'md') {
     abstractOnly: !!ir.meta.abstractOnly,
     notices,
     meta: { title: ir.meta.title, doi: ir.meta.doi, pmid: ir.meta.pmid, pmcid: ir.meta.pmcid, license: ir.meta.license, pdfUrl: ir.meta.pdfUrl || '' },
-    ...(plan ? { assets: [...plan].map(([url, path]) => ({ url, path })) } : {}),
+    ...(plan ? { assets: [...plan].map(([url, path]) => ({ url, path, alts: assetAlternates(ir).get(url) || [] })) } : {}),
   };
 }
 
@@ -245,6 +275,7 @@ export async function exportArticle({ doc, url, settings: rawSettings, fetchJats
     const ir = await publisherJats({ det, dom, doc, url, fetchJats, services, notices });
     if (ir) {
       ir.meta.url = url;
+      preferPageImages(ir, dom);
       if (!ir.meta.license) ir.meta.license = dom.meta.license;
       if (!ir.meta.keywords.length) ir.meta.keywords = dom.meta.keywords;
       return finish(ir, settings, notices, now, format);

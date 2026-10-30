@@ -58,6 +58,18 @@ export function planAssets(ir) {
   return plan;
 }
 
+/**
+ * 同一张图的其他地址（例如出版商页面上的图失败时退回 PMC 地址）：远程地址 → 候选地址列表
+ * @returns {Map<string,string[]>}
+ */
+export function assetAlternates(ir) {
+  const alts = new Map();
+  for (const x of [...ir.figures, ...ir.tables]) {
+    if (x.src && x.altSrc && x.altSrc !== x.src) alts.set(x.src, [x.altSrc]);
+  }
+  return alts;
+}
+
 /** 下载失败的图片：把正文里的本地路径换回原网址 */
 export function restoreRemoteImages(markdown, failed) {
   let md = markdown;

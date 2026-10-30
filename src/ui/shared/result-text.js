@@ -15,7 +15,10 @@ export function describeResult(result, lang, action) {
   else if (action === 'copy' || result.copied) status = t(lang, 'statusCopied', { count: result.markdown.length.toLocaleString(lang === 'zh' ? 'zh-CN' : 'en') });
   const notes = [];
   if (result.zip && result.zip.total) {
-    notes.push(t(lang, result.zip.packed === result.zip.total ? 'noticeZipAll' : 'noticeZipPartial', { packed: result.zip.packed, total: result.zip.total }));
+    const z = result.zip;
+    const hosts = (z.failedHosts || []).slice(0, 3).join(', ') || '?';
+    const key = z.packed === z.total ? 'noticeZipAll' : z.packed === 0 ? 'noticeZipNone' : 'noticeZipPartial';
+    notes.push(t(lang, key, { packed: z.packed, total: z.total, failed: z.total - z.packed, hosts }));
   }
   for (const n of result.notices || []) {
     if (n.code === 'jats_fallback') {
