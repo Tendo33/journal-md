@@ -6,39 +6,29 @@ import { extractDomArticle } from './dom-article';
 
 export const EUROPEPMC_CONFIG = {
   route: SOURCE_ROUTES.DOM_EUROPEPMC,
-  root: ['#article--main-content', '.article--main-content', 'main', 'article', '#app'],
-  title: ['h1#article--title', 'h1.article--title', 'h1'],
-  authors: '#article--author-list .author-name, .article--author-list .author-name, .authors-list .author-name',
-  journal: '#article--journal-title, .article--journal-title, .publication-title',
-  date: '#article--publication-date, .article--publication-date',
-  // 只在文章元数据区里找 DOI / PMCID；正文、参考文献、「被引」列表里的都不算（QA JM-01）
-  metaArea: ['#article--meta', '.article--meta'],
+  // 2026-10 的页面（tests/fixtures/html/europepmc-*.html，真实页面裁剪）：#article-mid-col 下是元数据 + 各个 .content-section
+  root: ['#article-mid-col', '#article--main-content', '.article--main-content', 'main', 'article', '#app'],
+  title: ['#article--current--title', 'h1#article--title', 'h1.article--title', 'h1'],
+  // 只取姓名，不带后面的单位编号 <sup> 1 </sup>（QA JM-10）
+  authors: '.metadata--author-name, #article--author-list .author-name, .article--author-list .author-name',
+  journal: '.metadata--source-title, #article--journal-title, .article--journal-title',
+  date: '.metadata--citation [itemprop="datepublished"], #article--publication-date, .article--publication-date',
+  // 只在文章元数据区里找 DOI / PMID / PMCID；正文、参考文献、「被引」「相似文章」里的都不算（QA JM-01）
+  metaArea: ['.metadata--citation', '#article--meta', '.article--meta'],
   doi: 'a[href*="doi.org/10."]',
   license: 'a[href*="creativecommons.org/licenses"], a[href*="creativecommons.org/publicdomain"]',
-  abstract: '#abstract, #article--abstract, .abstract',
+  abstract: '#article--abstract--content, #abstract:not(.content-section), #article--abstract, .abstract',
   keywords: '.keywords, .kwd-group',
+  // 正文只认全文容器（白名单）：MED 无全文页上的「Author information / Full text links / References / Citations /
+  // Similar Articles / Funding / Share」都不是正文（QA JM-10）。全文是懒加载的，没展开时这里为空 → 仅摘要
+  body: '#free-full-text .section-content, #fulltextcontent, #article--fulltext',
   refList: '#references, #article--references, .ref-list',
-  refItems: '#references li, #article--references li, .ref-list li',
+  refItems: '#fulltextcontent ~ #references li, #free-full-text .ref-list li',
   refText: '.citation, cite',
   refLabel: '.label, .ref-label',
-  supp: '.supplementary-material, .supplementary-file',
+  supp: '#free-full-text .supplementary-material, #fulltextcontent .supplementary-material',
   suppCaption: '.caption, .supp-caption',
-  remove: [
-    'h1',
-    'header',
-    'nav',
-    'aside',
-    '.article--meta',
-    '#article--meta',
-    '.article--toolbar',
-    '.article--sidebar',
-    '.feedback',
-    // 被引、相关文章列表（里面有别的文章的 PMCID / DOI，QA JM-01）
-    '#citations',
-    '#article--citations',
-    '#similar-articles',
-    '#article--similar-articles',
-  ],
+  remove: [],
   selectors: {
     figure: 'figure, .fig',
     table: '.table-wrap, .tw',

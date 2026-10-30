@@ -159,7 +159,14 @@ export function extractDomArticle(doc, url, cfg, ids = {}) {
   ir.supp = suppItems(conv, root, cfg, url);
 
   // ---- 正文 ----
-  const body = root.cloneNode(true);
+  // cfg.body 是白名单：只从这些容器取正文（没有就是没有正文）；否则整个 root 去掉已知的非正文部分
+  let body;
+  if (cfg.body) {
+    body = doc.createElement('div');
+    all(root, cfg.body).filter((el, _i, arr) => !arr.some((o) => o !== el && o.contains(el))).forEach((el) => body.appendChild(el.cloneNode(true)));
+  } else {
+    body = root.cloneNode(true);
+  }
   removeAll(body, [cfg.abstract, cfg.refList, cfg.supp, cfg.keywords, ...(cfg.remove || [])]);
   const sections = conv.sections(body);
 

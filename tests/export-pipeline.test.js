@@ -195,3 +195,29 @@ describe('review nits N-A / N-B / N-D', () => {
     expect(ok).not.toHaveBeenCalled();
   });
 });
+
+describe('QA JM-10: real Europe PMC pages (2026-10 layout)', () => {
+  test('MED page without full text: abstract only, no site chrome, no affiliation numbers', async () => {
+    const r = await exportArticle({ doc: html('europepmc-med-31862249.html'), url: 'https://europepmc.org/article/MED/31862249', fetchJats: ok, now: NOW });
+    expect(ok).not.toHaveBeenCalled();
+    expect(r).toMatchObject({ ok: true, route: 'dom-europepmc', abstractOnly: true, meta: { pmid: '31862249', pmcid: '', doi: '10.1016/s0140-6736(19)32500-0' } });
+    const md = r.markdown;
+    expect(md).toContain('abstract_only: true');
+    expect(md.match(/^## Abstract$/gm)).toHaveLength(1);
+    expect(md).toContain('### Background');
+    for (const chrome of ['Author information', 'Full text links', 'Partnerships', 'Share this article', 'Similar Articles', 'Citations & impact', '<sup>']) {
+      expect(md).not.toContain(chrome);
+    }
+    expect(md).toMatch(/^authors: \[Lagae L, Sullivan J, /m);
+    expect(md).toContain('journal: "Lancet (London, England)"');
+  });
+
+  test('PMC page: IDs come from the citation line; JATS is preferred', async () => {
+    const doc = html('europepmc-pmc-7095418.html');
+    const xml = fs.readFileSync(path.join(__dirname, 'fixtures/jats/europepmc-PMC7095418.xml'), 'utf8');
+    const fetchJats = jest.fn(async () => ({ ok: true, xml }));
+    const r = await exportArticle({ doc, url: 'https://europepmc.org/article/PMC/PMC7095418', fetchJats, now: NOW });
+    expect(fetchJats).toHaveBeenCalledWith('PMC7095418');
+    expect(r).toMatchObject({ ok: true, route: 'jats-europepmc', meta: { pmid: '32015507', pmcid: 'PMC7095418' } });
+  });
+});
