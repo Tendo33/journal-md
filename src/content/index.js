@@ -93,7 +93,7 @@ async function deliver(result, action) {
     const dl = zip ? await chrome.runtime.sendMessage({ type: MSG.DOWNLOAD_ZIP, base64: base64FromBytes(zip.bytes), filename }) : null;
     if (!dl || !dl.ok) return { ...result, ok: false, error: 'download_failed' };
     // markdown 换成 ZIP 里那份（下载失败的图片已换回原网址），供调用方复制
-    return { ...result, saved: true, filename, zip: { packed: zip.packed, total: zip.total, failedHosts: zip.failedHosts, needsPermission: zip.needsPermission, permissionCount: zip.permissionCount } };
+    return { ...result, saved: true, filename, zip: { packed: zip.packed, total: zip.total, failedHosts: zip.failedHosts } };
   }
   if (result.ok && action === ACTIONS.DOWNLOAD) {
     const dl = await chrome.runtime.sendMessage({ type: MSG.DOWNLOAD, markdown: result.markdown, filename: result.filename });

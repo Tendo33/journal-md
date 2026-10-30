@@ -144,11 +144,11 @@ describe('QA JM-M2-01: images on publisher pages come from the publisher, PMC as
     expect(z).toMatchObject({ packed: 1, total: 1, failedHosts: [] });
   });
 
-  test('failure message names the blocking host', () => {
+  test('failure message names the host, neutral wording (fix2c)', () => {
     const { describeResult } = require('@/ui/shared/result-text');
     const r = { ok: true, saved: true, filename: 'x.zip', markdown: '', zip: { packed: 0, total: 5, failedHosts: ['media.springernature.com'] } };
-    expect(describeResult(r, 'en', 'zip').notes[0]).toBe('No images could be packed: media.springernature.com does not let extensions download them. The ZIP has article.md only, with web links to all 5 images.');
-    expect(describeResult({ ...r, zip: { packed: 3, total: 5, failedHosts: ['pmc.ncbi.nlm.nih.gov'] } }, 'zh', 'zip').notes[0]).toBe('已打包 3/5 张图片。其余 2 张在 pmc.ncbi.nlm.nih.gov 上，该网站不允许扩展下载，article.md 里保留网络链接。');
+    expect(describeResult(r, 'en', 'zip').notes[0]).toBe('No images could be packed: downloading from media.springernature.com failed. The ZIP has article.md only, with web links to all 5 images.');
+    expect(describeResult({ ...r, zip: { packed: 3, total: 5, failedHosts: ['pmc.ncbi.nlm.nih.gov'] } }, 'zh', 'zip').notes[0]).toBe('已打包 3/5 张图片。其余 2 张没能从 pmc.ncbi.nlm.nih.gov 下载，article.md 里保留网络链接。');
   });
 
   test('background proxy also accepts the PMC image CDN (it sends CORS *)', () => {

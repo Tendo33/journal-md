@@ -1,10 +1,10 @@
 // ZIP 导出：article.md + images/（链接改成包内路径，思路同 arxiv-md 的 ZIP 输出）。
-// 图片先在页面里按 CORS 请求；被 CORS 拦下、而图片在本扩展已有权限的站点上时，再请后台代取。
-// 两条路都拿不到的图片（例如 media.springernature.com 不给 CORS 头）保留原网址，并在结果里说明，不新增任何权限。
+// 图片先在页面里按 CORS 请求；被 CORS 拦下、而图片在本扩展 host_permissions 里的站点上时（含 PLOS 图片存储、
+// media.springernature.com 这两个不给 CORS 头的 CDN，安装时授予），再请后台代取。使用时不申请任何权限。
+// 两条路都拿不到的图片（网络错误、CDN 拒绝、超时）照样生成 ZIP：保留原网址，并在结果里说明。
 import { createZip } from '@pdf-core/output/zip.js';
 import { restoreRemoteImages } from '../core/export/zip-plan';
 import { MSG } from '../utils/messages';
-import { originsNeededFor } from '../core/zip-image-hosts';
 
 export const IMAGE_TIMEOUT_MS = 15000;
 export const MAX_IMAGE_BYTES = 20 * 1000 * 1000;
@@ -81,10 +81,7 @@ export async function buildArticleZip(result, { fetchInPage = fetchImageInPage, 
   const entries = [{ name: 'article.md', data: markdown }];
   assets.forEach((a, i) => { if (files[i]) entries.push({ name: a.path, data: files[i] }); });
   const failedHosts = [...new Set(failed.map((a) => { try { return new URL(a.url).hostname; } catch (_) { return ''; } }).filter(Boolean))];
-  // 失败的图片里有没有「授予可选权限后就能取到」的（PLOS 存储桶 / media.springernature.com）
-  const needsPermission = originsNeededFor(failed.flatMap((a) => [a.url, ...(a.alts || [])]));
-  const permissionCount = failed.filter((a) => [a.url, ...(a.alts || [])].some((u) => originsNeededFor([u]).length)).length;
-  return { bytes: createZip(entries), packed: assets.length - failed.length, total: assets.length, failed, failedHosts, needsPermission, permissionCount };
+  return { bytes: createZip(entries), packed: assets.length - failed.length, total: assets.length, failed, failedHosts };
 }
 
 export function zipFilename(mdFilename) {

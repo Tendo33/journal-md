@@ -88,8 +88,8 @@ async function main() {
     if (url.startsWith('https://iiif.elifesciences.org/') && ['fetch', 'xhr'].includes(route.request().resourceType())) {
       return route.fulfill({ status: 200, contentType: 'image/png', headers: { 'Access-Control-Allow-Origin': '*' }, body: PNG });
     }
-    // 真实的 media.springernature.com 不发 CORS 头，没有可选权限时页面和后台的 fetch 都会失败（2026-10-30 线上实测）。
-    // Playwright 的 route.fulfill 会自己满足 CORS，模拟不了「缺 CORS 头」，所以这里直接让请求以网络错误失败——代码看到的结果相同
+    // media.springernature.com 现在是安装时授予的主机权限，后台本可以取到；这里让它以网络错误失败，
+    // 验证「图片取不到时照样出 ZIP、保留原网址、给出提示」这条路（e2e 不访问真实 CDN）
     if (url.startsWith('https://media.springernature.com/') && ['fetch', 'xhr'].includes(route.request().resourceType())) {
       return route.abort('failed');
     }
@@ -296,7 +296,7 @@ async function main() {
     await pp.addInitScript(({ tid, turl }) => {
       const orig = chrome.tabs.query.bind(chrome.tabs);
       chrome.tabs.query = async (q) => (q && q.active ? [{ id: tid, url: turl }] : orig(q));
-      // 权限弹窗没法在自动化里点：记录调用并模拟「拒绝」
+      // fix2c：使用时不应申请任何权限。万一有调用就记下来（并按「拒绝」返回），检查里要求一次都没有
       window.__permCalls = [];
       chrome.permissions.request = (q) => { window.__permCalls.push(q); return Promise.resolve(false); };
     }, { tid: id, turl: url });
@@ -315,24 +315,25 @@ async function main() {
   const zipItem = (await sw.evaluate(() => chrome.downloads.search({}))).filter((d) => d.state === 'complete' && /application\/zip/.test(d.mime || d.url || '')).pop();
   const zfiles = zipItem ? unzip(fs.readFileSync(zipItem.filename)) : {};
   const zmd = zfiles['article.md'] ? zfiles['article.md'].toString('utf8') : '';
-  check('ZIP permission: eLife needs no extra host, nothing is requested', (await ep.evaluate(() => window.__permCalls.length)) === 0);
+  check('fix2c: eLife ZIP — nothing called permissions.request', (await ep.evaluate(() => window.__permCalls.length)) === 0);
   check('ZIP contains article.md with local image links and the images', zmd.includes('](images/01-elife-09560-fig1-v1.jpg)') && !!zfiles['images/01-elife-09560-fig1-v1.jpg'] && !zmd.includes('iiif.elifesciences.org'), Object.keys(zfiles).slice(0, 4).join(','));
 
-  // ZIP 可选权限（Simon 2026-10-30 批准）：Nature 的图在 media.springernature.com，点「下载 ZIP」时在点击里申请；拒绝后照样出 ZIP + 提示
+  // Nature 的图在 media.springernature.com（Simon 10-30 18:06 起安装时授予，点「下载 ZIP」时不申请）；
+  // 上面的路由让这些图片取不到：照样出 ZIP、保留原网址、给出提示
   const zp = await openPopup(natTab, NATURE_URL);
   const zipBefore = (await sw.evaluate(() => chrome.downloads.search({}))).filter((d) => /application\/zip/.test(d.mime || d.url || '')).length;
   await zp.click('#zip');
   await zp.waitForSelector('#status .ok, #status .err', { timeout: 15000 }).catch(() => {});
   await zp.waitForTimeout(500);
   const permCalls = await zp.evaluate(() => window.__permCalls);
-  check('ZIP permission: requested once from the click with exactly media.springernature.com', JSON.stringify(permCalls) === JSON.stringify([{ origins: ['https://media.springernature.com/*'] }]), JSON.stringify(permCalls));
+  check('fix2c: Nature ZIP — nothing called permissions.request', permCalls.length === 0, JSON.stringify(permCalls));
   const zpStatus = await zp.textContent('#status');
   const zipAfter = (await sw.evaluate(() => chrome.downloads.search({}))).filter((d) => d.state === 'complete' && /application\/zip/.test(d.mime || d.url || ''));
-  check('ZIP permission denied: ZIP still saved, visible notice to allow access', zipAfter.length === zipBefore + 1 && /\.zip/.test(zpStatus) && /needs your permission|需要你授权/.test(zpStatus), zpStatus);
+  check('ZIP images unavailable: ZIP still saved, notice names the host, no permission wording', zipAfter.length === zipBefore + 1 && /\.zip/.test(zpStatus) && /could not be downloaded from media\.springernature\.com|downloading from media\.springernature\.com failed|没能从 media\.springernature\.com 下载|从 media\.springernature\.com 下载失败/.test(zpStatus) && !/permission|授权/.test(zpStatus), zpStatus);
   // downloads.search 不按时间排序：取最新开始的那一个
   const newestZip = zipAfter.slice().sort((x, y) => String(x.startTime).localeCompare(String(y.startTime))).pop();
   const nmd = newestZip ? (unzip(fs.readFileSync(newestZip.filename))['article.md'] || '').toString('utf8') : '';
-  check('ZIP permission denied: images keep their remote links in article.md', /\]\(https:\/\/media\.springernature\.com\//.test(nmd) && !/\]\(images\//.test(nmd));
+  check('ZIP images unavailable: they keep their remote links in article.md', /\]\(https:\/\/media\.springernature\.com\//.test(nmd) && !/\]\(images\//.test(nmd));
 
   // PDF 解析（Simon 10-30 18:06）：没有启用开关、没有确认、不申请权限——给所选后端填了 Token 就有按钮，点了直接发（发给上面模拟的后端）
   await sw.evaluate(() => chrome.storage.local.set({ pdfSettings: { provider: 'paddleocr', tokens: { paddleocr: 'e2e-placeholder' } } }));

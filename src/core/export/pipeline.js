@@ -18,7 +18,6 @@ import { ERR, NOTICE } from '../errors';
 import { normalizePmcid } from '../ids';
 import { planAssets, assetAlternates } from './zip-plan';
 import { isOpenAccessPdf } from '../../pdf/oa';
-import { originsNeededFor } from '../zip-image-hosts';
 
 const DOM_ADAPTERS = {
   pmc: extractPmc,
@@ -54,10 +53,8 @@ export function inspectPage(doc, url, rawSettings) {
     error: m.title ? undefined : ERR.NO_CONTENT,
     title: m.title,
     ids: { doi: m.doi, pmid: m.pmid, pmcid: m.pmcid },
-    // L3 PDF 解析用：PDF 地址、是否开放获取（决定要不要弹确认），任务文件名和 front matter 用的题录
+    // L3 PDF 解析用：PDF 地址、是否开放获取（只用于显示，不拦截上传），任务文件名和 front matter 用的题录
     pdf: m.pdfUrl ? { url: m.pdfUrl, openAccess: isOpenAccessPdf({ pageUrl: url, pdfUrl: m.pdfUrl, license: m.license }), license: m.license } : null,
-    // ZIP 打包页面图片要用到的可选主机权限（PLOS 存储桶 / media.springernature.com）。弹窗点「下载 ZIP」时在点击里申请
-    zipOrigins: settings.includeImages ? originsNeededFor([...planAssets(ir).keys()]) : [],
     meta: { title: m.title, year: m.year, doi: m.doi, pmid: m.pmid, pmcid: m.pmcid, journal: m.journal, authors: (m.authors || []).slice(0, 50).map((a) => ({ name: a.name })) },
     routes: {
       // jats：有 PMCID 才可能；是否真的可用（OA）要由后台探测

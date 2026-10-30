@@ -237,7 +237,7 @@
     "message": "All {total} images are in the ZIP; links point to images/."
   },
   "noticeZipPartial": {
-    "message": "{packed} of {total} images are in the ZIP. The other {failed} are on {hosts}, which does not let extensions download them; they keep their web links in article.md."
+    "message": "{packed} of {total} images are in the ZIP. The other {failed} could not be downloaded from {hosts}; they keep their web links in article.md."
   },
   "fabButton": {
     "message": "Export as Markdown (menu)"
@@ -375,9 +375,6 @@
     "message": "Enter a token first."
   },
   "noticeZipNone": {
-    "message": "No images could be packed: {hosts} does not let extensions download them. The ZIP has article.md only, with web links to all {total} images."
-  },
-  "noticeZipNeedsPermission": {
-    "message": "{count} image(s) are stored on {hosts}, which needs your permission. They keep their web links in article.md. To include them, click Download ZIP in the toolbar popup and choose Allow."
+    "message": "No images could be packed: downloading from {hosts} failed. The ZIP has article.md only, with web links to all {total} images."
   }
 }

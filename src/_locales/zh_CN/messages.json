@@ -237,7 +237,7 @@
     "message": "{total} 张图片都已打包，链接指向 images/。"
   },
   "noticeZipPartial": {
-    "message": "已打包 {packed}/{total} 张图片。其余 {failed} 张在 {hosts} 上，该网站不允许扩展下载，article.md 里保留网络链接。"
+    "message": "已打包 {packed}/{total} 张图片。其余 {failed} 张没能从 {hosts} 下载，article.md 里保留网络链接。"
   },
   "fabButton": {
     "message": "导出为 Markdown（菜单）"
@@ -375,9 +375,6 @@
     "message": "请先填写 Token。"
   },
   "noticeZipNone": {
-    "message": "没能打包任何图片：{hosts} 不允许扩展下载图片。ZIP 里只有 article.md，{total} 张图片都保留网络链接。"
-  },
-  "noticeZipNeedsPermission": {
-    "message": "有 {count} 张图片存放在 {hosts}，需要你授权才能打包，现在 article.md 里保留网络链接。要打包这些图片，请在工具栏弹窗里点「下载 ZIP」并选择允许。"
+    "message": "没能打包任何图片：从 {hosts} 下载失败。ZIP 里只有 article.md，{total} 张图片都保留网络链接。"
   }
 }
