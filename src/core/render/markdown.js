@@ -129,10 +129,13 @@ class Renderer {
     if (title) parts.push(heading(level, oneLine(title)));
     const body = this.blocks(s.blocks);
     if (body) parts.push(body);
+    let hasChild = false;
     for (const c of s.children || []) {
       const child = this.section(c, title ? level + 1 : level);
-      if (child) parts.push(child);
+      if (child) { parts.push(child); hasChild = true; }
     }
+    // 只有标题、没有内容的节不输出（QA JM-06：空的「Supplementary information」）
+    if (!body && !hasChild) return '';
     return parts.join('\n\n');
   }
 
