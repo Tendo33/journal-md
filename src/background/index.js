@@ -21,8 +21,6 @@ export function handleMessage(message, sender) {
   switch (message.type) {
   case MSG.FETCH_JATS:
     return jats.get(message.pmcid);
-  case MSG.PROBE_JATS:
-    return jats.get(message.pmcid).then((r) => ({ ok: r.ok, reason: r.reason }));
   case MSG.DOWNLOAD:
     return downloadMarkdown({ markdown: message.markdown, filename: message.filename });
   default:

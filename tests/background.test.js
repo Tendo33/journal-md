@@ -112,8 +112,10 @@ describe('background message router', () => {
     expect(handleMessage({ type: 'JMD_FETCH_JATS', pmcid: 'PMC1' }, { id: 'evil' })).toBeNull();
   });
 
-  test('probe strips the XML payload; fetch goes to Europe PMC only', async () => {
-    await expect(handleMessage({ type: 'JMD_PROBE_JATS', pmcid: 'PMC1' }, { id: 'self' })).resolves.toEqual({ ok: false, reason: 'not_available' });
+  test('FETCH_JATS goes to Europe PMC only; the removed probe message is ignored', async () => {
+    expect(handleMessage({ type: 'JMD_PROBE_JATS', pmcid: 'PMC1' }, { id: 'self' })).toBeNull();
+    expect(global.fetch).not.toHaveBeenCalled();
+    await expect(handleMessage({ type: 'JMD_FETCH_JATS', pmcid: 'PMC1' }, { id: 'self' })).resolves.toEqual({ ok: false, reason: 'not_available', status: 404 });
     expect(global.fetch.mock.calls[0][0]).toBe('https://www.ebi.ac.uk/europepmc/webservices/rest/PMC1/fullTextXML');
   });
 

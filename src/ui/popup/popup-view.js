@@ -18,15 +18,12 @@ export function emptyText(lang, check) {
 }
 
 /**
- * 「JATS ✓ / 页面 ✓ / 摘要 ✓」
- * @param {'checking'|'yes'|'no'|'off'} jatsState
+ * 「JATS：导出时检查 · 页面 ✓」。打开弹窗时不请求 Europe PMC，所以 JATS 只显示「导出时检查」。
  */
-export function routeItems(lang, routes, jatsState) {
+export function routeItems(lang, routes) {
   const items = [];
   if (routes.jats) {
-    const mark = jatsState === 'checking' ? '…' : jatsState === 'yes' ? '✓' : '✗';
-    const desc = jatsState === 'checking' ? t(lang, 'routeChecking') : t(lang, jatsState === 'yes' ? 'routeYes' : 'routeNo');
-    items.push({ text: `${t(lang, 'routeJats')} ${mark}`, state: jatsState === 'checking' ? 'checking' : jatsState, desc: `${t(lang, 'routeJats')}: ${desc}` });
+    items.push({ text: t(lang, 'routeJatsDeferred'), state: 'deferred', desc: t(lang, 'routeJatsDeferred') });
   }
   items.push({ text: `${t(lang, 'routeDom')} ${routes.dom ? '✓' : '✗'}`, state: routes.dom ? 'yes' : 'no', desc: `${t(lang, 'routeDom')}: ${t(lang, routes.dom ? 'routeYes' : 'routeNo')}` });
   if (!routes.dom) {

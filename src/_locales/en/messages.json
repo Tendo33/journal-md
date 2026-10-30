@@ -32,14 +32,14 @@
   "routeJats": {
     "message": "JATS"
   },
+  "routeJatsDeferred": {
+    "message": "JATS: checked on export"
+  },
   "routeDom": {
     "message": "Page"
   },
   "routeAbstract": {
     "message": "Abstract"
-  },
-  "routeChecking": {
-    "message": "checking…"
   },
   "routeYes": {
     "message": "available"
@@ -210,7 +210,7 @@
     "message": "Version {version}"
   },
   "optPrivacy": {
-    "message": "Articles are converted inside your browser. The only network request is to Europe PMC for open-access article XML."
+    "message": "Articles are converted inside your browser. Only when you export or copy an article does the extension ask Europe PMC (EMBL-EBI) for its open-access full text, using the article's PMCID. No cookies or page address are sent. Opening the popup sends nothing."
   },
   "btnClose": {
     "message": "Close"

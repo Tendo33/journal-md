@@ -42,10 +42,12 @@ async function main() {
   });
   const consoleErrors = [];
   const external = [];
+  const jatsHits = [];
   await ctx.route('**/*', (route) => {
     const url = route.request().url();
     if (url.startsWith('chrome-extension://') || url.startsWith('data:') || url.startsWith('blob:')) return route.continue();
     const hit = ROUTES[url];
+    if (url.includes('/fullTextXML')) jatsHits.push(url);
     if (hit) return route.fulfill({ status: 200, contentType: hit.type, body: hit.body });
     // 页面自己的图片等资源直接中止；扩展发出的 fetch/xhr 必须全部命中 fixture
     if (['fetch', 'xhr'].includes(route.request().resourceType())) external.push(url);
@@ -68,11 +70,6 @@ async function main() {
   await page.waitForTimeout(800);
   const tabId = await sw.evaluate(async (url) => (await chrome.tabs.query({ url }))[0].id, PMC_URL);
 
-  // content script → 导出（JATS 由 route 提供）
-  const res = await sw.evaluate((id) => chrome.tabs.sendMessage(id, { type: 'JMD_EXPORT', action: 'none' }), tabId);
-  check('export via JATS route', res && res.ok && res.route === 'jats-europepmc', JSON.stringify(res && { ok: res.ok, route: res.route, error: res.error }));
-  check('markdown has front matter and footnotes', res && /^---\ntitle:/.test(res.markdown) && res.markdown.includes('[^1]:'));
-
   // popup：把 chrome.tabs.query 指到 fixture 标签页（独立打开的 popup 自己才是活动标签页）
   const popup = await ctx.newPage();
   popup.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(`popup: ${m.text()}`); });
@@ -83,15 +80,19 @@ async function main() {
   await popup.setViewportSize({ width: 360, height: 600 });
   await popup.goto(`chrome-extension://${extId}/popup.html`);
   await popup.waitForSelector('#info:not([hidden])', { timeout: 5000 });
+  await popup.waitForTimeout(1000);
   check('popup shows platform', (await popup.textContent('#platform')) === 'PubMed Central');
   check('popup shows PMCID', (await popup.textContent('#pmcid')) === 'PMC11000001');
-  await popup.waitForFunction(() => document.querySelector('#routes').textContent.includes('JATS ✓'), null, { timeout: 5000 }).catch(() => {});
-  check('popup routes read JATS ✓ / Page ✓', /JATS ✓.*✓/.test(await popup.textContent('#routes')), await popup.textContent('#routes'));
+  check('popup routes: JATS checked on export / Page ✓', /JATS.*(export|导出时检查).*✓/.test(await popup.textContent('#routes')), await popup.textContent('#routes'));
+  check('M-1: opening the popup sends no request', jatsHits.length === 0 && external.length === 0, jatsHits.concat(external).join(', '));
   const rowBefore = await popup.locator('#actions').boundingBox();
   await popup.click('#export');
   await popup.waitForSelector('#status .ok', { timeout: 8000 }).catch(() => {});
+  await popup.waitForTimeout(300);
   const status = await popup.textContent('#status');
   check('export button saves .md', /(Saved|已保存) .*\(2025\)\.md/.test(status), status);
+  check('MF3: no stale "Converting…" line after export', !/Converting|正在转换/.test(status), status);
+  check('M-1: export sends exactly one Europe PMC request', jatsHits.length === 1, jatsHits.join(', '));
   const rowAfter = await popup.locator('#actions').boundingBox();
   check('R05: button row does not move after status', Math.abs(rowBefore.y - rowAfter.y) <= 1 && Math.abs(rowBefore.height - rowAfter.height) <= 1);
   const dl = await sw.evaluate(() => new Promise((r) => setTimeout(() => chrome.downloads.search({}).then(r), 1000)));
@@ -104,12 +105,24 @@ async function main() {
   const selects = await popup.locator('select').count();
   check('R01: no native select in popup', selects === 0);
 
-  // 不支持的页面：popup 直接给出原因
+  // content script → 导出（后台缓存命中，不再请求）
+  const res = await sw.evaluate((id) => chrome.tabs.sendMessage(id, { type: 'JMD_EXPORT', action: 'none' }), tabId);
+  check('export via JATS route', res && res.ok && res.route === 'jats-europepmc', JSON.stringify(res && { ok: res.ok, route: res.route, error: res.error }));
+  check('markdown has front matter and footnotes', res && /^---\ntitle:/.test(res.markdown) && res.markdown.includes('[^1]:'));
+
+  // 不支持的页面：popup 直接给出原因，按钮不显示、不能被 Tab 聚焦（MF1 / JM-04）
   const p2 = await ctx.newPage();
   await p2.addInitScript(() => { chrome.tabs.query = async () => [{ id: -1, url: 'https://www.mdpi.com/2076-2615/11/5/1300' }]; });
   await p2.goto(`chrome-extension://${extId}/popup.html`);
   await p2.waitForSelector('#empty:not([hidden])');
   check('popup explains planned site', (await p2.textContent('#empty')).includes('MDPI'));
+  check('MF1: export/copy hidden on unsupported page', !(await p2.isVisible('#export')) && !(await p2.isVisible('#copy')));
+  const focusIds = [];
+  for (let i = 0; i < 6; i += 1) {
+    await p2.keyboard.press('Tab');
+    focusIds.push(await p2.evaluate(() => document.activeElement && document.activeElement.id));
+  }
+  check('MF1: hidden buttons take no Tab focus', !focusIds.includes('export') && !focusIds.includes('copy'), focusIds.join(','));
 
   // PubMed 无 PMCID：仅摘要
   const pub = await ctx.newPage();
@@ -123,6 +136,7 @@ async function main() {
   const opt = await ctx.newPage();
   opt.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(`options: ${m.text()}`); });
   await opt.goto(`chrome-extension://${extId}/options.html`);
+  check('MF2: welcome card hidden without ?welcome=1', !(await opt.isVisible('#welcome')));
   await opt.click('input[name="language"][value="zh"]', { force: true });
   await opt.waitForFunction(() => document.querySelector('h1').textContent.includes('设置'));
   check('options switches to Chinese immediately', true);

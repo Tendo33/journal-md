@@ -32,14 +32,14 @@
   "routeJats": {
     "message": "JATS"
   },
+  "routeJatsDeferred": {
+    "message": "JATS：导出时检查"
+  },
   "routeDom": {
     "message": "页面"
   },
   "routeAbstract": {
     "message": "摘要"
-  },
-  "routeChecking": {
-    "message": "检查中…"
   },
   "routeYes": {
     "message": "可用"
@@ -210,7 +210,7 @@
     "message": "版本 {version}"
   },
   "optPrivacy": {
-    "message": "文章在浏览器内完成转换。唯一的网络请求是向 Europe PMC 获取开放获取文章的 XML。"
+    "message": "文章在浏览器内完成转换。只有在你导出或复制文章时，扩展才会用文章的 PMCID 向 Europe PMC（EMBL-EBI）请求开放获取全文，不发送 Cookie 和页面地址。打开弹窗不会发出任何请求。"
   },
   "btnClose": {
     "message": "关闭"

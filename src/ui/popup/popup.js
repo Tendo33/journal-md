@@ -103,12 +103,8 @@ async function inspect(settings) {
   setRow('doi', info.ids.doi);
   setRow('pmcid', info.ids.pmcid);
   setRow('pmid', info.ids.pmid);
-  renderRoutes(info.routes, info.routes.jats ? 'checking' : 'off');
-  if (info.routes.jats) {
-    // 探测结果会被后台缓存，随后的导出直接复用
-    chrome.runtime.sendMessage({ type: MSG.PROBE_JATS, pmcid: info.ids.pmcid })
-      .then((r) => renderRoutes(info.routes, r && r.ok ? 'yes' : 'no'), () => renderRoutes(info.routes, 'no'));
-  }
+  // 打开弹窗不联网（审查 M-1）：JATS 是否可用只在用户点导出 / 复制时才向 Europe PMC 请求
+  renderRoutes(info.routes);
 }
 
 async function run(action) {

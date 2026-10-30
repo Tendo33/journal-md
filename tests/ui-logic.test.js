@@ -57,10 +57,10 @@ describe('popup view logic', () => {
     expect(emptyText('zh', { error: 'site_planned', siteName: 'MDPI' })).toBe('暂不支持 MDPI，计划在后续版本加入。');
     expect(errorText('en', 'nonsense')).toBe(t('en', 'err_unknown'));
   });
-  test('routes read "JATS ✓ / Page ✓"', () => {
-    expect(routeItems('en', { jats: true, dom: true, abstract: true }, 'yes').map((i) => i.text)).toEqual(['JATS ✓', 'Page ✓']);
-    expect(routeItems('en', { jats: true, dom: true }, 'checking')[0]).toMatchObject({ text: 'JATS …', desc: 'JATS: checking…' });
-    expect(routeItems('zh', { jats: false, dom: false, abstract: true }, 'off').map((i) => i.text)).toEqual(['页面 ✗', '摘要 ✓']);
+  test('routes: JATS is only checked on export (no request when the popup opens)', () => {
+    expect(routeItems('en', { jats: true, dom: true, abstract: true }).map((i) => i.text)).toEqual(['JATS: checked on export', 'Page ✓']);
+    expect(routeItems('zh', { jats: true, dom: true }).map((i) => i.text)).toEqual(['JATS：导出时检查', '页面 ✓']);
+    expect(routeItems('zh', { jats: false, dom: false, abstract: true }).map((i) => i.text)).toEqual(['页面 ✗', '摘要 ✓']);
   });
   test('shortcut hint', () => {
     expect(shortcutText('en', [{ name: 'export-markdown', shortcut: 'Alt+Shift+M' }])).toBe('Shortcuts: Alt+Shift+M export · not set copy');
