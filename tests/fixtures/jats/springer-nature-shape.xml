@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hand-made regression fixture for QA JM-03/05/06, shaped like Springer Nature JATS in Europe PMC
+     (references inside a back <sec>, mixed-citations without punctuation, surname/given-names without spaces,
+     nested Data availability, supplementary material without id, boxes in floats-group). Content is synthetic. -->
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article">
+  <front>
+    <journal-meta><journal-title-group><journal-title>Nature</journal-title></journal-title-group></journal-meta>
+    <article-meta>
+      <article-id pub-id-type="pmcid">PMC9000003</article-id>
+      <article-id pub-id-type="pmid">39000003</article-id>
+      <article-id pub-id-type="doi">10.1038/s41586-000-0003-x</article-id>
+      <title-group><article-title>A synthetic study of data reuse</article-title></title-group>
+      <contrib-group><contrib contrib-type="author"><name><surname>Doe</surname><given-names>Jane</given-names></name></contrib></contrib-group>
+      <pub-date pub-type="epub"><year>2020</year></pub-date>
+    </article-meta>
+  </front>
+  <body>
+    <sec id="Sec1"><title>Main</title>
+      <p>Earlier outbreaks were described<sup><xref ref-type="bibr" rid="CR1">1</xref>,<xref ref-type="bibr" rid="CR2">2</xref></sup>. Key terms are listed in <xref ref-type="boxed-text" rid="Box1">Box 1</xref>.</p>
+    </sec>
+    <sec id="Sec2"><title>Methods</title>
+      <sec id="Sec3"><title>Sequencing</title><p>Samples were sequenced<sup><xref ref-type="bibr" rid="CR3">3</xref></sup>.</p></sec>
+      <sec id="Sec4"><title>Data availability</title><p>Sequences are deposited in GISAID.</p></sec>
+    </sec>
+    <sec id="Sec5"><title>Online content</title><p><label>Extended data</label> is available for this paper at <ext-link ext-link-type="doi" xlink:href="10.1038/s41586-000-0003-x">https://doi.org/10.1038/s41586-000-0003-x</ext-link>.</p></sec>
+  </body>
+  <back>
+    <sec id="Sec6"><title>References</title>
+      <ref-list id="Bib1">
+        <ref id="CR1"><label>1.</label><mixed-citation publication-type="journal"><person-group person-group-type="author"><name><surname>Zhu</surname><given-names>N</given-names></name><etal/></person-group><article-title>A novel coronavirus from patients with pneumonia in China, 2019</article-title><source>N. Engl. J. Med.</source><year>2020</year><volume>382</volume><fpage>727</fpage><lpage>733</lpage><pub-id pub-id-type="doi">10.1056/NEJMoa2001017</pub-id></mixed-citation></ref>
+        <ref id="CR2"><label>2.</label><mixed-citation publication-type="journal"><string-name><surname>Roche</surname><given-names>D. G.</given-names></string-name>, <string-name><surname>Kruuk</surname><given-names>L. E. B.</given-names></string-name>. Public data archiving in ecology. <source>PLoS Biol.</source> <year>2015</year>.</mixed-citation></ref>
+        <ref id="CR3"><label>3.</label><mixed-citation publication-type="journal"><person-group person-group-type="author"><name><surname>Esfahani</surname><given-names>K</given-names></name><name><surname>Roudaia</surname><given-names>L</given-names></name></person-group><article-title>A review of cancer immunotherapy</article-title><source>Curr. Oncol.</source><year>2020</year><volume>27</volume><fpage>87</fpage></mixed-citation></ref>
+      </ref-list>
+    </sec>
+    <sec sec-type="data-availability"><title>Data availability</title><p>Sequences are deposited in GISAID.</p></sec>
+    <sec sec-type="supplementary-material"><title>Supplementary information</title>
+      <sec><p><supplementary-material content-type="local-data"><media xlink:href="41586_2020_0003_MOESM1_ESM.pdf"><caption><p>Supplementary Tables 1–3</p></caption></media></supplementary-material></p></sec>
+    </sec>
+  </back>
+  <floats-group>
+    <boxed-text id="Box1" position="float"><label>Box 1</label><caption><title>Terms and abbreviations</title></caption><list list-type="bullet"><list-item><p>FAIR: findable, accessible, interoperable, reusable</p></list-item></list></boxed-text>
+    <boxed-text id="Box2" position="float"><label>Box 2</label><caption><title>The principles</title></caption><p>F1. (meta)data are assigned a globally unique identifier.</p></boxed-text>
+  </floats-group>
+</article>

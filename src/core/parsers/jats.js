@@ -1,5 +1,5 @@
 // JATS（Europe PMC fullTextXML）→ ArticleIR。转换规则参考 litdown 的 JATS 处理思路（PRD §2.4），代码为新写。
-import { createArticle, SOURCE_ROUTES, normalizeInlines, trimInlines, inlinesToPlain } from '../article-ir';
+import { createArticle, SOURCE_ROUTES, normalizeInlines, trimInlines, inlinesToPlain, blocksToPlain } from '../article-ir';
 import { mathmlToLatex } from '../math/mathml-to-latex';
 import { stripTexDocument } from '../math/clean-latex';
 import { normalizeDoi, normalizePmcid, normalizePmid, extractYear } from '../ids';
@@ -23,6 +23,10 @@ export function parseJatsXml(xmlText, DOMParserImpl = globalThis.DOMParser) {
   return article;
 }
 
+function sectionHasContent(s) {
+  return !!(s && ((s.blocks && s.blocks.length) || (s.children || []).some(sectionHasContent)));
+}
+
 class JatsParser {
   constructor(article, { pmcid, url } = {}) {
     this.article = article;
@@ -32,6 +36,10 @@ class JatsParser {
     this.figIds = new Set();
     this.tableIds = new Set();
     this.suppIds = new Set();
+    // 没有 id 的 fig / table-wrap / supplementary-material 会被正文和兜底扫描各遇到一次，按节点去重（QA JM-06）
+    this.nodeIds = new Map();
+    this.floatBoxes = new Map();
+    this.placedBoxes = new Set();
     this.counter = 0;
   }
 
@@ -84,12 +92,55 @@ class JatsParser {
       return [{ t: 'math', tex: stripTexDocument(node.textContent) }];
     case 'inline-graphic':
       return [{ t: 'mathImage', src: this.asset(attr(node, 'href'), 'image') }];
-    case 'fn': case 'label': case 'object-id': case 'alt-text': case 'target': case 'fig': case 'table-wrap':
-    case 'supplementary-material':
+    case 'name': case 'string-name':
+      return this.nameInlines(node);
+    case 'person-group':
+      return this.personGroupInlines(node);
+    case 'label':
+      // <p> 里直接出现的 label 是正文的一部分，不能丢（QA JM-06 残句）；其他位置的 label 由各自的处理函数负责
+      return ln(node.parentNode) === 'p' ? this.inlines(node) : [];
+    case 'fn': case 'object-id': case 'alt-text': case 'target': case 'fig': case 'table-wrap':
+    case 'supplementary-material': case 'boxed-text':
       return [];
     default:
       return this.inlines(node);
     }
+  }
+
+  /** <surname>Roche</surname><given-names>D. G.</given-names> 之间常常没有空白（QA JM-05） */
+  nameInlines(node) {
+    const out = [];
+    let prevEl = false;
+    for (const n of Array.from(node.childNodes || [])) {
+      if (n.nodeType === 1) {
+        if (prevEl) out.push({ t: 'text', v: ' ' });
+        out.push(...this.inlineNode(n));
+        prevEl = true;
+      } else {
+        out.push(...this.inlineNode(n));
+        prevEl = n.nodeType === 3 && !n.nodeValue.trim() ? prevEl : false;
+      }
+    }
+    return out;
+  }
+
+  /** person-group 里相邻的 name 之间没有分隔符时补「, 」 */
+  personGroupInlines(node) {
+    const out = [];
+    let prevName = false;
+    for (const n of Array.from(node.childNodes || [])) {
+      const isName = n.nodeType === 1 && ['name', 'string-name', 'collab'].includes(ln(n));
+      if (isName && prevName) out.push({ t: 'text', v: ', ' });
+      if (n.nodeType === 1 && ln(n) === 'etal') {
+        out.push({ t: 'text', v: prevName ? ', et al.' : 'et al.' });
+        prevName = false;
+        continue;
+      }
+      out.push(...this.inlineNode(n));
+      if (isName) prevName = true;
+      else if (!(n.nodeType === 3 && !n.nodeValue.trim())) prevName = false;
+    }
+    return out;
   }
 
   xref(node) {
@@ -147,6 +198,16 @@ class JatsParser {
       }
     }
     flush();
+    // floats-group 里的 boxed-text 放到第一次引用它的段落后面（QA JM-06）
+    for (const x of findAll(p, 'xref')) {
+      for (const rid of attr(x, 'rid').split(/\s+/)) {
+        const box = this.floatBoxes.get(rid);
+        if (box && !this.placedBoxes.has(rid)) {
+          this.placedBoxes.add(rid);
+          blocks.push(...this.blockNode(box));
+        }
+      }
+    }
     return blocks;
   }
 
@@ -194,9 +255,15 @@ class JatsParser {
       const inner = [];
       const cap = child(node, 'caption');
       const title = cap && child(cap, 'title');
-      if (title) inner.push({ type: 'paragraph', inlines: [{ t: 'strong', c: trimInlines(this.inlines(title)) }] });
+      const label = textOf(child(node, 'label')).replace(/[.:]\s*$/, '');
+      const head = trimInlines([
+        ...(label ? [{ t: 'text', v: title ? `${label}. ` : label }] : []),
+        ...(title ? this.inlines(title) : []),
+      ]);
+      if (head.length) inner.push({ type: 'paragraph', inlines: [{ t: 'strong', c: head }] });
+      if (cap) for (const k of kids(cap)) if (ln(k) !== 'title') inner.push(...this.blockNode(k));
       for (const k of kids(node)) {
-        if (['caption', 'label'].includes(ln(k))) continue;
+        if (['caption', 'label', 'object-id'].includes(ln(k))) continue;
         if (ln(k) === 'sec') inner.push(...this.flattenSection(k));
         else inner.push(...this.blockNode(k));
       }
@@ -206,6 +273,10 @@ class JatsParser {
       return [{ type: 'code', text: node.textContent }];
     case 'supplementary-material':
       this.supp(node);
+      return [];
+    case 'ref-list':
+      // 有的文章把参考文献放在 back 的 <sec> 里；当成文本会挤成一段、正文引用也对不上（QA JM-03）
+      this.refList(node);
       return [];
     case 'graphic': {
       const src = this.asset(attr(node, 'href'), 'image');
@@ -286,8 +357,13 @@ class JatsParser {
     return out;
   }
 
+  nodeId(node, prefix) {
+    if (!this.nodeIds.has(node)) this.nodeIds.set(node, attr(node, 'id') || this.uid(prefix));
+    return this.nodeIds.get(node);
+  }
+
   figure(node) {
-    const id = attr(node, 'id') || this.uid('fig');
+    const id = this.nodeId(node, 'fig');
     if (this.figIds.has(id)) return id;
     this.figIds.add(id);
     const graphic = find(node, 'graphic');
@@ -302,7 +378,7 @@ class JatsParser {
   }
 
   table(node) {
-    const id = attr(node, 'id') || this.uid('table');
+    const id = this.nodeId(node, 'table');
     if (this.tableIds.has(id)) return id;
     this.tableIds.add(id);
     const tableEl = find(node, 'table');
@@ -369,7 +445,7 @@ class JatsParser {
   }
 
   supp(node) {
-    const id = attr(node, 'id') || this.uid('supp');
+    const id = this.nodeId(node, 'supp');
     if (this.suppIds.has(id)) return;
     this.suppIds.add(id);
     const media = find(node, 'media');
@@ -505,6 +581,28 @@ class JatsParser {
   }
 
   // ---------- body / back ----------
+  /** 把正文（含子节）里的数据可用性 / 基金 / 利益冲突 / 致谢节移到文末，并去掉空节（QA JM-06） */
+  pruneSection(s) {
+    const children = [];
+    for (const c of s.children) {
+      const key = classifyBackSection(inlinesToPlain(c.title || []), c.type);
+      if (key) this.ir.back[key].push(...c.blocks, ...c.children.flatMap((x) => this.flattenSectionIr(x)));
+      else {
+        const pruned = this.pruneSection(c);
+        if (sectionHasContent(pruned)) children.push(pruned);
+      }
+    }
+    return { ...s, children };
+  }
+
+  flattenSectionIr(x) {
+    const out = [];
+    if (x.title && x.title.length) out.push({ type: 'paragraph', inlines: [{ t: 'strong', c: x.title }] });
+    out.push(...x.blocks);
+    x.children.forEach((c) => out.push(...this.flattenSectionIr(c)));
+    return out;
+  }
+
   body() {
     const body = child(this.article, 'body');
     if (!body) return;
@@ -513,8 +611,11 @@ class JatsParser {
       if (ln(k) === 'sec') {
         const s = this.section(k);
         const key = classifyBackSection(inlinesToPlain(s.title || []), s.type);
-        if (key && key !== 'acknowledgements' && !s.children.length) this.ir.back[key].push(...s.blocks);
-        else this.ir.sections.push(s);
+        if (key) this.ir.back[key].push(...s.blocks, ...s.children.flatMap((x) => this.flattenSectionIr(x)));
+        else {
+          const pruned = this.pruneSection(s);
+          if (sectionHasContent(pruned)) this.ir.sections.push(pruned);
+        }
       } else {
         loose.push(...this.blockNode(k));
       }
@@ -537,11 +638,15 @@ class JatsParser {
   }
 
   backSec(node) {
-    const s = this.section(node);
+    let s = this.section(node);
     const key = classifyBackSection(inlinesToPlain(s.title || []), attr(node, 'sec-type') || attr(node, 'notes-type'));
     if (key) {
-      this.ir.back[key].push(...s.blocks, ...s.children.flatMap((c) => this.flattenSection(c)));
-    } else if (s.blocks.length || s.children.length) {
+      this.ir.back[key].push(...s.blocks, ...s.children.flatMap((c) => this.flattenSectionIr(c)));
+      return;
+    }
+    const pruned = this.pruneSection(s);
+    if (sectionHasContent(pruned)) {
+      s = pruned;
       if (!s.title) s.title = [{ t: 'text', v: 'Notes' }];
       this.ir.back.other.push(s);
     }
@@ -584,11 +689,15 @@ class JatsParser {
   }
 
   mixedCitation(cit) {
+    // 有的出版商（如 Springer Nature）在 mixed-citation 里只放结构化元素、没有标点；按 element-citation 拼（QA JM-03）
+    const looseText = Array.from(cit.childNodes).some((n) => n.nodeType === 3 && /[^\s]/.test(n.nodeValue));
+    if (!looseText && kids(cit, 'person-group', 'article-title', 'source', 'year').length >= 2) return this.elementCitation(cit);
     const clone = cit.cloneNode(true);
     findAll(clone, 'pub-id', 'comment').forEach((n) => n.parentNode && n.parentNode.removeChild(n));
     const inl = trimInlines(this.inlines(clone));
     const last = inl[inl.length - 1];
-    if (last && last.t === 'text') last.v = last.v.replace(/[\s.;,]*(doi:?|pmid:?|\[pubmed\]|pubmed)?[\s.;,]*$/i, '');
+    // 去掉 pub-id 删除后留下的「doi: .」之类尾巴，但保留引文自己的句号
+    if (last && last.t === 'text') last.v = last.v.replace(/[\s;,]*\b(doi:?|pmid:?|\[pubmed\]|pubmed)[\s.;,:]*$/i, '').replace(/[\s;,]+$/, '');
     return trimInlines(inl);
   }
 
@@ -615,8 +724,10 @@ class JatsParser {
     const out = [];
     const add = (inl, sep = ' ') => { if (inl.length) { if (out.length) out.push({ t: 'text', v: sep }); out.push(...inl); } };
     if (authors) add([{ t: 'text', v: `${authors}.` }]);
-    if (title) add([...trimInlines(this.inlines(title)), { t: 'text', v: '.' }]);
-    if (source) add([...trimInlines(this.inlines(source)), { t: 'text', v: '.' }]);
+    // 已经以句号结尾的（如 N. Engl. J. Med.）不再补句号
+    const withStop = (inl) => (/[.?!]$/.test(inlinesToPlain(inl).trim()) ? inl : [...inl, { t: 'text', v: '.' }]);
+    if (title) add(withStop(trimInlines(this.inlines(title))));
+    if (source) add(withStop(trimInlines(this.inlines(source))));
     let tail = year;
     if (volume) tail += `${tail ? ';' : ''}${volume}${issue ? `(${issue})` : ''}`;
     if (fpage) tail += `:${fpage}${lpage ? `-${lpage}` : ''}`;
@@ -634,15 +745,38 @@ class JatsParser {
       else if (ln(k) === 'fig-group') kids(k, 'fig').forEach((f) => this.figure(f));
       else if (ln(k) === 'supplementary-material') this.supp(k);
     }
+    // 没被正文引用到的 box：作为独立小节放在正文末尾
+    for (const [rid, box] of this.floatBoxes) {
+      if (this.placedBoxes.has(rid)) continue;
+      this.placedBoxes.add(rid);
+      const label = textOf(child(box, 'label')).replace(/[.:]\s*$/, '') || 'Box';
+      this.ir.sections.push({ title: [{ t: 'text', v: label }], blocks: this.blockNode(box), children: [] });
+    }
+  }
+
+  dedupeBack() {
+    for (const key of ['acknowledgements', 'dataAvailability', 'funding', 'competingInterests']) {
+      const seen = new Set();
+      this.ir.back[key] = this.ir.back[key].filter((b) => {
+        const k = blocksToPlain([b]).replace(/\s+/g, ' ').trim().toLowerCase();
+        if (!k) return true;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+    }
   }
 
   parse() {
+    const fg = child(this.article, 'floats-group');
+    if (fg) for (const b of findAll(fg, 'boxed-text')) this.floatBoxes.set(attr(b, 'id') || this.uid('box'), b);
     this.meta();
     this.body();
     this.back();
     this.floatsGroup();
     // body 里没被放进块的附件（例如 sec 内的 supplementary-material 已注册）在这里补全
     findAll(this.article, 'supplementary-material').forEach((s) => this.supp(s));
+    this.dedupeBack();
     this.ir.notices = [...new Set(this.ir.notices)];
     return this.ir;
   }
