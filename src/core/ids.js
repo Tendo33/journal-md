@@ -9,7 +9,14 @@ export function normalizeDoi(value) {
   s = s.replace(/^(?:https?:\/\/)?(?:dx\.)?doi\.org\//i, '').replace(/^doi:\s*/i, '');
   const m = s.match(DOI_RE);
   if (!m) return '';
-  return m[1].replace(/[.,;:)\]]+$/, '');
+  // 去掉句末标点；结尾的「)」只在括号不配对时才去掉：10.1000/x(1) 要保留，"(doi 10.1/x)" 的「)」要去掉（审查 N-1）
+  let doi = m[1];
+  for (;;) {
+    const before = doi;
+    doi = doi.replace(/[.,;:\]]+$/, '');
+    if (doi.endsWith(')') && (doi.match(/\(/g) || []).length < (doi.match(/\)/g) || []).length) doi = doi.slice(0, -1);
+    if (doi === before) return doi;
+  }
 }
 
 export function normalizePmcid(value) {

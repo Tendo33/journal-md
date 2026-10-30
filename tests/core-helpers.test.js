@@ -9,6 +9,11 @@ describe('ids', () => {
     expect(normalizeDoi('doi: 10.3389/fgene.2021.123456.')).toBe('10.3389/fgene.2021.123456');
     expect(normalizeDoi('https://doi.org/10.1093%2Fjas%2Fskz370')).toBe('10.1093/jas/skz370');
     expect(normalizeDoi('no doi here')).toBe('');
+    // 审查 N-1：配对的括号保留，不配对的结尾括号去掉
+    expect(normalizeDoi('10.1000/x(1)')).toBe('10.1000/x(1)');
+    expect(normalizeDoi('https://doi.org/10.1016/S0140-6736(20)30183-5')).toBe('10.1016/S0140-6736(20)30183-5');
+    expect(normalizeDoi('(doi: 10.1000/abc)')).toBe('10.1000/abc');
+    expect(normalizeDoi('see 10.1000/x(1)).')).toBe('10.1000/x(1)');
   });
   test('pmcid / pmid / year', () => {
     expect(normalizePmcid('PMC6986428')).toBe('PMC6986428');
