@@ -270,3 +270,39 @@ describe('Europe PMC search client', () => {
     expect(ok).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('review M-1: the licence comes only from the licence box / rel=license / metadata', () => {
+  // Nature 订阅文章：去掉 Rights and permissions 里的 CC 许可，在参考文献里放一条 CC 链接
+  const closed = () => {
+    const doc = html('nature-alphafold.html');
+    doc.querySelectorAll('#rightslink-content a, a[rel="license"]').forEach((a) => a.remove());
+    const ref = doc.querySelector('.c-article-references__text');
+    const cc = doc.createElement('a');
+    cc.href = 'https://creativecommons.org/licenses/by/4.0/';
+    cc.textContent = 'CC BY 4.0';
+    ref.append(' Data licensed ', cc);
+    const foot = doc.createElement('footer');
+    foot.innerHTML = '<a href="https://creativecommons.org/licenses/by/4.0/">site content CC BY</a>';
+    doc.body.append(foot);
+    return doc;
+  };
+
+  test('a CC link in the references (or footer) does not make a subscription article OA', async () => {
+    const url = 'https://www.nature.com/articles/s41586-021-03819-2';
+    const info = inspectPage(closed(), url);
+    expect(info.pdf).toMatchObject({ url: 'https://www.nature.com/articles/s41586-021-03819-2.pdf', openAccess: false, license: '' });
+    const r = await exportArticle({ doc: closed(), url, fetchJats: noJats, services: { lookupDoi: noLookup }, now: NOW });
+    expect(r.markdown).not.toMatch(/^license:/m);
+  });
+
+  test('the real licence box still counts', () => {
+    expect(inspectPage(html('nature-alphafold.html'), 'https://www.nature.com/articles/s41586-021-03819-2').pdf).toMatchObject({ openAccess: true, license: 'CC-BY-4.0' });
+  });
+
+  test('MDPI: the copyright box wins over a stale dc.rights; Frontiers: copyright text', async () => {
+    const m = await dom('mdpi-animals-11-01300.html', 'https://www.mdpi.com/2076-2615/11/5/1300');
+    expect(m.meta.license).toBe('CC-BY-4.0');
+    const f = await dom('frontiers-effect-sizes.html', 'https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2013.00863/full', { settings: { preferJats: false } });
+    expect(f.meta.license).toBe('CC-BY');
+  });
+});

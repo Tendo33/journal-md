@@ -12,7 +12,8 @@ export const PMC_CONFIG = {
   date: '.pmc-layout__citation',
   metaArea: ['section[aria-label="Article citation and metadata"]', '.front-matter'],
   doi: 'a[href*="doi.org"]',
-  license: 'a[href*="creativecommons.org/licenses"], a[href*="creativecommons.org/publicdomain"]',
+  // 只看「Copyright and License information」面板和 rel="license"（审查 M-1）
+  license: '#clp_a a[href*="creativecommons.org"], .license a[href*="creativecommons.org"], a[rel="license"]',
   abstract: 'section.abstract',
   keywords: '.kwd-group',
   refList: 'section.ref-list',

@@ -157,8 +157,11 @@ export function extractDomArticle(doc, url, cfg, ids = {}) {
   meta.pmid = normalizePmid(citationMeta(doc, 'citation_pmid')[0] || pmidText || ids.pmid || '');
   const pmcText = metaArea ? (textOf(metaArea).match(/PMCID:?\s*(PMC\d+)/i) || [])[1] : '';
   meta.pmcid = normalizePmcid(citationMeta(doc, 'citation_pmcid')[0] || pmcText || ids.pmcid || '');
-  const lic = first(root, cfg.license) || first(doc, cfg.license);
-  const dcRights = metaValues(doc, 'dc.rights')[0] || '';
+  // 许可证只从专门的位置取（审查 M-1）：站点自己的版权 / 许可框和 rel="license"（cfg.license，每个站点写死的容器）、
+  // 许可 / 版权说明文字（cfg.licenseText）、citation_* / dc.rights 元数据。绝不在整页里找 CC 链接——
+  // 参考文献、数据集引用、页脚里都可能有，会把订阅文章误判成开放获取，PDF 解析就不弹确认了
+  const lic = first(doc, cfg.license);
+  const dcRights = metaValues(doc, 'citation_license', 'dc.rights', 'dcterms.license')[0] || '';
   // 没有许可链接时看版权说明文字（PLOS：「…distributed under the terms of the Creative Commons Attribution License…」）
   const licText = all(doc, cfg.licenseText).map(textOf).find((tx) => /creative commons|\bCC[ -]BY\b|CC0/i.test(tx)) || '';
   meta.license = lic ? normalizeLicense(lic.getAttribute('href') || textOf(lic))
