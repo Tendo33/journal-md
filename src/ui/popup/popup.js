@@ -22,11 +22,20 @@ function setEmpty(text) {
   el.hidden = false;
 }
 
-/** 状态区：先清空、下一帧再写，同一句话也会被读屏重新播报（R15） */
+/**
+ * 状态区：先清空、下一帧再写，同一句话也会被读屏重新播报（R15）。
+ * 每次调用取消上一次还没执行的写入，并在回调里先清空，避免「正在转换…」残留（设计 MF3）。
+ */
+let statusSeq = 0;
+let statusFrame = 0;
 function setStatus(lines) {
   const el = $('status');
+  const seq = ++statusSeq;
+  cancelAnimationFrame(statusFrame);
   el.textContent = '';
-  requestAnimationFrame(() => {
+  statusFrame = requestAnimationFrame(() => {
+    if (seq !== statusSeq) return;
+    el.textContent = '';
     for (const { text, cls, href } of lines) {
       if (!text) continue;
       const p = document.createElement('p');
