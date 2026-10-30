@@ -13,7 +13,7 @@ export const ERR = Object.freeze({
 
 // 导出成功但需要告诉用户的情况
 export const NOTICE = Object.freeze({
-  JATS_FALLBACK: 'jats_fallback', // L1 失败，回退到页面 DOM；reason: timeout / not_available / network / http / parse
+  JATS_FALLBACK: 'jats_fallback', // L1 失败，回退到页面 DOM；reason: timeout / not_available / network / http / parse / mismatch
   ABSTRACT_ONLY: 'abstract_only',
   PUBMED_FULLTEXT: 'pubmed_fulltext', // PubMed 页通过 Europe PMC 拿到了全文
   EQUATION_IMAGE: 'equation_image',

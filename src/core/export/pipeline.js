@@ -70,7 +70,21 @@ function finish(ir, settings, notices, now) {
   };
 }
 
-async function tryJats(pmcid, url, fetchJats, notices) {
+const same = (a, b) => !!a && !!b && String(a).trim().toLowerCase() === String(b).trim().toLowerCase();
+
+/**
+ * 取回的 JATS 必须是当前这篇文章（QA JM-01）：
+ * 页面上的 PMID 或 DOI 与 JATS 一致即通过；两边都有却不一致即拒绝；
+ * 没有可比的独立 ID 时，只信任 URL 里直接给出的 PMCID（PMC 页、Europe PMC /article/PMC/ 页）。
+ */
+export function jatsMatchesPage(jatsMeta, pageMeta, urlIds = {}) {
+  if (same(jatsMeta.pmid, pageMeta.pmid) || same(jatsMeta.doi, pageMeta.doi)) return true;
+  const comparable = (jatsMeta.pmid && pageMeta.pmid) || (jatsMeta.doi && pageMeta.doi);
+  if (comparable) return false;
+  return same(urlIds.pmcid, jatsMeta.pmcid);
+}
+
+async function tryJats(pmcid, url, fetchJats, notices, verify) {
   let res;
   try {
     res = await fetchJats(pmcid);
@@ -84,6 +98,10 @@ async function tryJats(pmcid, url, fetchJats, notices) {
   try {
     const ir = parseJats(res.xml, { pmcid, url });
     if (!hasContent(ir)) throw new Error('empty');
+    if (verify && !verify(ir.meta)) {
+      notices.push({ code: NOTICE.JATS_FALLBACK, reason: 'mismatch' });
+      return null;
+    }
     return ir;
   } catch (_) {
     notices.push({ code: NOTICE.JATS_FALLBACK, reason: 'parse' });
@@ -105,10 +123,11 @@ export async function exportArticle({ doc, url, settings: rawSettings, fetchJats
   const notices = [];
   const dom = DOM_ADAPTERS[det.site.id](doc, url, det.ids);
   const pmcid = dom.meta.pmcid || det.ids.pmcid || '';
+  const verify = (jatsMeta) => jatsMatchesPage(jatsMeta, dom.meta, det.ids);
 
   if (det.site.id === 'pubmed') {
     if (pmcid) {
-      const ir = await tryJats(pmcid, url, fetchJats, notices);
+      const ir = await tryJats(pmcid, url, fetchJats, notices, verify);
       if (ir) {
         // 页面上的 MeSH、PMID 等补进全文版本；url 保持当前页
         ir.meta.url = url;
@@ -124,7 +143,7 @@ export async function exportArticle({ doc, url, settings: rawSettings, fetchJats
   }
 
   if (pmcid && settings.preferJats) {
-    const ir = await tryJats(pmcid, url, fetchJats, notices);
+    const ir = await tryJats(pmcid, url, fetchJats, notices, verify);
     if (ir) {
       ir.meta.url = url;
       if (!ir.meta.pmid) ir.meta.pmid = dom.meta.pmid;

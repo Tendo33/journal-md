@@ -113,6 +113,9 @@
   "noticeJats_invalid_id": {
     "message": "本页的 PMCID 格式不正确。"
   },
+  "noticeJats_mismatch": {
+    "message": "Europe PMC 返回的全文不是这篇文章。"
+  },
   "noticeFallbackDom": {
     "message": "已改为从当前页面导出。"
   },

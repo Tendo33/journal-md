@@ -8,7 +8,7 @@ import { normalizeLicense } from '../license';
 import { textOf, resolveUrl } from '../parsers/dom-utils';
 
 const REF_LINK_NOISE = /^(DOI|PubMed|PMC free article|Google Scholar|CrossRef|Crossref|Article|CAS|PubMed Central|Europe PMC|Free full text|Abstract|Full Text)$/i;
-const DROP_SECTION = /^(references?|literature cited|bibliography|associated data|supplementary (information|materials?|data)|additional files?|electronic supplementary material)$/i;
+const DROP_SECTION = /^(references?|literature cited|bibliography|associated data|supplementary (information|materials?|data)|additional files?|electronic supplementary material|citations?( (&|and) impact)?|cited by|similar articles|related articles|articles citing this)$/i;
 const NOTES_SECTION = /^(footnotes?|notes|article notes)$/i;
 
 function first(root, selectors) {
@@ -119,9 +119,12 @@ export function extractDomArticle(doc, url, cfg, ids = {}) {
     .filter((n, i, arr) => arr.indexOf(n) === i).map((name) => ({ name, affiliations: [] }));
   meta.journal = citationMeta(doc, 'citation_journal_title')[0] || textOf(first(root, cfg.journal));
   meta.year = extractYear(citationMeta(doc, 'citation_publication_date')[0] || citationMeta(doc, 'citation_date')[0] || textOf(first(root, cfg.date)));
-  meta.doi = normalizeDoi(citationMeta(doc, 'citation_doi')[0] || (first(root, cfg.doi) && (first(root, cfg.doi).getAttribute('href') || textOf(first(root, cfg.doi)))));
-  meta.pmid = normalizePmid(citationMeta(doc, 'citation_pmid')[0] || ids.pmid || '');
-  const pmcText = (textOf(root).match(/PMCID:?\s*(PMC\d+)/i) || [])[1];
+  // DOI / PMCID 只从文章自己的元数据区取，不能扫整页：参考文献和「相关文章」里也有 DOI、PMCID（QA JM-01）
+  const metaArea = first(doc, cfg.metaArea);
+  const doiEl = metaArea ? first(metaArea, cfg.doi) : null;
+  meta.doi = normalizeDoi(citationMeta(doc, 'citation_doi')[0] || (doiEl && (doiEl.getAttribute('href') || textOf(doiEl))) || '');
+  meta.pmid = normalizePmid(ids.pmid || citationMeta(doc, 'citation_pmid')[0] || '');
+  const pmcText = metaArea ? (textOf(metaArea).match(/PMCID:?\s*(PMC\d+)/i) || [])[1] : '';
   meta.pmcid = normalizePmcid(ids.pmcid || citationMeta(doc, 'citation_pmcid')[0] || pmcText || '');
   const lic = first(root, cfg.license) || first(doc, cfg.license);
   meta.license = lic ? normalizeLicense(lic.getAttribute('href') || textOf(lic)) : '';

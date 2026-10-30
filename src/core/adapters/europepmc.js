@@ -11,6 +11,8 @@ export const EUROPEPMC_CONFIG = {
   authors: '#article--author-list .author-name, .article--author-list .author-name, .authors-list .author-name',
   journal: '#article--journal-title, .article--journal-title, .publication-title',
   date: '#article--publication-date, .article--publication-date',
+  // 只在文章元数据区里找 DOI / PMCID；正文、参考文献、「被引」列表里的都不算（QA JM-01）
+  metaArea: ['#article--meta', '.article--meta'],
   doi: 'a[href*="doi.org/10."]',
   license: 'a[href*="creativecommons.org/licenses"], a[href*="creativecommons.org/publicdomain"]',
   abstract: '#abstract, #article--abstract, .abstract',
@@ -31,6 +33,11 @@ export const EUROPEPMC_CONFIG = {
     '.article--toolbar',
     '.article--sidebar',
     '.feedback',
+    // 被引、相关文章列表（里面有别的文章的 PMCID / DOI，QA JM-01）
+    '#citations',
+    '#article--citations',
+    '#similar-articles',
+    '#article--similar-articles',
   ],
   selectors: {
     figure: 'figure, .fig',

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { exportArticle, inspectPage } from '@core/export/pipeline';
+import { exportArticle, inspectPage, jatsMatchesPage } from '@core/export/pipeline';
 
 const NOW = new Date(Date.UTC(2026, 9, 30, 2, 0));
 const html = (name) => new DOMParser().parseFromString(fs.readFileSync(path.join(__dirname, 'fixtures/html', name), 'utf8'), 'text/html');
@@ -97,6 +97,41 @@ describe('Europe PMC page', () => {
     doc.getElementById('fulltextcontent').remove();
     const r = await exportArticle({ doc, url: 'https://europepmc.org/article/MED/33900001', fetchJats: notOa, now: NOW });
     expect(r).toMatchObject({ ok: true, route: 'dom-europepmc', abstractOnly: true });
+  });
+});
+
+describe('JATS must belong to the page article (QA JM-01)', () => {
+  const MED_URL = 'https://europepmc.org/article/MED/31862249';
+
+  test('PMCIDs in citation lists are never used; MED page without full text → abstract only, no request', async () => {
+    const doc = html('europepmc-med-no-fulltext.html');
+    const info = inspectPage(doc, MED_URL);
+    expect(info.ids).toEqual({ doi: '10.1016/S0140-6736(19)32500-0', pmid: '31862249', pmcid: '' });
+    expect(info.routes.jats).toBe(false);
+    const r = await exportArticle({ doc, url: MED_URL, fetchJats: ok, now: NOW });
+    expect(ok).not.toHaveBeenCalled();
+    expect(r).toMatchObject({ ok: true, route: 'dom-europepmc', abstractOnly: true, meta: { pmid: '31862249', pmcid: '' } });
+    expect(r.markdown).not.toContain('PMC7756901');
+  });
+
+  test('fetched JATS for another article is rejected → abstract only with reason mismatch', async () => {
+    const doc = html('pubmed-abstract-only.html');
+    // 页面上的 PMCID 指错了（JATS fixture 是 PMID 40000001 / 另一个 DOI）
+    const ids = doc.querySelector('#full-view-identifiers');
+    ids.insertAdjacentHTML('beforeend', '<li><span class="identifier pmc"><a class="id-link">PMC11000001</a></span></li>');
+    const r = await exportArticle({ doc, url: 'https://pubmed.ncbi.nlm.nih.gov/31768545/', fetchJats: ok, now: NOW });
+    expect(ok).toHaveBeenCalledWith('PMC11000001');
+    expect(r).toMatchObject({ ok: true, route: 'dom-pubmed', abstractOnly: true, meta: { pmid: '31768545' } });
+    expect(r.notices).toContainEqual({ code: 'jats_fallback', reason: 'mismatch' });
+    expect(r.markdown).not.toContain('Genomic heritability');
+  });
+
+  test('jatsMatchesPage rules', () => {
+    expect(jatsMatchesPage({ pmid: '1', doi: '10.1/a' }, { pmid: '1' })).toBe(true);
+    expect(jatsMatchesPage({ pmid: '1', doi: '10.1/A' }, { pmid: '', doi: '10.1/a' })).toBe(true);
+    expect(jatsMatchesPage({ pmid: '2', doi: '10.1/a' }, { pmid: '1', doi: '' })).toBe(false);
+    expect(jatsMatchesPage({ pmid: '', doi: '', pmcid: 'PMC5' }, { pmid: '', doi: '' }, { pmcid: 'PMC5' })).toBe(true);
+    expect(jatsMatchesPage({ pmid: '', doi: '', pmcid: 'PMC5' }, { pmid: '', doi: '' }, {})).toBe(false);
   });
 });
 

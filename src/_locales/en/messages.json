@@ -113,6 +113,9 @@
   "noticeJats_invalid_id": {
     "message": "The PMCID on this page looks invalid."
   },
+  "noticeJats_mismatch": {
+    "message": "The Europe PMC full text belongs to a different article."
+  },
   "noticeFallbackDom": {
     "message": "Exported from this page instead."
   },
