@@ -38,8 +38,8 @@ describe('download adapter (Chrome SW data URL vs Firefox blob URL)', () => {
 describe('context menu', () => {
   test('two page items in each language, only on supported sites', () => {
     const en = buildMenuItems('en');
-    expect(en.map((i) => i.title)).toEqual(['Export this article as Markdown', 'Copy full-text Markdown']);
-    expect(buildMenuItems('zh').map((i) => i.title)).toEqual(['导出本文为 Markdown', '复制全文 Markdown']);
+    expect(en.map((i) => i.title)).toEqual(['Export this page as Markdown', 'Copy this page as Markdown']);
+    expect(buildMenuItems('zh').map((i) => i.title)).toEqual(['导出本页为 Markdown', '复制本页为 Markdown']);
     for (const item of en) {
       expect(item.contexts).toEqual(['page']);
       expect(item.documentUrlPatterns).toEqual(SUPPORTED_PAGE_PATTERNS);

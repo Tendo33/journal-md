@@ -59,11 +59,17 @@ function renderSites() {
       const sw = document.createElement('input');
       sw.type = 'checkbox';
       sw.id = id;
-      sw.className = 'switch';
+
       sw.setAttribute('role', 'switch');
       sw.checked = settings.sites[site.id] !== false;
       sw.addEventListener('change', () => update({ sites: { [site.id]: sw.checked } }));
-      li.append(sw);
+      // ui-v2 开关结构：<span class="switch"><input><span></span></span>
+      const wrap = document.createElement('span');
+      wrap.className = 'switch';
+      const track = document.createElement('span');
+      track.setAttribute('aria-hidden', 'true');
+      wrap.append(sw, track);
+      li.append(wrap);
     } else {
       const span = document.createElement('span');
       span.className = 'planned';
@@ -105,7 +111,6 @@ function renderPdf() {
   $('pdfToken-label').textContent = t(lang, 'optPdfToken', { provider: providerLabel(id) });
   $('pdfToken').value = pdfSettings.tokens[id] || '';
   $('pdfKeyLink').href = provider.keyUrl;
-  $('sec-pdf').closest('.group').toggleAttribute('data-pdf-off', !pdfSettings.enabled);
 }
 
 /**

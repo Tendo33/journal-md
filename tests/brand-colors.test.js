@@ -1,41 +1,55 @@
-// Simon 决定：主按钮和悬浮按钮用图标 A 的青绿（#0f766e），深浅色都要满足 WCAG AA。
+// 系列统一：tokens 来自 ui-v2.css（arxiv-md / zhihu-md 同源），journal-md 只换品牌色（#0f766e，Simon 决定）。
+// 深浅色下品牌色的每一组搭配都要满足 WCAG AA（4.5:1）。
 import fs from 'fs';
 import path from 'path';
 
-const css = fs.readFileSync(path.join(__dirname, '../src/ui/shared/tokens.css'), 'utf8');
-const fab = fs.readFileSync(path.join(__dirname, '../src/content/fab.js'), 'utf8');
+const read = (p) => fs.readFileSync(path.join(__dirname, '..', p), 'utf8');
+const brandCss = read('src/ui/shared/tokens.css');
+const uiV2 = read('src/ui/shared/ui-v2.css');
+const fab = read('src/content/fab.js');
 
 function lum(hex) {
-  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+  const h = hex.length === 4 ? `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}` : hex;
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
-const token = (block, name) => (block.match(new RegExp(`--${name}:\\s*(#[0-9a-f]{6})`, 'i')) || [])[1];
+const token = (block, name) => (block.match(new RegExp(`--${name}:\\s*(#[0-9a-f]{3,6})\\b`, 'i')) || [])[1];
 
-describe('teal brand tokens', () => {
-  const [light, dark] = css.split('@media (prefers-color-scheme: dark)');
-  const [fabLight, fabDark] = fab.split('@media (prefers-color-scheme: dark)');
+const lightBrand = brandCss.match(/\[data-brand=journal\]\{[^}]*\}/)[0];
+const darkBrand = brandCss.match(/\[data-theme=dark\]\[data-brand=journal\]\{[^}]*\}/)[0];
+const lightRoot = uiV2.match(/:root\{[\s\S]*?\n\}/)[0];
+const darkRoot = uiV2.match(/\[data-theme=dark\]\{[\s\S]*?\}/)[0];
 
-  test('light: #0f766e with white text, links and hover meet AA', () => {
-    expect(token(light, 'brand')).toBe('#0f766e');
-    expect(ratio(token(light, 'brand'), token(light, 'on-brand'))).toBeGreaterThanOrEqual(4.5);
-    expect(ratio(token(light, 'brand-hover'), token(light, 'on-brand'))).toBeGreaterThanOrEqual(4.5);
-    expect(ratio(token(light, 'brand'), token(light, 'bg'))).toBeGreaterThanOrEqual(4.5);
-    expect(ratio(token(light, 'brand'), token(light, 'surface'))).toBeGreaterThanOrEqual(4.5);
+describe('teal brand on the shared ui-v2 tokens', () => {
+  test('ui-v2.css is the series file (copied from arxiv-md bdf0175)', () => {
+    expect(uiV2).toContain('ui-v2.css — Round 3 C-1 共用骨架');
+    expect(uiV2).toContain('arxiv-md bdf0175');
   });
 
-  test('dark: teal with dark text, links and hover meet AA', () => {
-    expect(ratio(token(dark, 'brand'), token(dark, 'on-brand'))).toBeGreaterThanOrEqual(4.5);
-    expect(ratio(token(dark, 'brand-hover'), token(dark, 'on-brand'))).toBeGreaterThanOrEqual(4.5);
-    expect(ratio(token(dark, 'brand'), token(dark, 'bg'))).toBeGreaterThanOrEqual(4.5);
-    expect(ratio(token(dark, 'brand'), token(dark, 'surface'))).toBeGreaterThanOrEqual(4.5);
+  test('light: brand #0f766e, white text, links on page background, brand text on soft fill', () => {
+    expect(token(lightBrand, 'brand')).toBe('#0f766e');
+    for (const t of ['brand', 'brand-hover', 'brand-press']) expect(ratio(token(lightBrand, t), token(lightBrand, 'brand-on'))).toBeGreaterThanOrEqual(4.5);
+    expect(ratio(token(lightBrand, 'brand-text'), token(lightRoot, 'bg'))).toBeGreaterThanOrEqual(4.5);
+    expect(ratio(token(lightBrand, 'brand-text'), token(lightRoot, 'surface'))).toBeGreaterThanOrEqual(4.5);
+    expect(ratio(token(lightBrand, 'brand-text'), token(lightBrand, 'brand-soft'))).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('floating button uses the same teal, AA for its glyph in both schemes', () => {
-    expect(token(fabLight, 'brand')).toBe(token(light, 'brand'));
-    expect(token(fabDark, 'brand')).toBe(token(dark, 'brand'));
+  test('dark: teal with dark text, links on dark page and surface', () => {
+    for (const t of ['brand', 'brand-hover', 'brand-press']) expect(ratio(token(darkBrand, t), token(darkBrand, 'brand-on'))).toBeGreaterThanOrEqual(4.5);
+    expect(ratio(token(darkBrand, 'brand-text'), token(darkRoot, 'bg'))).toBeGreaterThanOrEqual(4.5);
+    expect(ratio(token(darkBrand, 'brand-text'), token(darkRoot, 'surface'))).toBeGreaterThanOrEqual(4.5);
+    expect(ratio(token(darkBrand, 'brand-text'), token(darkBrand, 'brand-soft'))).toBeGreaterThanOrEqual(4.5);
+    // 媒体查询里的深色品牌和 data-theme=dark 一致
+    expect(brandCss).toMatch(/prefers-color-scheme:dark[\s\S]*--brand:#14b8a6/);
+  });
+
+  test('floating button uses the same brand values and keeps AA for its glyph', () => {
+    const [fabLight, fabDark] = fab.split('@media (prefers-color-scheme: dark)');
+    expect(token(fabLight, 'brand')).toBe(token(lightBrand, 'brand'));
+    expect(token(fabDark, 'brand')).toBe(token(darkBrand, 'brand'));
     expect(ratio(token(fabLight, 'brand'), token(fabLight, 'brand-on'))).toBeGreaterThanOrEqual(4.5);
     expect(ratio(token(fabDark, 'brand'), token(fabDark, 'brand-on'))).toBeGreaterThanOrEqual(4.5);
-    expect(css + fab).not.toMatch(/#1d4e89|#4c8fd6/i);
+    expect(brandCss + fab).not.toMatch(/#1d4e89|#4c8fd6/i);
   });
 });

@@ -9,16 +9,16 @@
     "message": "期刊全文转 Markdown：导出本文"
   },
   "cmdExport": {
-    "message": "导出本文为 Markdown"
+    "message": "导出本页为 Markdown"
   },
   "cmdCopy": {
-    "message": "复制全文 Markdown"
+    "message": "复制本页为 Markdown"
   },
   "menuExport": {
-    "message": "导出本文为 Markdown"
+    "message": "导出本页为 Markdown"
   },
   "menuCopy": {
-    "message": "复制全文 Markdown"
+    "message": "复制本页为 Markdown"
   },
   "popupHeading": {
     "message": "期刊全文转 Markdown"

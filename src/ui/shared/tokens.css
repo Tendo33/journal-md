@@ -1,70 +1,19 @@
-/* journal-md 设计 token：4/8 间距、浅色/深色跟随系统（R13）、焦点环独立 token（R07/R20）。 */
-:root {
-  color-scheme: light dark;
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-6: 24px;
-  --radius: 8px;
-  --radius-sm: 6px;
-  --font: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  --font-size: 14px;
-  --line: 20px;
-
-  --bg: #ffffff;
-  --surface: #f6f8fa;
-  --text: #1f2328;
-  --muted: #59636e;
-  --border: #d0d7de;
-  --brand: #0f766e; /* 与图标 A 同色（Simon 决定）：白字 5.47:1 */
-  --brand-hover: #115e59; /* 白字 7.58:1 */
-  --on-brand: #ffffff;
-  --success: #1a7f37;
-  --error: #b42318;
-  --warning: #9a6700;
-  --focus: #0969da;
+/* journal-md 品牌层：叠在系列共用的 ui-v2.css 之后（和 arxiv-md / zhihu-md 一样用 data-brand 换品牌色，只换 --brand-*）。
+ * 品牌色 #0f766e（与图标 A 同色，Simon 决定）。对比度（tests/brand-colors.test.js 会算）：
+ *   浅色 brand/白字 5.47、hover 7.58、press 9.48；作为链接色对 --bg 5.02；brand-text 对 brand-soft 4.84
+ *   深色 brand #14b8a6 配 brand-on #04201d 6.86、hover 9.18、press 4.56；对 --bg 7.47、对 --surface 6.77 */
+[data-brand=journal]{--brand:#0f766e;--brand-hover:#115e59;--brand-press:#134e4a;--brand-on:#fff;--brand-soft:#e6f4f1;--brand-text:#0f766e}
+[data-theme=dark][data-brand=journal]{--brand:#14b8a6;--brand-hover:#2dd4bf;--brand-press:#0d9488;--brand-on:#04201d;--brand-soft:#0f2e2b;--brand-text:#2dd4bf}
+@media (prefers-color-scheme:dark){
+:root[data-brand=journal]:not([data-theme=light]){--brand:#14b8a6;--brand-hover:#2dd4bf;--brand-press:#0d9488;--brand-on:#04201d;--brand-soft:#0f2e2b;--brand-text:#2dd4bf}
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #15191e;
-    --surface: #1f2428;
-    --text: #e6edf3;
-    --muted: #9198a1;
-    --border: #3d444d;
-    --brand: #14b8a6; /* 深色：配 --on-brand #0d1117 为 7.6:1，对页面背景 7.09:1 */
-    --brand-hover: #2dd4bf;
-    --on-brand: #0d1117;
-    --success: #3fb950;
-    --error: #f47067;
-    --warning: #d29922;
-    --focus: #79c0ff;
-  }
-}
-
-* { box-sizing: border-box; }
 /* 组件的 display 规则不能盖过 hidden 属性（设计 MF1/MF2） */
-[hidden] { display: none !important; }
-html, body { margin: 0; background: var(--bg); color: var(--text); font: var(--font-size)/var(--line) var(--font); }
-h1, h2, h3, p { margin: 0; }
-.muted { color: var(--muted); }
-.nw { white-space: nowrap; }
-
-.btn {
-  appearance: none; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
-  height: 36px; padding: 0 var(--space-4); border-radius: var(--radius-sm); border: 1px solid var(--border);
-  background: var(--surface); color: var(--text); font: 600 var(--font-size)/var(--line) var(--font); cursor: pointer;
-}
-.btn:hover { border-color: var(--muted); }
-.btn.primary { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
-.btn.primary:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
-.btn:disabled, .btn[aria-disabled="true"] { opacity: .6; cursor: default; }
-.link { appearance: none; border: 0; background: none; padding: var(--space-1) 0; min-height: 24px; color: var(--brand); font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
-
-:focus { outline: none; }
-:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition: none !important; animation: none !important; }
-}
+[hidden]{display:none!important}
+.nw{white-space:nowrap}
+.muted{color:var(--text-2)}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+/* 文字链接样式的按钮（「设置」入口等）：品牌文字色，最小点击高度 24（R11） */
+.link{appearance:none;border:0;background:none;padding:var(--sp-1) 0;min-height:24px;color:var(--brand-text);font:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+a{color:var(--brand-text)}

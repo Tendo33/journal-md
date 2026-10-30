@@ -117,7 +117,7 @@ async function main() {
   await popup.waitForSelector('#info:not([hidden])', { timeout: 5000 });
   await popup.waitForTimeout(1000);
   check('popup shows platform', (await popup.textContent('#platform')) === 'PubMed Central');
-  check('icon: popup header logo (assets/icon.svg) loads', await popup.$eval('.head img', (img) => img.complete && img.naturalWidth > 0 && img.getAttribute('src') === 'assets/icon.svg'));
+  check('icon: popup header logo (assets/icon.svg) loads', await popup.$eval('.hd .logo img', (img) => img.complete && img.naturalWidth > 0 && img.getAttribute('src') === 'assets/icon.svg'));
   check('popup shows PMCID', (await popup.textContent('#pmcid')) === 'PMC11000001');
   check('popup routes: JATS checked on export / Page ✓', /JATS.*(export|导出时检查).*✓/.test(await popup.textContent('#routes')), await popup.textContent('#routes'));
   check('shortcut hint shows Alt+Shift+J', /Alt\+Shift\+J|⌥⇧J/.test(await popup.textContent('#shortcuts')), await popup.textContent('#shortcuts'));
@@ -178,7 +178,8 @@ async function main() {
   await opt.click('input[name="language"][value="zh"]', { force: true });
   await opt.waitForFunction(() => document.querySelector('h1').textContent.includes('设置'));
   check('options switches to Chinese immediately', true);
-  await opt.click('#includeImages', { force: true });
+  // 不用 force：点开关本身（ui-v2 结构里轨道 span 不能挡住 input）
+  await opt.locator('#includeImages').locator('xpath=..').click();
   await opt.waitForTimeout(300);
   const stored = await sw.evaluate(() => chrome.storage.sync.get('settings'));
   check('options instant-save', stored.settings && stored.settings.language === 'zh' && stored.settings.includeImages === false, JSON.stringify(stored));
@@ -199,11 +200,13 @@ async function main() {
 
   // ---------- 1.0.0：设计 nit、悬浮按钮、出版商页面、ZIP、PDF 确认 ----------
   const deferredColor = await popup.$eval('.route[data-state="deferred"]', (el) => getComputedStyle(el).color);
-  const mutedColor = await popup.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--muted').trim());
+  const mutedColor = await popup.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--text-2').trim());
   const toRgb = (hex) => `rgb(${parseInt(hex.slice(1, 3), 16)}, ${parseInt(hex.slice(3, 5), 16)}, ${parseInt(hex.slice(5, 7), 16)})`;
   check('design: "JATS: checked on export" is muted', deferredColor === toRgb(mutedColor), `${deferredColor} vs ${mutedColor}`);
   const btnBoxes = await Promise.all(['#export', '#copy', '#zip'].map((id) => popup.locator(id).boundingBox()));
-  check('popup: ZIP button shown; buttons share one height (R04)', btnBoxes.every((b) => b && Math.abs(b.height - btnBoxes[0].height) < 0.5), JSON.stringify(btnBoxes));
+  // 系列 ui-v2：主按钮独占一行、40 高；同一行的复制 / ZIP 必须同高同顶（R04 只比较同一行）
+  check('popup: ZIP button shown; same-row buttons share one height (R04)', btnBoxes.every(Boolean) && Math.abs(btnBoxes[1].height - btnBoxes[2].height) < 0.5 && Math.abs(btnBoxes[1].y - btnBoxes[2].y) < 0.5 && btnBoxes[0].y < btnBoxes[1].y, JSON.stringify(btnBoxes));
+  check('series ui: primary button is the full-width 40px row (ui-v2 .acts)', Math.abs(btnBoxes[0].height - 40) < 0.5 && btnBoxes[0].width > btnBoxes[1].width * 1.8, JSON.stringify(btnBoxes[0]));
 
   // 页内悬浮按钮（PMC fixture 页）：键盘打开菜单、方向键、Esc 回到按钮
   const fabBtn = page.locator('journal-md-fab button.fab');

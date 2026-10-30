@@ -1,4 +1,4 @@
-// 右键菜单（PRD §2.5）：页面上「导出本文为 Markdown」「复制全文 Markdown」，只在 M1 支持的站点出现。
+// 右键菜单（PRD §2.5）：页面上「导出本页为 Markdown」「复制本页为 Markdown」（与 zhihu-md 同一说法），只在支持的站点出现。
 // 依赖注入，便于在 node 里测试（结构参考 arxiv-md src/background/context-menu.js）。
 import { t } from '../config/i18n';
 import { SUPPORTED_PAGE_PATTERNS } from '../core/sites/registry';

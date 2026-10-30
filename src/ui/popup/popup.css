@@ -1,42 +1,44 @@
-body { width: 360px; }
-.popup { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); }
-.head { display: flex; align-items: center; gap: var(--space-2); }
-.head h1 { font-size: 16px; line-height: 24px; font-weight: 700; }
+/* popup：骨架来自 ui-v2.css（arxiv-md / zhihu-md 同源），这里只放 journal-md popup 专有的补充，写法同 arxiv-md popup.css */
+html,body{width:360px}
+body{min-width:360px}
+/* 浏览器自带 popup 外框，不再画圆角和阴影（同 arxiv-md / zhihu-md） */
+.pop{border-color:transparent;border-radius:0;box-shadow:none}
 
-.card { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: var(--space-3); }
-.title { font-weight: 600; margin-bottom: var(--space-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
-.kv { margin: 0; display: grid; gap: var(--space-1); }
-.kv > div { display: grid; grid-template-columns: 72px 1fr; gap: var(--space-2); }
-.kv dt { color: var(--muted); }
-.kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
-.route { display: inline-block; margin-right: var(--space-2); white-space: nowrap; }
-.route[data-state="yes"] { color: var(--success); }
-.route[data-state="no"] { color: var(--muted); }
-/* 「JATS：导出时检查」是待定状态，用 muted 和「页面 ✓」的成功色区分（设计 backlog 3） */
-.route[data-state="deferred"] { color: var(--muted); }
+/* 当前页卡片：平台徽标 + 标题（两行省略）+ 题录小字 */
+.ctx .badge{max-width:100%}
+.kv{margin:0;display:grid;gap:2px;font-size:var(--fs-xs);line-height:1.5}
+.kv>div{display:grid;grid-template-columns:56px 1fr;gap:var(--sp-2)}
+.kv dt{color:var(--text-2)}
+.kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
+#loading{white-space:normal}
+.ctx .empty{padding:12px 4px}
+.route{display:inline-block;margin-right:var(--sp-2);white-space:nowrap}
+.route[data-state="yes"]{color:var(--success)}
+.route[data-state="no"],.route[data-state="deferred"]{color:var(--text-2)}
 
-.actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
-.actions .btn { width: 100%; }
-/* 主按钮独占一行；复制和 ZIP 在第二行（三个按钮同高同字号，R04） */
-.actions .btn.primary { grid-column: 1 / -1; }
+/* 按钮区：主按钮独占一行（ui-v2 .acts），复制和 ZIP 第二行 */
+.acts .btn{width:100%}
 
-.status { display: grid; gap: var(--space-1); overflow-wrap: anywhere; }
-.status:empty { display: none; }
-.status .ok { color: var(--success); font-weight: 600; }
-.status .err { color: var(--error); font-weight: 600; }
-.status .note { color: var(--muted); }
-.status a { color: var(--brand); }
+/* 状态区（R05：在按钮行下方，出现/消失不移动按钮）：一条结果用 ui-v2 .alert 样式，补充说明是小字 */
+.status{display:flex;flex-direction:column;gap:var(--sp-2);overflow-wrap:anywhere}
+.status:empty{display:none}
+.status .ok,.status .err{padding:10px 12px;border-radius:var(--r-md);font-size:var(--fs-sm);line-height:1.45;font-weight:600}
+.status .ok{background:var(--success-bg);color:var(--success);box-shadow:inset 0 0 0 1px color-mix(in srgb,currentColor 16%,transparent)}
+.status .err{background:var(--danger-bg);color:var(--danger);box-shadow:inset 0 0 0 1px color-mix(in srgb,currentColor 16%,transparent)}
+.status .note{color:var(--text-2);font-size:var(--fs-xs);line-height:1.5;padding:0 2px}
 
-.foot { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); border-top: 1px solid var(--border); padding-top: var(--space-2); font-size: 12px; line-height: 16px; }
-.foot .link { font-size: 12px; }
+/* L3 PDF 解析：默认关闭；非 OA 时先在这里确认（PRD §2.11），确认框用警告色 alert（同 zhihu-md .alert.warn） */
+.pdf-row{display:flex;flex-direction:column;gap:var(--sp-2)}
+.pdf-row>.btn{width:100%}
+.alert.warn{background:var(--warning-bg);color:var(--warning);box-shadow:inset 0 0 0 1px color-mix(in srgb,currentColor 16%,transparent)}
+.confirm{flex-direction:column}
+.confirm p{color:var(--text);font-weight:600}
+.confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-2)}
+.confirm-actions .btn{width:100%}
+.pdf-status{color:var(--text-2);font-size:var(--fs-xs);line-height:1.5;overflow-wrap:anywhere}
+.pdf-status:empty{display:none}
+.pdf-status[data-state="done"]{color:var(--success)}
+.pdf-status[data-state="failed"]{color:var(--danger)}
 
-/* L3 PDF 解析：默认关闭，打开后才出现；非 OA 时先在这里确认（PRD §2.11） */
-.pdf-row { display: grid; gap: var(--space-2); }
-.pdf-row > .btn { width: 100%; }
-.confirm { display: grid; gap: var(--space-2); border: 1px solid var(--warning); border-radius: var(--radius); padding: var(--space-3); }
-.confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
-.confirm-actions .btn { width: 100%; }
-.pdf-status { color: var(--muted); overflow-wrap: anywhere; }
-.pdf-status:empty { display: none; }
-.pdf-status[data-state="done"] { color: var(--success); }
-.pdf-status[data-state="failed"] { color: var(--error); }
+/* 页脚：快捷键说明（ui-v2 .ft，12px） */
+.ft>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

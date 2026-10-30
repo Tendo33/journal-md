@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-brand="journal">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Journal to Markdown</title>
+  <link rel="stylesheet" href="ui-v2.css">
   <link rel="stylesheet" href="tokens.css">
   <link rel="stylesheet" href="options.css">
 </head>
@@ -11,9 +12,9 @@
   <main class="page">
     <header class="head">
       <img src="assets/icon.svg" alt="" width="32" height="32">
-      <div>
+      <div class="brand-text">
         <h1 data-i18n="optTitle">Journal to Markdown settings</h1>
-        <p id="version" class="muted"></p>
+        <p id="version" class="sub"></p>
       </div>
     </header>
 
@@ -22,81 +23,85 @@
       <p data-i18n="optWelcomeBody"></p>
     </section>
 
-    <section class="group" aria-labelledby="sec-output">
+    <section class="grp" aria-labelledby="sec-output">
       <h2 id="sec-output" data-i18n="optSectionOutput"></h2>
-      <div class="field">
-        <label for="filename" data-i18n="optFilename"></label>
-        <input id="filename" type="text" spellcheck="false" autocomplete="off" aria-describedby="filename-help filename-preview">
-        <p id="filename-help" class="help" data-i18n="optFilenameHelp"></p>
-        <p id="filename-preview" class="help preview"></p>
+      <div class="it it-col">
+        <label for="filename" class="lbl" data-i18n="optFilename"></label>
+        <input id="filename" class="field" type="text" spellcheck="false" autocomplete="off" aria-describedby="filename-help filename-preview">
+        <small id="filename-help" class="help" data-i18n="optFilenameHelp"></small>
+        <small id="filename-preview" class="help preview"></small>
       </div>
-      <div class="switch-row">
-        <div>
-          <label for="includeImages" class="switch-label" data-i18n="optIncludeImages"></label>
-          <p id="includeImages-help" class="help" data-i18n="optIncludeImagesHelp"></p>
+      <div class="it">
+        <div class="tx">
+          <label for="includeImages" class="lbl" data-i18n="optIncludeImages"></label>
+          <small id="includeImages-help" class="help" data-i18n="optIncludeImagesHelp"></small>
         </div>
-        <input id="includeImages" type="checkbox" role="switch" class="switch" aria-describedby="includeImages-help">
+        <span class="switch"><input id="includeImages" type="checkbox" role="switch" aria-describedby="includeImages-help"><span aria-hidden="true"></span></span>
       </div>
-      <div class="switch-row">
-        <div>
-          <label for="showFab" class="switch-label" data-i18n="optShowFab"></label>
-          <p id="showFab-help" class="help" data-i18n="optShowFabHelp"></p>
+      <div class="it">
+        <div class="tx">
+          <label for="showFab" class="lbl" data-i18n="optShowFab"></label>
+          <small id="showFab-help" class="help" data-i18n="optShowFabHelp"></small>
         </div>
-        <input id="showFab" type="checkbox" role="switch" class="switch" aria-describedby="showFab-help">
+        <span class="switch"><input id="showFab" type="checkbox" role="switch" aria-describedby="showFab-help"><span aria-hidden="true"></span></span>
       </div>
-      <div class="switch-row">
-        <div>
-          <label for="preferJats" class="switch-label" data-i18n="optPreferJats"></label>
-          <p id="preferJats-help" class="help" data-i18n="optPreferJatsHelp"></p>
+      <div class="it">
+        <div class="tx">
+          <label for="preferJats" class="lbl" data-i18n="optPreferJats"></label>
+          <small id="preferJats-help" class="help" data-i18n="optPreferJatsHelp"></small>
         </div>
-        <input id="preferJats" type="checkbox" role="switch" class="switch" aria-describedby="preferJats-help">
+        <span class="switch"><input id="preferJats" type="checkbox" role="switch" aria-describedby="preferJats-help"><span aria-hidden="true"></span></span>
       </div>
     </section>
 
-    <section class="group" aria-labelledby="sec-language">
+    <section class="grp" aria-labelledby="sec-language">
       <h2 id="sec-language" data-i18n="optSectionLanguage"></h2>
-      <fieldset class="segmented" aria-labelledby="sec-language">
-        <label><input type="radio" name="language" value="auto"><span data-i18n="optLangAuto"></span></label>
-        <label><input type="radio" name="language" value="en"><span data-i18n="optLangEn"></span></label>
-        <label><input type="radio" name="language" value="zh"><span data-i18n="optLangZh"></span></label>
-      </fieldset>
+      <div class="it">
+        <fieldset class="segmented" aria-labelledby="sec-language">
+          <label><input type="radio" name="language" value="auto"><span data-i18n="optLangAuto"></span></label>
+          <label><input type="radio" name="language" value="en"><span data-i18n="optLangEn"></span></label>
+          <label><input type="radio" name="language" value="zh"><span data-i18n="optLangZh"></span></label>
+        </fieldset>
+      </div>
     </section>
 
-    <section class="group" aria-labelledby="sec-pdf">
+    <section class="grp" aria-labelledby="sec-pdf">
       <h2 id="sec-pdf" data-i18n="optSectionPdf"></h2>
-      <p class="help" data-i18n="optPdfHelp"></p>
-      <div class="switch-row">
-        <div>
-          <label for="pdfEnabled" class="switch-label" data-i18n="optPdfEnabled"></label>
-          <p id="pdfEnabled-help" class="help" data-i18n="optPdfEnabledHelp"></p>
+      <p class="grp-desc" data-i18n="optPdfHelp"></p>
+      <div class="it">
+        <div class="tx">
+          <label for="pdfEnabled" class="lbl" data-i18n="optPdfEnabled"></label>
+          <small id="pdfEnabled-help" class="help" data-i18n="optPdfEnabledHelp"></small>
         </div>
-        <input id="pdfEnabled" type="checkbox" role="switch" class="switch" aria-describedby="pdfEnabled-help">
+        <span class="switch"><input id="pdfEnabled" type="checkbox" role="switch" aria-describedby="pdfEnabled-help"><span aria-hidden="true"></span></span>
       </div>
-      <fieldset id="pdf-provider" class="segmented" aria-labelledby="pdf-provider-label">
-        <legend id="pdf-provider-label" class="visually-hidden" data-i18n="optPdfProvider"></legend>
-        <label><input type="radio" name="pdfProvider" value="paddleocr"><span data-i18n="optPdfPaddle"></span></label>
-        <label><input type="radio" name="pdfProvider" value="mineru"><span data-i18n="optPdfMineru"></span></label>
-      </fieldset>
-      <p id="pdf-provider-note" class="help"></p>
-      <div class="field">
-        <label for="pdfToken" id="pdfToken-label"></label>
+      <div class="it it-col">
+        <fieldset id="pdf-provider" class="segmented" aria-labelledby="pdf-provider-label">
+          <legend id="pdf-provider-label" class="sr-only" data-i18n="optPdfProvider"></legend>
+          <label><input type="radio" name="pdfProvider" value="paddleocr"><span data-i18n="optPdfPaddle"></span></label>
+          <label><input type="radio" name="pdfProvider" value="mineru"><span data-i18n="optPdfMineru"></span></label>
+        </fieldset>
+        <small id="pdf-provider-note" class="help"></small>
+      </div>
+      <div class="it it-col">
+        <label for="pdfToken" id="pdfToken-label" class="lbl"></label>
         <div class="token-row">
-          <input id="pdfToken" type="password" spellcheck="false" autocomplete="off" aria-describedby="pdfToken-help pdf-status">
-          <button id="pdfTest" type="button" class="btn" data-i18n="optPdfTest"></button>
+          <input id="pdfToken" class="field" type="password" spellcheck="false" autocomplete="off" aria-describedby="pdfToken-help pdf-status">
+          <button id="pdfTest" type="button" class="btn btn-secondary" data-i18n="optPdfTest"></button>
         </div>
-        <p id="pdfToken-help" class="help"><span data-i18n="optPdfTokenHelp"></span> <a id="pdfKeyLink" href="#" target="_blank" rel="noopener noreferrer" data-i18n="optPdfGetToken"></a></p>
+        <small id="pdfToken-help" class="help"><span data-i18n="optPdfTokenHelp"></span> <a id="pdfKeyLink" href="#" target="_blank" rel="noopener noreferrer" data-i18n="optPdfGetToken"></a></small>
+        <p id="pdf-status" class="pdf-status" role="status" aria-live="polite"></p>
       </div>
-      <p id="pdf-status" class="help pdf-status" role="status" aria-live="polite"></p>
     </section>
 
-    <section class="group" aria-labelledby="sec-sites">
+    <section class="grp" aria-labelledby="sec-sites">
       <h2 id="sec-sites" data-i18n="optSectionSites"></h2>
-      <p class="help" data-i18n="optSitesHelp"></p>
+      <p class="grp-desc" data-i18n="optSitesHelp"></p>
       <ul id="sites" class="sites"></ul>
     </section>
 
     <footer class="foot">
-      <p class="muted" data-i18n="optPrivacy"></p>
+      <p data-i18n="optPrivacy"></p>
       <p id="saved" class="saved" role="status" aria-live="polite"></p>
     </footer>
   </main>

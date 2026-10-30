@@ -9,16 +9,16 @@
     "message": "Journal to Markdown — export this article"
   },
   "cmdExport": {
-    "message": "Export this article as Markdown"
+    "message": "Export this page as Markdown"
   },
   "cmdCopy": {
-    "message": "Copy full-text Markdown"
+    "message": "Copy this page as Markdown"
   },
   "menuExport": {
-    "message": "Export this article as Markdown"
+    "message": "Export this page as Markdown"
   },
   "menuCopy": {
-    "message": "Copy full-text Markdown"
+    "message": "Copy this page as Markdown"
   },
   "popupHeading": {
     "message": "Journal to Markdown"

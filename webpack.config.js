@@ -57,6 +57,7 @@ module.exports = (env, argv) => {
           { from: 'src/ui/options/options.html', to: 'options.html' },
           { from: 'src/ui/options/options.css', to: 'options.css' },
           { from: 'src/ui/shared/tokens.css', to: 'tokens.css' },
+          { from: 'src/ui/shared/ui-v2.css', to: 'ui-v2.css' },
           { from: 'assets/icon-*.png', to: 'assets/[name][ext]' },
           // 弹窗和设置页标题旁的标志用矢量母版（icon.svg）；icon-16.svg 是 16px 手调版，只作设计源文件，不打包
           { from: 'assets/icon.svg', to: 'assets/icon.svg' },

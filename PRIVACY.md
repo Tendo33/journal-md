@@ -62,7 +62,7 @@ A PDF that needs a login or a subscription usually cannot be downloaded by these
 | `activeTab`, `scripting` | Read the current tab's address when you click the toolbar icon, and inject the converter into an article tab that was open before the extension was installed |
 | `storage` | Save settings, PDF tokens and the last PDF task (see above) |
 | `downloads` | Save `.md`, `.zip` and PDF parsing results |
-| `contextMenus` | "Export this article as Markdown" / "Copy full-text Markdown" on supported pages |
+| `contextMenus` | "Export this page as Markdown" / "Copy this page as Markdown" on supported pages |
 | `clipboardWrite` | Copy Markdown |
 | `https://pmc.ncbi.nlm.nih.gov/*`, `https://pubmed.ncbi.nlm.nih.gov/*`, `https://europepmc.org/*`, `https://link.springer.com/*`, `https://*.biomedcentral.com/*`, `https://*.springeropen.com/*`, `https://www.nature.com/*`, `https://www.frontiersin.org/*`, `https://www.mdpi.com/*`, `https://journals.plos.org/*`, `https://elifesciences.org/*` | Run the converter on article pages of these sites (and fetch images from them for ZIP files) |
 | `https://www.ebi.ac.uk/europepmc/*` | Europe PMC REST API (full text and DOI lookup), only on export |
