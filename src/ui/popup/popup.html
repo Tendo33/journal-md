@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Journal to Markdown</title>
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="popup">
+    <header class="head">
+      <img src="assets/icon-32.png" alt="" width="20" height="20">
+      <h1 data-i18n="popupHeading">Journal to Markdown</h1>
+    </header>
+
+    <section class="card" aria-labelledby="ctx-title">
+      <p id="loading" class="muted" data-i18n="popupLoading"></p>
+      <div id="info" hidden>
+        <p id="ctx-title" class="title"></p>
+        <dl class="kv">
+          <div><dt data-i18n="popupPlatform"></dt><dd id="platform"></dd></div>
+          <div id="row-doi" hidden><dt>DOI</dt><dd id="doi"></dd></div>
+          <div id="row-pmcid" hidden><dt>PMCID</dt><dd id="pmcid"></dd></div>
+          <div id="row-pmid" hidden><dt>PMID</dt><dd id="pmid"></dd></div>
+          <div><dt data-i18n="popupRoutes"></dt><dd id="routes" aria-live="polite"></dd></div>
+        </dl>
+      </div>
+      <p id="empty" class="empty" role="alert" hidden></p>
+    </section>
+
+    <div id="actions" class="actions" hidden>
+      <button id="export" type="button" class="btn primary" data-i18n="btnExport" data-i18n-title="btnExportTitle"></button>
+      <button id="copy" type="button" class="btn" data-i18n="btnCopy" data-i18n-title="btnCopyTitle"></button>
+    </div>
+
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+
+    <footer class="foot">
+      <span id="shortcuts" class="muted"></span>
+      <button id="settings" type="button" class="link" data-i18n="linkSettings"></button>
+    </footer>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>

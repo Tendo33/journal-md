@@ -1,0 +1,68 @@
+/* journal-md 设计 token：4/8 间距、浅色/深色跟随系统（R13）、焦点环独立 token（R07/R20）。 */
+:root {
+  color-scheme: light dark;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --radius: 8px;
+  --radius-sm: 6px;
+  --font: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-size: 14px;
+  --line: 20px;
+
+  --bg: #ffffff;
+  --surface: #f6f8fa;
+  --text: #1f2328;
+  --muted: #59636e;
+  --border: #d0d7de;
+  --brand: #1d4e89;
+  --brand-hover: #163d6b;
+  --on-brand: #ffffff;
+  --success: #1a7f37;
+  --error: #b42318;
+  --warning: #9a6700;
+  --focus: #0969da;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15191e;
+    --surface: #1f2428;
+    --text: #e6edf3;
+    --muted: #9198a1;
+    --border: #3d444d;
+    --brand: #4c8fd6;
+    --brand-hover: #6aa3e0;
+    --on-brand: #0d1117;
+    --success: #3fb950;
+    --error: #f47067;
+    --warning: #d29922;
+    --focus: #79c0ff;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); font: var(--font-size)/var(--line) var(--font); }
+h1, h2, h3, p { margin: 0; }
+.muted { color: var(--muted); }
+.nw { white-space: nowrap; }
+
+.btn {
+  appearance: none; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  height: 36px; padding: 0 var(--space-4); border-radius: var(--radius-sm); border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font: 600 var(--font-size)/var(--line) var(--font); cursor: pointer;
+}
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+.btn.primary:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: .6; cursor: default; }
+.link { appearance: none; border: 0; background: none; padding: var(--space-1) 0; min-height: 24px; color: var(--brand); font: inherit; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}

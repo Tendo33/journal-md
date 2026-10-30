@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Journal to Markdown</title>
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <main class="page">
+    <header class="head">
+      <img src="assets/icon-48.png" alt="" width="32" height="32">
+      <div>
+        <h1 data-i18n="optTitle">Journal to Markdown settings</h1>
+        <p id="version" class="muted"></p>
+      </div>
+    </header>
+
+    <section id="welcome" class="welcome" aria-labelledby="welcome-title" hidden>
+      <h2 id="welcome-title" data-i18n="optWelcomeTitle"></h2>
+      <p data-i18n="optWelcomeBody"></p>
+    </section>
+
+    <section class="group" aria-labelledby="sec-output">
+      <h2 id="sec-output" data-i18n="optSectionOutput"></h2>
+      <div class="field">
+        <label for="filename" data-i18n="optFilename"></label>
+        <input id="filename" type="text" spellcheck="false" autocomplete="off" aria-describedby="filename-help filename-preview">
+        <p id="filename-help" class="help" data-i18n="optFilenameHelp"></p>
+        <p id="filename-preview" class="help preview"></p>
+      </div>
+      <div class="switch-row">
+        <div>
+          <label for="includeImages" class="switch-label" data-i18n="optIncludeImages"></label>
+          <p id="includeImages-help" class="help" data-i18n="optIncludeImagesHelp"></p>
+        </div>
+        <input id="includeImages" type="checkbox" role="switch" class="switch" aria-describedby="includeImages-help">
+      </div>
+      <div class="switch-row">
+        <div>
+          <label for="preferJats" class="switch-label" data-i18n="optPreferJats"></label>
+          <p id="preferJats-help" class="help" data-i18n="optPreferJatsHelp"></p>
+        </div>
+        <input id="preferJats" type="checkbox" role="switch" class="switch" aria-describedby="preferJats-help">
+      </div>
+    </section>
+
+    <section class="group" aria-labelledby="sec-language">
+      <h2 id="sec-language" data-i18n="optSectionLanguage"></h2>
+      <fieldset class="segmented" aria-labelledby="sec-language">
+        <label><input type="radio" name="language" value="auto"><span data-i18n="optLangAuto"></span></label>
+        <label><input type="radio" name="language" value="en"><span data-i18n="optLangEn"></span></label>
+        <label><input type="radio" name="language" value="zh"><span data-i18n="optLangZh"></span></label>
+      </fieldset>
+    </section>
+
+    <section class="group" aria-labelledby="sec-sites">
+      <h2 id="sec-sites" data-i18n="optSectionSites"></h2>
+      <p class="help" data-i18n="optSitesHelp"></p>
+      <ul id="sites" class="sites"></ul>
+    </section>
+
+    <footer class="foot">
+      <p class="muted" data-i18n="optPrivacy"></p>
+      <p id="saved" class="saved" role="status" aria-live="polite"></p>
+    </footer>
+  </main>
+  <script src="options.js"></script>
+</body>
+</html>
