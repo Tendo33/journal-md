@@ -13,6 +13,7 @@ module.exports = {
     '^@core/(.*)$': '<rootDir>/src/core/$1',
     '^@utils/(.*)$': '<rootDir>/src/utils/$1',
     '^@config/(.*)$': '<rootDir>/src/config/$1',
+    '^@pdf-core/(.*)$': '<rootDir>/vendor/pdf-parse-core/src/$1',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
 };

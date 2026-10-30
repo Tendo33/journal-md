@@ -68,6 +68,8 @@ module.exports = (env, argv) => {
         '@core': path.resolve(__dirname, 'src/core'),
         '@utils': path.resolve(__dirname, 'src/utils'),
         '@config': path.resolve(__dirname, 'src/config'),
+        // vendored arxiv-md pdf-parse-core（vendor/pdf-parse-core/README.md）
+        '@pdf-core': path.resolve(__dirname, 'vendor/pdf-parse-core/src'),
       },
     },
   };

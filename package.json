@@ -12,7 +12,7 @@
     "verify:dist": "node scripts/verify-dist.js",
     "verify:dist:chrome": "node scripts/verify-dist.js dist --target=chrome",
     "verify:dist:firefox": "node scripts/verify-dist.js dist-firefox --target=firefox",
-    "lint": "eslint \"src/**/*.js\" \"scripts/**/*.js\" \"tests/**/*.js\" webpack.config.js jest.config.js",
+    "lint": "eslint \"src/**/*.js\" \"scripts/**/*.js\" \"tests/**/*.js\" \"vendor/**/*.js\" webpack.config.js jest.config.js",
     "test": "jest --runInBand",
     "package": "npm run build && npm run build:firefox && npm run verify:dist && node scripts/package.js",
     "check:keys": "node scripts/check-no-keys.js",

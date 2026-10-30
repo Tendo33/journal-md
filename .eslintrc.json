@@ -11,12 +11,43 @@
     "sourceType": "module"
   },
   "rules": {
-    "indent": ["error", 2, { "SwitchCase": 0 }],
-    "linebreak-style": ["error", "unix"],
-    "quotes": ["error", "single", { "avoidEscape": true }],
-    "semi": ["error", "always"],
-    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-    "no-console": ["warn", { "allow": ["warn", "error"] }]
+    "indent": [
+      "error",
+      2,
+      {
+        "SwitchCase": 0
+      }
+    ],
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
+    "quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true
+      }
+    ],
+    "semi": [
+      "error",
+      "always"
+    ],
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "no-console": [
+      "warn",
+      {
+        "allow": [
+          "warn",
+          "error"
+        ]
+      }
+    ]
   },
   "globals": {
     "chrome": "readonly",
@@ -24,14 +55,56 @@
   },
   "overrides": [
     {
-      "files": ["scripts/**/*.js", "webpack.config.js", "jest.config.js"],
-      "env": { "node": true, "browser": false },
-      "parserOptions": { "sourceType": "script" },
-      "rules": { "no-console": "off" }
+      "files": [
+        "scripts/**/*.js",
+        "webpack.config.js",
+        "jest.config.js"
+      ],
+      "env": {
+        "node": true,
+        "browser": false
+      },
+      "parserOptions": {
+        "sourceType": "script"
+      },
+      "rules": {
+        "no-console": "off"
+      }
     },
     {
-      "files": ["tests/**/*.js"],
-      "env": { "node": true, "jest": true }
+      "files": [
+        "tests/**/*.js"
+      ],
+      "env": {
+        "node": true,
+        "jest": true
+      }
+    },
+    {
+      "files": [
+        "vendor/pdf-parse-core/**/*.js"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@core/*",
+                  "@utils/*",
+                  "@config/*",
+                  "@ui/*",
+                  "@background/*",
+                  "@/*",
+                  "**/src/*"
+                ],
+                "message": "vendored pdf-parse-core must not import extension code"
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }
