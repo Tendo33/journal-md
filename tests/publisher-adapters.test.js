@@ -334,3 +334,60 @@ describe('QA JM-M2-02 / M2-03: MDPI after hydration (mathematics 11:2608)', () =
     expect(r).toMatchObject({ ok: true, route: 'dom-mdpi' });
   });
 });
+
+describe('review N1 (fix2b-3): rel=license counts only inside the licence box or <head>', () => {
+  const { PUBLISHER_ADAPTERS } = require('@core/adapters/publishers');
+  const { extractPmc } = require('@core/adapters/pmc');
+  const { extractEuropePmc } = require('@core/adapters/europepmc');
+  const CC_BY = 'https://creativecommons.org/licenses/by/4.0/';
+  const bodyRelLicense = (doc, where) => {
+    const a = doc.createElement('a');
+    a.setAttribute('rel', 'license');
+    a.setAttribute('href', CC_BY);
+    a.textContent = 'CC BY';
+    (doc.querySelector(where) || doc.body).append(a);
+  };
+
+  test('Nature subscription article: <a rel=license> in the body does NOT make it OA', () => {
+    const url = 'https://www.nature.com/articles/s41586-021-03819-2';
+    const doc = html('nature-alphafold.html');
+    doc.querySelectorAll('#rightslink-content a').forEach((a) => a.remove());
+    bodyRelLicense(doc, '.c-article-body');
+    bodyRelLicense(doc, '.c-article-references__text');
+    expect(PUBLISHER_ADAPTERS.nature(doc, url).meta.license).toBe('');
+    expect(inspectPage(doc, url).pdf).toMatchObject({ openAccess: false, license: '' });
+  });
+
+  test('<link rel=license> in <head> still counts', () => {
+    const url = 'https://www.nature.com/articles/s41586-021-03819-2';
+    const doc = html('nature-alphafold.html');
+    doc.querySelectorAll('#rightslink-content a').forEach((a) => a.remove());
+    const link = doc.createElement('link');
+    link.setAttribute('rel', 'license');
+    link.setAttribute('href', CC_BY);
+    doc.head.append(link);
+    expect(PUBLISHER_ADAPTERS.nature(doc, url).meta.license).toBe('CC-BY-4.0');
+  });
+
+  test('Frontiers / MDPI / PMC / Europe PMC: a body rel=license link is ignored', () => {
+    const f = html('frontiers-effect-sizes.html');
+    f.querySelectorAll('.Summary__copyright').forEach((x) => x.remove());
+    bodyRelLicense(f, '.ArticleContent');
+    expect(PUBLISHER_ADAPTERS.frontiers(f, 'https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2013.00863/full').meta.license).toBe('');
+
+    const m = html('mdpi-animals-11-01300.html');
+    m.querySelectorAll('#html-copyright').forEach((x) => x.remove());
+    m.querySelectorAll('meta[name="dc.rights"]').forEach((x) => x.remove());
+    bodyRelLicense(m, '.prose-article');
+    expect(PUBLISHER_ADAPTERS.mdpi(m, 'https://www.mdpi.com/2076-2615/11/5/1300').meta.license).toBe('');
+
+    const p = html('pmc-article.html');
+    p.querySelectorAll('a[href*="creativecommons.org"]').forEach((x) => x.remove());
+    bodyRelLicense(p, 'main');
+    expect(extractPmc(p, 'https://pmc.ncbi.nlm.nih.gov/articles/PMC11000001/', { pmcid: 'PMC11000001' }).meta.license).toBe('');
+
+    const e = html('europepmc-med-31862249.html');
+    bodyRelLicense(e, '#abstract');
+    expect(extractEuropePmc(e, 'https://europepmc.org/article/MED/31862249', { pmid: '31862249' }).meta.license).toBe('');
+  });
+});

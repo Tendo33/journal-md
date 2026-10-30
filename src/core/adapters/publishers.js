@@ -13,8 +13,9 @@ const SPRINGER_NATURE = {
   date: 'time',
   metaArea: ['.c-article-header', '.c-bibliographic-information'],
   doi: 'a[href*="doi.org/10."]',
-  // 许可只认 rel="license" 和「Rights and permissions」框（审查 M-1：参考文献里的 CC 链接不能算文章许可）
-  license: '#rightslink-content a[href*="creativecommons.org"], a[rel="license"]',
+  // 许可只认「Rights and permissions」框里的链接（含框里的 rel="license"）和 <head> 里的 link rel="license"
+  // （审查 M-1、复审 N1：正文 / 参考文献里的 CC 链接或 rel="license" 都不能算文章许可）
+  license: '#rightslink-content a[href*="creativecommons.org"], #rightslink-content a[rel="license"], head link[rel="license"]',
   abstract: 'section[data-title="Abstract"] .c-article-section__content, #Abs1-content',
   keywords: '',
   keywordItems: 'section[data-title="About this article"] h3 + .c-article-subject-list li',
@@ -58,8 +59,8 @@ export const FRONTIERS_CONFIG = {
   date: '',
   metaArea: ['.ArticleLayoutHeader'],
   doi: 'a[href*="doi.org/10."]',
-  license: 'a[rel="license"]',
-  // Frontiers 的许可只写在页面底部的版权框文字里
+  // 只认 <head> 里的 link rel="license"（复审 N1）；正文里没有许可链接，许可写在页面底部的版权框文字里
+  license: 'head link[rel="license"]',
   licenseText: '.Summary__copyright p',
   // 摘要在 .ArticleContent 的第一个 div（<h2>Abstract</h2> 开头）里，没有专门的类名：按标题找
   abstract: '',
@@ -106,7 +107,7 @@ export const MDPI_CONFIG = {
   date: '',
   metaArea: ['.bib-identity'],
   doi: 'a[href*="doi.org/10."]',
-  license: '#html-copyright a[href*="creativecommons.org"], a[rel="license"]',
+  license: '#html-copyright a[href*="creativecommons.org"], head link[rel="license"]',
   abstract: 'section#Abstract',
   keywords: '#html-keywords',
   keywordItems: '#html-keywords .html-keywords-link',

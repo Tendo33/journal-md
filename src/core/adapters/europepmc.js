@@ -16,8 +16,8 @@ export const EUROPEPMC_CONFIG = {
   // 只在文章元数据区里找 DOI / PMID / PMCID；正文、参考文献、「被引」「相似文章」里的都不算（QA JM-01）
   metaArea: ['.metadata--citation', '#article--meta', '.article--meta'],
   doi: 'a[href*="doi.org/10."]',
-  // 只看元数据区和 rel="license"（审查 M-1）
-  license: '#article--meta a[href*="creativecommons.org"], .article--meta a[href*="creativecommons.org"], .metadata--citation a[href*="creativecommons.org"], a[rel="license"]',
+  // 只看元数据区和 <head> 里的 link rel="license"（审查 M-1、复审 N1）
+  license: '#article--meta a[href*="creativecommons.org"], .article--meta a[href*="creativecommons.org"], .metadata--citation a[href*="creativecommons.org"], head link[rel="license"]',
   abstract: '#article--abstract--content, #abstract:not(.content-section), #article--abstract, .abstract',
   keywords: '.keywords, .kwd-group',
   // 正文只认全文容器（白名单）：MED 无全文页上的「Author information / Full text links / References / Citations /
