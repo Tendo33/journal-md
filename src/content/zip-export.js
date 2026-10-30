@@ -4,6 +4,7 @@
 import { createZip } from '@pdf-core/output/zip.js';
 import { restoreRemoteImages } from '../core/export/zip-plan';
 import { MSG } from '../utils/messages';
+import { originsNeededFor } from '../core/zip-image-hosts';
 
 export const IMAGE_TIMEOUT_MS = 15000;
 export const MAX_IMAGE_BYTES = 20 * 1000 * 1000;
@@ -80,7 +81,10 @@ export async function buildArticleZip(result, { fetchInPage = fetchImageInPage, 
   const entries = [{ name: 'article.md', data: markdown }];
   assets.forEach((a, i) => { if (files[i]) entries.push({ name: a.path, data: files[i] }); });
   const failedHosts = [...new Set(failed.map((a) => { try { return new URL(a.url).hostname; } catch (_) { return ''; } }).filter(Boolean))];
-  return { bytes: createZip(entries), packed: assets.length - failed.length, total: assets.length, failed, failedHosts };
+  // 失败的图片里有没有「授予可选权限后就能取到」的（PLOS 存储桶 / media.springernature.com）
+  const needsPermission = originsNeededFor(failed.flatMap((a) => [a.url, ...(a.alts || [])]));
+  const permissionCount = failed.filter((a) => [a.url, ...(a.alts || [])].some((u) => originsNeededFor([u]).length)).length;
+  return { bytes: createZip(entries), packed: assets.length - failed.length, total: assets.length, failed, failedHosts, needsPermission, permissionCount };
 }
 
 export function zipFilename(mdFilename) {

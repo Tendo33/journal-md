@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* global document, getComputedStyle */
+/* global document, getComputedStyle, window */
 // 扩展冒烟（有界面的 Chromium，加载 dist/）：所有网络请求都被 route 到 tests/fixtures 或直接中止，不访问真实站点。
 // 覆盖：content script 注入、popup（支持 / 不支持页面）、JATS 探测、导出下载、复制、options 即时保存、控制台无报错；
 // 1.0.0 新增：出版商页面（Nature、eLife 真实页面 fixture）、页内悬浮按钮（键盘、深色）、ZIP 内容、PDF 解析的 OA 确认（不访问真实后端）。
@@ -83,6 +83,11 @@ async function main() {
     }
     if (url.startsWith('https://iiif.elifesciences.org/') && ['fetch', 'xhr'].includes(route.request().resourceType())) {
       return route.fulfill({ status: 200, contentType: 'image/png', headers: { 'Access-Control-Allow-Origin': '*' }, body: PNG });
+    }
+    // 真实的 media.springernature.com 不发 CORS 头，没有可选权限时页面和后台的 fetch 都会失败（2026-10-30 线上实测）。
+    // Playwright 的 route.fulfill 会自己满足 CORS，模拟不了「缺 CORS 头」，所以这里直接让请求以网络错误失败——代码看到的结果相同
+    if (url.startsWith('https://media.springernature.com/') && ['fetch', 'xhr'].includes(route.request().resourceType())) {
+      return route.abort('failed');
     }
     // 页面自己的图片等资源直接中止；扩展发出的 fetch/xhr 必须全部命中 fixture
     if (['fetch', 'xhr'].includes(route.request().resourceType())) external.push(url);
@@ -271,6 +276,9 @@ async function main() {
     await pp.addInitScript(({ tid, turl }) => {
       const orig = chrome.tabs.query.bind(chrome.tabs);
       chrome.tabs.query = async (q) => (q && q.active ? [{ id: tid, url: turl }] : orig(q));
+      // 权限弹窗没法在自动化里点：记录调用并模拟「拒绝」
+      window.__permCalls = [];
+      chrome.permissions.request = (q) => { window.__permCalls.push(q); return Promise.resolve(false); };
     }, { tid: id, turl: url });
     await pp.setViewportSize({ width: 360, height: 640 });
     await pp.goto(`chrome-extension://${extId}/popup.html`);
@@ -287,7 +295,22 @@ async function main() {
   const zipItem = (await sw.evaluate(() => chrome.downloads.search({}))).filter((d) => d.state === 'complete' && /application\/zip/.test(d.mime || d.url || '')).pop();
   const zfiles = zipItem ? unzip(fs.readFileSync(zipItem.filename)) : {};
   const zmd = zfiles['article.md'] ? zfiles['article.md'].toString('utf8') : '';
+  check('ZIP permission: eLife needs no extra host, nothing is requested', (await ep.evaluate(() => window.__permCalls.length)) === 0);
   check('ZIP contains article.md with local image links and the images', zmd.includes('](images/01-elife-09560-fig1-v1.jpg)') && !!zfiles['images/01-elife-09560-fig1-v1.jpg'] && !zmd.includes('iiif.elifesciences.org'), Object.keys(zfiles).slice(0, 4).join(','));
+
+  // ZIP 可选权限（Simon 2026-10-30 批准）：Nature 的图在 media.springernature.com，点「下载 ZIP」时在点击里申请；拒绝后照样出 ZIP + 提示
+  const zp = await openPopup(natTab, NATURE_URL);
+  const zipBefore = (await sw.evaluate(() => chrome.downloads.search({}))).filter((d) => /application\/zip/.test(d.mime || d.url || '')).length;
+  await zp.click('#zip');
+  await zp.waitForSelector('#status .ok, #status .err', { timeout: 15000 }).catch(() => {});
+  await zp.waitForTimeout(500);
+  const permCalls = await zp.evaluate(() => window.__permCalls);
+  check('ZIP permission: requested once from the click with exactly media.springernature.com', JSON.stringify(permCalls) === JSON.stringify([{ origins: ['https://media.springernature.com/*'] }]), JSON.stringify(permCalls));
+  const zpStatus = await zp.textContent('#status');
+  const zipAfter = (await sw.evaluate(() => chrome.downloads.search({}))).filter((d) => d.state === 'complete' && /application\/zip/.test(d.mime || d.url || ''));
+  check('ZIP permission denied: ZIP still saved, visible notice to allow access', zipAfter.length === zipBefore + 1 && /\.zip/.test(zpStatus) && /needs your permission|需要你授权/.test(zpStatus), zpStatus);
+  const nmd = zipAfter.length ? (unzip(fs.readFileSync(zipAfter[zipAfter.length - 1].filename))['article.md'] || '').toString('utf8') : '';
+  check('ZIP permission denied: images keep their remote links in article.md', /\]\(https:\/\/media\.springernature\.com\//.test(nmd) && !/\]\(images\//.test(nmd));
 
   // PDF 解析：打开（直接写 storage.local，不经过浏览器权限弹窗）后，非 OA 文章先确认；拒绝 / 缺权限时不访问后端
   await sw.evaluate(() => chrome.storage.local.set({ pdfSettings: { enabled: true, provider: 'paddleocr', tokens: { paddleocr: 'e2e-placeholder' } } }));

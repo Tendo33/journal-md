@@ -1,5 +1,6 @@
 // 导出结果 → 用户可读的状态和提示（popup 和页内 toast 共用，保证说法一致，R19）。
 import { t } from '../../config/i18n';
+import { originLabel } from '../../core/zip-image-hosts';
 
 export function errorText(lang, error, extra = {}) {
   const key = `err_${error || 'unknown'}`;
@@ -19,6 +20,10 @@ export function describeResult(result, lang, action) {
     const hosts = (z.failedHosts || []).slice(0, 3).join(', ') || '?';
     const key = z.packed === z.total ? 'noticeZipAll' : z.packed === 0 ? 'noticeZipNone' : 'noticeZipPartial';
     notes.push(t(lang, key, { packed: z.packed, total: z.total, failed: z.total - z.packed, hosts }));
+    // 缺的图片要可选权限才能取（用户拒绝了，或者从悬浮按钮 / 快捷键导出、没机会申请）：说清楚怎么补上
+    if (z.needsPermission && z.needsPermission.length) {
+      notes.push(t(lang, 'noticeZipNeedsPermission', { count: z.permissionCount || (z.total - z.packed), hosts: z.needsPermission.map(originLabel).join(', ') }));
+    }
   }
   for (const n of result.notices || []) {
     if (n.code === 'jats_fallback') {

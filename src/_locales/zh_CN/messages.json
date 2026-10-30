@@ -406,5 +406,8 @@
   },
   "noticeZipNone": {
     "message": "没能打包任何图片：{hosts} 不允许扩展下载图片。ZIP 里只有 article.md，{total} 张图片都保留网络链接。"
+  },
+  "noticeZipNeedsPermission": {
+    "message": "有 {count} 张图片存放在 {hosts}，需要你授权才能打包，现在 article.md 里保留网络链接。要打包这些图片，请在工具栏弹窗里点「下载 ZIP」并选择允许。"
   }
 }

@@ -32,7 +32,7 @@
 
 - **四个入口**：页面右下角的 **M↓ 悬浮按钮**（菜单：下载 .md、下载 ZIP、复制）、工具栏弹窗、右键菜单、快捷键 `Alt+Shift+J`（导出）。悬浮按钮可以用键盘操作、读屏可读，跟随系统深色模式，可在设置里或按钮菜单里隐藏。
 - **输出**：YAML front matter（title、authors、journal、year、doi、pmid、pmcid、license、url、`source_route`、exported）；公式写成 `$…$` / `$$…$$`；没有合并单元格的表格写成 GFM 表格，有合并单元格的保留 HTML；正文引用变成 `[^n]` 脚注，参考文献带 DOI 链接；数据可用性、基金、利益冲突、致谢各自成节；补充材料列出文件名和链接。
-- **下载 ZIP**：`article.md` + `images/`，正文里的图片链接改成包内路径。图片服务器不允许扩展下载的（例如 Springer 的图片 CDN）保留原网址，并提示打包了几张。
+- **下载 ZIP**：`article.md` + `images/`，正文里的图片链接改成包内路径。Springer / BMC / Nature 和 PLOS 的图片放在不允许跨站下载的服务器上：在工具栏弹窗里点「下载 ZIP」时，浏览器会请求访问 `media.springernature.com` 或 PLOS 的图片存储（可选权限，只在这时申请）；拒绝也照样生成 ZIP，这些图片保留网络链接并给出提示。
 - **PDF 解析（可选，默认关闭）**：页面上没有可用全文时，可以用你自己的 Token 让 **PaddleOCR**（默认）或 **MinerU** 解析文章 PDF，结果下载为 ZIP。只有许可为 CC BY / CC0（或整站开放获取、页面没写更严许可）且 PDF 与文章同站时才直接发送；CC BY-NC / ND / SA 等和判断不了的文章，每次都会先弹出确认：「这篇不是开放获取文章，上传给 {后端} 可能违反出版商条款，是否继续？」，没有「总是允许」。Token 只存在本浏览器（`chrome.storage.local`）。
 - **中英文界面**，跟随浏览器语言，也可在设置里切换。
 

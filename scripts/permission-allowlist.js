@@ -34,6 +34,10 @@ const OPTIONAL_HOST_PERMISSIONS = [
   'https://*.bj.bcebos.com/*', // PaddleOCR 结果 JSONL 和图片
   'https://mineru.net/*', // MinerU 任务接口
   'https://cdn-mineru.openxlab.org.cn/*', // MinerU 结果 ZIP
+  // ZIP 打包图片（Simon 2026-10-30 17:52 批准）：用户在 PLOS / Springer / Nature / BMC 文章上点「下载 ZIP」、
+  // 而图片在这两个不带 CORS 头的 CDN 上时才申请。PLOS 所有 /article/figure/image 地址都 302 到这一个 R2 存储桶（只取这个确切主机）
+  'https://corpus-prod.f505aadad1e46610c8f8563037eb3c4b.r2.cloudflarestorage.com/*',
+  'https://media.springernature.com/*',
 ];
 
 // 明确禁止的写法（任何字段里出现都算失败）

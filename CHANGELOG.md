@@ -26,6 +26,7 @@ First public release.
 - MDPI: reliable export after the page re-renders (formulas read from the page's server HTML), figure images kept; every failed export shows a message (QA JM-M2-02, M2-03).
 - PLOS JATS: figures no longer point at formula images from their captions (QA JM-M2-04); placeholder "undefined" author names dropped (M2-06); JM-09 also fixed on the PMC page route.
 - PDF parsing: the licence is read only from the article's licence box or metadata, and only CC BY / CC0 skip the confirmation (review M-1, N7, N2).
+- ZIP: images on Springer / BMC / Nature (media.springernature.com) and PLOS (its image storage) are packed after you allow an optional permission that the popup asks for when you click Download ZIP; declining still saves the ZIP with web links and a notice.
 - Brand colour is teal #0f766e (matching the icon) in light and dark mode; the floating button stays clear of cookie banners (QA JM-M2-07).
 
 [1.0.0]: https://github.com/Tendo33/journal-md/releases/tag/v1.0.0

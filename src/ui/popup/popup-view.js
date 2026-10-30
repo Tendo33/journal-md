@@ -36,3 +36,17 @@ export function shortcutText(lang, commands) {
   const find = (name) => ((commands || []).find((c) => c.name === name) || {}).shortcut || t(lang, 'popupNoShortcut');
   return t(lang, 'popupShortcuts', { export: find('export-markdown'), copy: find('copy-markdown') });
 }
+
+/**
+ * ZIP 要打包的图片在不发 CORS 头的 CDN 上（PLOS 存储桶、media.springernature.com）时，申请对应的可选主机权限。
+ * 必须在点击回调里同步调用 permissions.request（Firefox 要求在用户手势的同一调用栈里，前面不能有 await）；
+ * 已经授权过时浏览器直接返回 true，不再弹窗。返回 Promise<boolean>，拒绝或出错都是 false。
+ */
+export function requestZipImagePermission(perms, origins) {
+  if (!origins || !origins.length || !perms || typeof perms.request !== 'function') return Promise.resolve(true);
+  try {
+    return Promise.resolve(perms.request({ origins })).then((ok) => !!ok, () => false);
+  } catch (_) {
+    return Promise.resolve(false);
+  }
+}

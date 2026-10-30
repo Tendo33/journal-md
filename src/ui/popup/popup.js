@@ -2,7 +2,7 @@ import { loadSettings } from '../../config/settings';
 import { applyI18n, resolveLanguage, t } from '../../config/i18n';
 import { MSG, ACTIONS } from '../../utils/messages';
 import { describeResult, errorText } from '../shared/result-text';
-import { quickCheck, emptyText, routeItems, shortcutText } from './popup-view';
+import { quickCheck, emptyText, routeItems, shortcutText, requestZipImagePermission } from './popup-view';
 import { loadPdfSettings, PDF_TASK_KEY } from '../../pdf/settings';
 import { pdfStatusText, providerLabel } from '../shared/pdf-text';
 
@@ -181,7 +181,7 @@ function onPdfClick() {
   else askPdfConsent();
 }
 
-async function run(action) {
+async function run(action, permission = null) {
   if (busy) return;
   busy = true;
   const buttons = [$('export'), $('copy'), $('zip')];
@@ -190,6 +190,8 @@ async function run(action) {
   setStatus([{ text: t(lang, 'statusWorking'), cls: 'alert info run' }]);
   let result;
   try {
+    // 先等权限弹窗的结果（拒绝也照样导出：图片保留网络链接，结果里有提示）
+    if (permission) await permission;
     result = await sendToTab({ type: MSG.EXPORT, action: action === ACTIONS.COPY ? ACTIONS.NONE : action });
     if (result && result.ok && action === ACTIONS.COPY) {
       // popup 有焦点和用户手势，在这里写剪贴板最稳
@@ -220,7 +222,12 @@ async function main() {
   $('settings').addEventListener('click', () => chrome.runtime.openOptionsPage());
   $('export').addEventListener('click', () => run(ACTIONS.DOWNLOAD));
   $('copy').addEventListener('click', () => run(ACTIONS.COPY));
-  $('zip').addEventListener('click', () => run(ACTIONS.ZIP));
+  $('zip').addEventListener('click', () => {
+    if (busy) return;
+    // 同步申请，不能放到 run() 的 await 之后
+    const permission = requestZipImagePermission(chrome.permissions, pageInfo && pageInfo.zipOrigins);
+    run(ACTIONS.ZIP, permission);
+  });
   $('pdf').addEventListener('click', onPdfClick);
   $('pdf-continue').addEventListener('click', () => { closePdfConsent(); startPdf(true); });
   $('pdf-cancel').addEventListener('click', () => { closePdfConsent(); setPdfStatus(null); $('pdf-status').textContent = t(lang, 'pdfCancelled'); });

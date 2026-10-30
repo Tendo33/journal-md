@@ -94,7 +94,11 @@ describe('background: ZIP download and asset proxy', () => {
 
   test('asset proxy only for https images on supported hosts', async () => {
     expect(assetAllowed('https://www.frontiersin.org/files/a.jpg')).toBe(true);
-    expect(assetAllowed('https://media.springernature.com/a.jpg')).toBe(false);
+    // 可选权限的两个图片主机（授予后才真正取得到）
+    expect(assetAllowed('https://media.springernature.com/a.jpg')).toBe(true);
+    expect(assetAllowed('https://corpus-prod.f505aadad1e46610c8f8563037eb3c4b.r2.cloudflarestorage.com/x.PNG_L')).toBe(true);
+    expect(assetAllowed('https://other-bucket.r2.cloudflarestorage.com/x.png')).toBe(false);
+    expect(assetAllowed('https://static-content.springer.com/a.jpg')).toBe(false);
     expect(assetAllowed('http://www.frontiersin.org/a.jpg')).toBe(false);
     expect(assetAllowed('https://user:pw@www.frontiersin.org/a.jpg')).toBe(false);
     const fetchImpl = jest.fn(async () => ({ ok: true, headers: { get: () => 'text/html' }, arrayBuffer: async () => new ArrayBuffer(4) }));
