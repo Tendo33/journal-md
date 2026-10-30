@@ -10,10 +10,12 @@ export function stripTexDocument(tex) {
   s = s.replace(/\\(?:documentclass|usepackage)\s*(?:\[[^\]]*\])?\s*\{[^}]*\}/g, '');
   s = s.replace(/\\(?:setlength|addtolength)\s*\{[^}]*\}\s*\{[^}]*\}/g, '');
   s = s.trim();
+  // 只有内部再没有未转义的 $ 时才剥外层定界符（"$a$ and $b$" 不是一整个公式）
+  const bare = (x) => !/(^|[^\\])\$/.test(x);
   for (;;) {
     const before = s;
-    if (/^\$\$[\s\S]*\$\$$/.test(s)) s = s.slice(2, -2).trim();
-    else if (/^\$[\s\S]*\$$/.test(s) && s.length > 1) s = s.slice(1, -1).trim();
+    if (/^\$\$[\s\S]*\$\$$/.test(s) && s.length > 3 && bare(s.slice(2, -2))) s = s.slice(2, -2).trim();
+    else if (/^\$[\s\S]*\$$/.test(s) && s.length > 1 && bare(s.slice(1, -1))) s = s.slice(1, -1).trim();
     else if (/^\\\[[\s\S]*\\\]$/.test(s)) s = s.slice(2, -2).trim();
     else if (/^\\\([\s\S]*\\\)$/.test(s)) s = s.slice(2, -2).trim();
     if (s === before) break;

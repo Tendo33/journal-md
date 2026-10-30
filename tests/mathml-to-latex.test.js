@@ -1,5 +1,6 @@
 import { mathmlToLatex, joinTex } from '@core/math/mathml-to-latex';
 import { cleanLatexFormula, stripTexDocument } from '@core/math/clean-latex';
+import { texForMarkdown } from '@core/render/inline';
 
 const NS = 'http://www.w3.org/1998/Math/MathML';
 function math(inner, attrs = '') {
@@ -69,6 +70,14 @@ describe('clean-latex', () => {
   test('stripTexDocument removes \\[ \\] and equation environments', () => {
     expect(stripTexDocument('\\[ a+b \\]')).toBe('a+b');
     expect(stripTexDocument('\\begin{equation}y = Xb + e\\end{equation}')).toBe('y = Xb + e');
+  });
+
+  test('single-$ shells are stripped once; stray delimiters are dropped, never escaped (review N-10)', () => {
+    expect(stripTexDocument('\\documentclass{minimal}\\begin{document}$x$\\end{document}')).toBe('x');
+    expect(stripTexDocument('$a$ and $b$')).toBe('$a$ and $b$');
+    expect(texForMarkdown('$a$ and $b$')).toBe('a and b');
+    expect(texForMarkdown('\\begin{document}$x$\\end{document}')).toBe('x');
+    expect(texForMarkdown('\\$5')).toBe('\\$5');
   });
 
   test('cleanLatexFormula (ported from arxiv-md) drops colors, sizes and refs', () => {

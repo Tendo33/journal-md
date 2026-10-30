@@ -25,7 +25,8 @@ export function escapeHtml(s) {
 }
 
 export function texForMarkdown(tex) {
-  return cleanLatexFormula(stripTexDocument(tex)).replace(/\$/g, '\\$');
+  // 公式里剩下的未转义 $ 只可能是定界符（字面美元符号在 TeX 里写作 \$），直接去掉，不能再转义成 \$（审查 N-10）
+  return cleanLatexFormula(stripTexDocument(tex)).replace(/(^|[^\\])\$+/g, '$1');
 }
 
 function wrap(marker, inner) {
