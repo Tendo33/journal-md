@@ -201,6 +201,8 @@ async function main() {
     check(`R08: options has no horizontal scroll at 320px (${lang})`, noScroll);
   }
   await opt.setViewportSize({ width: 1280, height: 800 });
+  const keyLink = await opt.locator('#pdfKeyLink').boundingBox();
+  check('fix2b-2: #pdfKeyLink target is at least 24×24 (WCAG 2.5.8)', !!keyLink && keyLink.height >= 24 && keyLink.width >= 24, JSON.stringify(keyLink));
   check('options: PDF parsing off by default, PaddleOCR preselected', !(await opt.isChecked('#pdfEnabled')) && (await opt.isChecked('input[name="pdfProvider"][value="paddleocr"]')));
 
   // ---------- 1.0.0：设计 nit、悬浮按钮、出版商页面、ZIP、PDF 确认 ----------

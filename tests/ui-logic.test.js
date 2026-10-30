@@ -85,3 +85,12 @@ describe('describeResult', () => {
     expect(describeResult({ ok: false, error: 'download_failed' }, 'en', 'download').status).toBe(t('en', 'err_download_failed'));
   });
 });
+
+test('fix2b-2: options CSS gives #pdfKeyLink a 24px minimum target (WCAG 2.5.8)', () => {
+  const css = require('fs').readFileSync(require('path').join(__dirname, '../src/ui/options/options.css'), 'utf8');
+  const rule = css.match(/#pdfKeyLink\{([^}]*)\}/);
+  expect(rule).not.toBeNull();
+  expect(rule[1]).toMatch(/min-height:24px/);
+  expect(rule[1]).toMatch(/min-width:24px/);
+  expect(rule[1]).toMatch(/display:inline-flex/);
+});
