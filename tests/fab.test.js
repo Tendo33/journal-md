@@ -91,3 +91,35 @@ describe('in-page floating button', () => {
     expect(css).toContain('prefers-reduced-motion: reduce');
   });
 });
+
+describe('QA JM-M2-07: cookie banners do not cover the button', () => {
+  const { clearBottom } = require('@/content/fab');
+  const win = (pos) => ({ innerWidth: 1280, innerHeight: 800, getComputedStyle: () => ({ position: pos }) });
+  const host = { contains: () => false };
+
+  test('a fixed banner at the bottom lifts the button above it (16px gap)', () => {
+    const banner = { getBoundingClientRect: () => ({ top: 700 }) };
+    const doc = { elementsFromPoint: () => [banner, {}] };
+    expect(clearBottom(doc, host, win('fixed'))).toBe(116);
+  });
+
+  test('nothing fixed on top, a full-screen overlay, or no API → stays at 24px', () => {
+    expect(clearBottom({ elementsFromPoint: () => [host] }, host, win('fixed'))).toBe(24);
+    expect(clearBottom({ elementsFromPoint: () => [{ getBoundingClientRect: () => ({ top: 700 }) }] }, host, win('static'))).toBe(24);
+    expect(clearBottom({ elementsFromPoint: () => [{ getBoundingClientRect: () => ({ top: 0 }) }] }, host, win('fixed'))).toBe(24);
+    expect(clearBottom({}, host, win('fixed'))).toBe(24);
+  });
+
+  test('the button sits on the top layer', () => {
+    const fab = mountFab(document, { labels, onAction: async () => ({ ok: true }), onHide: () => {} });
+    expect(fab.host.parentNode).toBe(document.documentElement);
+    expect(fab.host.shadowRoot.querySelector('style').textContent).toContain('z-index: 2147483647');
+    fab.remove();
+  });
+});
+
+test('QA JM-M2-07: a modal cookie <dialog> (top layer) does not move the button', () => {
+  const { clearBottom } = require('@/content/fab');
+  const dialog = { tagName: 'DIALOG', open: true, matches: () => true, getBoundingClientRect: () => ({ top: 400 }) };
+  expect(clearBottom({ elementsFromPoint: () => [dialog] }, { contains: () => false }, { innerWidth: 1280, innerHeight: 800, getComputedStyle: () => ({ position: 'fixed' }) })).toBe(24);
+});

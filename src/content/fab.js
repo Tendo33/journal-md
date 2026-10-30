@@ -7,7 +7,7 @@ const HOST_TAG = 'journal-md-fab';
 
 const CSS = `
 :host { all: initial; }
-.wrap { position: fixed; right: 24px; bottom: 24px; z-index: 2147483646; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+.wrap { position: fixed; right: 24px; bottom: var(--jmd-bottom, 24px); z-index: 2147483647; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
   font: 14px/20px system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   --brand: #0f766e; --brand-on: #ffffff; --success: #1a7f37; --error: #b42318; --focus: #0969da;
   --panel: #ffffff; --text: #1f2328; --muted: #59636e; --border: #d0d7de; --hover: #f6f8fa; }
@@ -43,6 +43,39 @@ const CSS = `
 `;
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
+const BASE_BOTTOM = 24;
+const FAB_SIZE = 44;
+
+function isModal(el) {
+  try {
+    if (el.matches && el.matches(':modal')) return true;
+  } catch (_) { /* 旧浏览器不认 :modal */ }
+  return String(el.tagName || '').toLowerCase() === 'dialog' && el.open === true;
+}
+
+/**
+ * 站点的 Cookie 横幅、反馈按钮常常固定在右下角，z-index 也是最大值，会盖住按钮（QA JM-M2-07）。
+ * 看按钮原本位置上最上层的元素：不是我们自己、而且是 fixed/sticky 的，就把按钮抬到它上面 16px；挡住的东西消失后回到原位。
+ * @returns {number} 新的 bottom（px）
+ */
+export function clearBottom(doc, host, win = doc.defaultView) {
+  if (!win || typeof doc.elementsFromPoint !== 'function') return BASE_BOTTOM;
+  const x = win.innerWidth - 24 - FAB_SIZE / 2;
+  const y = win.innerHeight - BASE_BOTTOM - FAB_SIZE / 2;
+  const blocker = doc.elementsFromPoint(x, y).find((el) => {
+    if (el === host || host.contains(el)) return false;
+    const pos = win.getComputedStyle(el).position;
+    return pos === 'fixed' || pos === 'sticky';
+  });
+  if (!blocker) return BASE_BOTTOM;
+  // 模态 <dialog>（Nature / Springer 的 Cookie 同意框）在浏览器顶层、背后的页面不可点：任何 z-index 都盖不过它，
+  // 抬高也没用，保持原位，等它关掉
+  if (isModal(blocker)) return BASE_BOTTOM;
+  const top = blocker.getBoundingClientRect().top;
+  const lifted = Math.round(win.innerHeight - top + 16);
+  // 挡住半个屏幕以上的（全屏遮罩、弹窗）不追着抬，留在原位
+  return lifted > win.innerHeight / 2 ? BASE_BOTTOM : Math.max(BASE_BOTTOM, lifted);
+}
 
 function icon(doc, d) {
   const s = doc.createElementNS(SVG_NS, 'svg');
@@ -184,7 +217,23 @@ export function mountFab(doc, { labels, onAction, onHide }) {
   doc.addEventListener('pointerdown', outside, true);
 
   setState('idle');
-  (doc.body || doc.documentElement).appendChild(host);
+  // 挂在 <html> 的最后，z-index 相同时也排在页面元素上面
+  doc.documentElement.appendChild(host);
+  const reposition = () => {
+    // 先回到原位再看：否则抬高后测到的就不是原来那个位置
+    host.style.removeProperty('--jmd-bottom');
+    const bottom = clearBottom(doc, host);
+    if (bottom !== BASE_BOTTOM) host.style.setProperty('--jmd-bottom', `${bottom}px`);
+  };
+  reposition();
+  // 横幅多半在加载后几秒内出现、在用户点掉后消失：前 30 秒每 2 秒看一次，之后在窗口大小变化和打开菜单时看
+  let checks = 0;
+  const poll = setInterval(() => { reposition(); if (++checks >= 15) clearInterval(poll); }, 2000);
+  const win = doc.defaultView;
+  if (win) win.addEventListener('resize', reposition);
+  btn.addEventListener('pointerenter', reposition);
+  // 模态 Cookie 框关掉后（close 事件不冒泡，用捕获）马上重新看一次
+  doc.addEventListener('close', reposition, true);
   const api = {
     host,
     button: btn,
@@ -192,7 +241,8 @@ export function mountFab(doc, { labels, onAction, onHide }) {
     setState,
     getState: () => state,
     run,
-    remove: () => { clearTimeout(timer); doc.removeEventListener('pointerdown', outside, true); host.remove(); },
+    reposition,
+    remove: () => { clearTimeout(timer); clearInterval(poll); if (win) win.removeEventListener('resize', reposition); doc.removeEventListener('pointerdown', outside, true); doc.removeEventListener('close', reposition, true); host.remove(); },
   };
   host.__jmdFab = api;
   return api;
