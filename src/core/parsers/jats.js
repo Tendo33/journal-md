@@ -8,6 +8,23 @@ import { classifyBackSection } from './back-matter';
 import { pmcAssetUrl } from '../assets';
 import { ln, kids, child, find, findAll, attr, textOf } from './dom-utils';
 
+/**
+ * 图 / 表自己的图片：先找直接子元素 <graphic>，再找不在图注、公式里的 <graphic>。
+ * 图注里的行内公式也带 <graphic>（PLOS 的 e018.jpg），而且排在图片前面，不能拿它当图（QA JM-M2-04）
+ */
+export function floatGraphic(node) {
+  const direct = child(node, 'graphic');
+  if (direct) return direct;
+  const inAlt = kids(node, 'alternatives').map((a) => child(a, 'graphic')).find(Boolean);
+  if (inAlt) return inAlt;
+  return findAll(node, 'graphic').find((g) => {
+    for (let p = g.parentNode; p && p !== node; p = p.parentNode) {
+      if (['caption', 'inline-formula', 'disp-formula', 'table-wrap-foot', 'fn', 'table'].includes(ln(p))) return false;
+    }
+    return true;
+  }) || null;
+}
+
 const CITATION_TAGS = ['element-citation', 'mixed-citation', 'citation', 'nlm-citation'];
 const SKIP_ABSTRACT_TYPES = new Set(['graphical', 'teaser', 'author-highlights', 'precis', 'editor-summary', 'web-summary', 'toc']);
 
@@ -406,7 +423,7 @@ class JatsParser {
     const id = this.nodeId(node, 'fig');
     if (this.figIds.has(id)) return id;
     this.figIds.add(id);
-    const graphic = find(node, 'graphic');
+    const graphic = floatGraphic(node);
     this.ir.figures.push({
       id,
       label: textOf(child(node, 'label')),
@@ -436,7 +453,7 @@ class JatsParser {
         });
       }
     }
-    const graphic = !tableEl ? find(node, 'graphic') : null;
+    const graphic = !tableEl ? floatGraphic(node) : null;
     const foot = child(node, 'table-wrap-foot');
     this.ir.tables.push({
       id,
