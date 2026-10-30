@@ -45,7 +45,7 @@ function scan(dirs) {
 module.exports = { scan, scanText, walk, PATTERNS };
 
 if (require.main === module) {
-  const dirs = process.argv.slice(2).length ? process.argv.slice(2) : ['src', 'scripts', 'tests', 'dist', 'dist-firefox'];
+  const dirs = process.argv.slice(2).length ? process.argv.slice(2) : ['src', 'scripts', 'tests', 'vendor', 'dist', 'dist-firefox'];
   const hits = scan(dirs);
   if (hits.length) {
     hits.forEach((h) => console.error(`${h.file}: ${h.name} ${h.sample}`));
