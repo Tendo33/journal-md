@@ -1,4 +1,5 @@
-// 右键菜单 / 快捷键触发时的页内提示（shadow DOM，不受页面样式影响）。悬浮按钮留到 M2。
+// 右键菜单 / 快捷键 / 悬浮按钮触发时的页内提示（shadow DOM，不受页面样式影响）。
+// 页面上有悬浮按钮时提示上移，不压住按钮。
 const HOST_ID = 'journal-md-toast-host';
 const HIDE_MS = 6000;
 
@@ -9,6 +10,7 @@ const STYLE = `
   font: 14px/20px system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   background: #ffffff; color: #1f2328; border: 1px solid #d0d7de; box-shadow: 0 8px 24px rgba(0,0,0,.16);
   transition: opacity .2s ease; }
+.toast[data-raised] { bottom: 80px; }
 .toast[data-kind="error"] { border-color: #b42318; }
 .toast[data-kind="success"] { border-color: #1a7f37; }
 .msg { flex: 1; min-width: 0; overflow-wrap: anywhere; }
@@ -24,7 +26,7 @@ button:focus-visible { outline: 2px solid #0969da; outline-offset: 2px; }
 
 let hideTimer = null;
 
-export function showToast(message, kind = 'info', { closeLabel = 'Close' } = {}) {
+export function showToast(message, kind = 'info', { closeLabel = 'Close', raised = false } = {}) {
   let host = document.getElementById(HOST_ID);
   if (!host) {
     host = document.createElement('div');
@@ -52,6 +54,7 @@ export function showToast(message, kind = 'info', { closeLabel = 'Close' } = {})
   const msg = root.querySelector('.msg');
   root.querySelector('button').setAttribute('aria-label', closeLabel);
   box.dataset.kind = kind;
+  if (raised) box.dataset.raised = ''; else delete box.dataset.raised;
   // 同一句话再次出现也要能被读屏播报：先清空，下一帧再写
   msg.textContent = '';
   requestAnimationFrame(() => { msg.textContent = message; });

@@ -8,6 +8,9 @@ import { writeClipboard } from '../utils/clipboard';
 import { describeResult } from '../ui/shared/result-text';
 import { showToast } from './toast';
 import { buildArticleZip, base64FromBytes, zipFilename } from './zip-export';
+import { mountFab, fabMounted } from './fab';
+import { detectSite } from '../core/sites/registry';
+import { saveSettings, SETTINGS_KEY } from '../config/settings';
 
 const SITE_XML_TIMEOUT_MS = 8000;
 
@@ -41,7 +44,7 @@ async function fetchSiteXml(url) {
 async function runExport(action, withToast) {
   const settings = await loadSettings();
   const lang = resolveLanguage(settings.language);
-  if (withToast) showToast(t(lang, 'statusWorking'), 'working');
+  if (withToast) showToast(t(lang, 'statusWorking'), 'working', { raised: fabMounted(document) });
   let result;
   try {
     result = await exportArticle({ doc: document, url: location.href, settings, fetchJats, services: { lookupDoi, fetchSiteXml }, format: action === ACTIONS.ZIP ? 'zip' : 'md' });
@@ -72,7 +75,7 @@ async function runExport(action, withToast) {
   }
   if (withToast) {
     const text = describeResult(result, lang, action);
-    showToast([text.status, ...text.notes].filter(Boolean).join(' '), result.ok ? 'success' : 'error', { closeLabel: t(lang, 'btnClose') });
+    showToast([text.status, ...text.notes].filter(Boolean).join(' '), result.ok ? 'success' : 'error', { closeLabel: t(lang, 'btnClose'), raised: fabMounted(document) });
   }
   delete result.assets;
   return result;
@@ -97,8 +100,58 @@ function onMessage(message, _sender, sendResponse) {
   return false;
 }
 
+// ---- 页内悬浮按钮 ----
+let fab = null;
+
+function fabWanted(settings) {
+  const det = detectSite(location.href);
+  return !!(settings.showFab && det.supported && det.isArticle && settings.sites[det.site.id] !== false);
+}
+
+async function syncFab() {
+  const settings = await loadSettings();
+  if (!fabWanted(settings)) {
+    if (fab) { fab.remove(); fab = null; }
+    return;
+  }
+  if (fab) return;
+  const lang = resolveLanguage(settings.language);
+  fab = mountFab(document, {
+    labels: {
+      button: t(lang, 'fabButton'),
+      menu: t(lang, 'fabMenu'),
+      download: t(lang, 'fabDownload'),
+      zip: t(lang, 'fabZip'),
+      copy: t(lang, 'fabCopy'),
+      hide: t(lang, 'fabHide'),
+      run: t(lang, 'statusWorking').replace(/[….]+$/, ''),
+      ok: t(lang, 'fabDone'),
+      err: t(lang, 'fabFailed'),
+    },
+    onAction: (action) => runExport(action, true),
+    onHide: async () => {
+      await saveSettings({ showFab: false });
+      showToast(t(lang, 'fabHidden'), 'info', { closeLabel: t(lang, 'btnClose') });
+    },
+  });
+}
+
 // popup 可能用 scripting 再注入一次：只挂一个监听器
 if (!globalThis.__journalMdContentLoaded) {
   globalThis.__journalMdContentLoaded = true;
   chrome.runtime.onMessage.addListener(onMessage);
+  syncFab();
+  // 设置页里开关按钮、切换语言、关闭站点时立即生效
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'sync' || !changes[SETTINGS_KEY]) return;
+    if (fab) { fab.remove(); fab = null; }
+    syncFab();
+  });
+  // 单页应用（Europe PMC、Frontiers）换文章时地址变了但不重新加载：按地址决定按钮是否显示
+  let lastUrl = location.href;
+  setInterval(() => {
+    if (location.href === lastUrl) return;
+    lastUrl = location.href;
+    syncFab();
+  }, 1500);
 }

@@ -238,5 +238,38 @@
   },
   "noticeZipPartial": {
     "message": "{packed} of {total} images are in the ZIP. The others could not be downloaded from their site and keep their web links."
+  },
+  "fabButton": {
+    "message": "Export as Markdown (menu)"
+  },
+  "fabMenu": {
+    "message": "Journal to Markdown"
+  },
+  "fabDownload": {
+    "message": "Download .md"
+  },
+  "fabZip": {
+    "message": "Download ZIP (with images)"
+  },
+  "fabCopy": {
+    "message": "Copy Markdown"
+  },
+  "fabHide": {
+    "message": "Hide this button"
+  },
+  "fabDone": {
+    "message": "Done"
+  },
+  "fabFailed": {
+    "message": "Failed"
+  },
+  "fabHidden": {
+    "message": "The button is hidden. Turn it back on in Settings › Output."
+  },
+  "optShowFab": {
+    "message": "Show the Markdown button on article pages"
+  },
+  "optShowFabHelp": {
+    "message": "A small M↓ button at the bottom right of supported article pages: download .md or ZIP, or copy."
   }
 }

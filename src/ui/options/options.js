@@ -94,6 +94,7 @@ async function main() {
   $('filename').value = settings.filenameTemplate;
   $('includeImages').checked = settings.includeImages;
   $('preferJats').checked = settings.preferJats;
+  $('showFab').checked = settings.showFab;
   document.querySelectorAll('input[name="language"]').forEach((r) => { r.checked = r.value === settings.language; });
   render();
 
@@ -105,6 +106,11 @@ async function main() {
   });
   $('includeImages').addEventListener('change', (e) => update({ includeImages: e.target.checked }));
   $('preferJats').addEventListener('change', (e) => update({ preferJats: e.target.checked }));
+  $('showFab').addEventListener('change', (e) => update({ showFab: e.target.checked }));
+  // 页面上点了「隐藏此按钮」时，设置页同步开关状态
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'sync' && changes.settings && changes.settings.newValue) $('showFab').checked = changes.settings.newValue.showFab !== false;
+  });
   document.querySelectorAll('input[name="language"]').forEach((r) => r.addEventListener('change', async () => {
     await update({ language: r.value });
     render();

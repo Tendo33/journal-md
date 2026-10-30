@@ -238,5 +238,38 @@
   },
   "noticeZipPartial": {
     "message": "已打包 {packed}/{total} 张图片；其余图片无法从原网站下载，保留网络链接。"
+  },
+  "fabButton": {
+    "message": "导出为 Markdown（菜单）"
+  },
+  "fabMenu": {
+    "message": "期刊全文转 Markdown"
+  },
+  "fabDownload": {
+    "message": "下载 .md"
+  },
+  "fabZip": {
+    "message": "下载 ZIP（含图片）"
+  },
+  "fabCopy": {
+    "message": "复制 Markdown"
+  },
+  "fabHide": {
+    "message": "隐藏此按钮"
+  },
+  "fabDone": {
+    "message": "已完成"
+  },
+  "fabFailed": {
+    "message": "失败"
+  },
+  "fabHidden": {
+    "message": "已隐藏按钮。可在「设置 › 输出」里重新打开。"
+  },
+  "optShowFab": {
+    "message": "在文章页显示 Markdown 按钮"
+  },
+  "optShowFabHelp": {
+    "message": "在支持的文章页右下角显示 M↓ 小按钮：下载 .md、下载 ZIP 或复制。"
   }
 }

@@ -10,6 +10,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   filenameTemplate: DEFAULT_FILENAME_TEMPLATE,
   includeImages: true,
   preferJats: true,
+  showFab: true,
   sites: Object.freeze(Object.fromEntries(SUPPORTED_SITE_IDS.map((id) => [id, true]))),
 });
 
@@ -25,6 +26,7 @@ export function normalizeSettings(raw) {
     filenameTemplate: tpl || DEFAULT_SETTINGS.filenameTemplate,
     includeImages: typeof r.includeImages === 'boolean' ? r.includeImages : DEFAULT_SETTINGS.includeImages,
     preferJats: typeof r.preferJats === 'boolean' ? r.preferJats : DEFAULT_SETTINGS.preferJats,
+    showFab: typeof r.showFab === 'boolean' ? r.showFab : DEFAULT_SETTINGS.showFab,
     sites,
   };
 }
