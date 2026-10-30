@@ -30,8 +30,21 @@ export function showToast(message, kind = 'info', { closeLabel = 'Close' } = {})
     host = document.createElement('div');
     host.id = HOST_ID;
     const root = host.attachShadow({ mode: 'open' });
-    root.innerHTML = `<style>${STYLE}</style><div class="toast" role="status" aria-live="polite"><span class="msg"></span><button type="button">×</button></div>`;
-    root.querySelector('button').addEventListener('click', () => host.remove());
+    // 不用 innerHTML（AMO web-ext lint 警告，审查 N-8）
+    const style = document.createElement('style');
+    style.textContent = STYLE;
+    const box = document.createElement('div');
+    box.className = 'toast';
+    box.setAttribute('role', 'status');
+    box.setAttribute('aria-live', 'polite');
+    const msg = document.createElement('span');
+    msg.className = 'msg';
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.textContent = '×';
+    close.addEventListener('click', () => host.remove());
+    box.append(msg, close);
+    root.append(style, box);
     (document.body || document.documentElement).appendChild(host);
   }
   const root = host.shadowRoot;
