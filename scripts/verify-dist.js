@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 校验构建产物：
 //  1. background 字段按目标浏览器（Chrome/Edge 只有 service_worker，Firefox 只有 scripts）
-//  2. permissions / host_permissions 只在 M1 白名单内，没有 optional_*、<all_urls>、localhost
+//  2. permissions / host_permissions / optional_* 只在白名单内（scripts/permission-allowlist.js），没有 <all_urls>、localhost
 //  3. Firefox 包有 gecko id 和 data_collection_permissions；Chrome 包没有 browser_specific_settings
 //  4. manifest 引用的文件都在；_locales en / zh_CN 的键一致，manifest 用到的 __MSG_*__ 都有
 //  5. 不带 source map，没有字面量 Key
@@ -9,7 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 const { parseVerifyArgs, verifyBackground, normalizeTarget } = require('./manifest-target');
-const { ALLOWED_PERMISSIONS, ALLOWED_HOST_PERMISSIONS, FORBIDDEN_HOST_PATTERNS, GECKO_ID } = require('./permission-allowlist');
+const { ALLOWED_PERMISSIONS, ALLOWED_HOST_PERMISSIONS, OPTIONAL_PERMISSIONS, FIREFOX_EXTRA_PERMISSIONS, OPTIONAL_HOST_PERMISSIONS, FORBIDDEN_HOST_PATTERNS, GECKO_ID } = require('./permission-allowlist');
 const { scanText, walk } = require('./check-no-keys');
 
 function hostOf(pattern) {
@@ -17,16 +17,26 @@ function hostOf(pattern) {
   return m ? m[1] : null;
 }
 
-function verifyPermissions(manifest) {
+function verifyPermissions(manifest, target = 'chrome') {
   const errors = [];
+  const firefox = normalizeTarget(target) === 'firefox';
+  const allowed = firefox ? [...ALLOWED_PERMISSIONS, ...FIREFOX_EXTRA_PERMISSIONS] : ALLOWED_PERMISSIONS;
   for (const p of manifest.permissions || []) {
-    if (!ALLOWED_PERMISSIONS.includes(p)) errors.push(`permission not in M1 allowlist: ${p}`);
+    if (!allowed.includes(p)) errors.push(`permission not in allowlist: ${p}`);
   }
   for (const h of manifest.host_permissions || []) {
-    if (!ALLOWED_HOST_PERMISSIONS.includes(h)) errors.push(`host_permission not in M1 allowlist: ${h}`);
+    if (!ALLOWED_HOST_PERMISSIONS.includes(h)) errors.push(`host_permission not in allowlist: ${h}`);
   }
-  if (manifest.optional_permissions) errors.push('optional_permissions must not be declared in M1');
-  if (manifest.optional_host_permissions) errors.push('optional_host_permissions must not be declared in M1');
+  // Chrome：DNR 必须是可选；Firefox：DNR 已改为必需，不能再出现在可选里
+  const optAllowed = firefox ? OPTIONAL_PERMISSIONS.filter((p) => !FIREFOX_EXTRA_PERMISSIONS.includes(p)) : OPTIONAL_PERMISSIONS;
+  for (const p of manifest.optional_permissions || []) {
+    if (!optAllowed.includes(p)) errors.push(`optional_permission not in allowlist: ${p}`);
+  }
+  if (!firefox && !(manifest.optional_permissions || []).includes('declarativeNetRequestWithHostAccess')) errors.push('Chrome build must keep declarativeNetRequestWithHostAccess optional');
+  if (firefox && !(manifest.permissions || []).includes('declarativeNetRequestWithHostAccess')) errors.push('Firefox build must require declarativeNetRequestWithHostAccess (as arxiv-md)');
+  for (const h of manifest.optional_host_permissions || []) {
+    if (!OPTIONAL_HOST_PERMISSIONS.includes(h)) errors.push(`optional_host_permission not in allowlist: ${h}`);
+  }
   const allPatterns = [
     ...(manifest.host_permissions || []),
     ...(manifest.content_scripts || []).flatMap((c) => c.matches || []),
@@ -130,7 +140,7 @@ function verifyDist(distDir, target) {
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
   const errors = [
     ...verifyBackground(manifest, target),
-    ...verifyPermissions(manifest),
+    ...verifyPermissions(manifest, target),
     ...verifyBrowserSettings(manifest, target),
     ...referencedFiles(manifest).filter((f) => !fs.existsSync(path.join(dist, f))).map((f) => `manifest references missing file: ${f}`),
     ...verifyLocales(dist, manifest),

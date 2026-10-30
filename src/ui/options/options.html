@@ -62,6 +62,33 @@
       </fieldset>
     </section>
 
+    <section class="group" aria-labelledby="sec-pdf">
+      <h2 id="sec-pdf" data-i18n="optSectionPdf"></h2>
+      <p class="help" data-i18n="optPdfHelp"></p>
+      <div class="switch-row">
+        <div>
+          <label for="pdfEnabled" class="switch-label" data-i18n="optPdfEnabled"></label>
+          <p id="pdfEnabled-help" class="help" data-i18n="optPdfEnabledHelp"></p>
+        </div>
+        <input id="pdfEnabled" type="checkbox" role="switch" class="switch" aria-describedby="pdfEnabled-help">
+      </div>
+      <fieldset id="pdf-provider" class="segmented" aria-labelledby="pdf-provider-label">
+        <legend id="pdf-provider-label" class="visually-hidden" data-i18n="optPdfProvider"></legend>
+        <label><input type="radio" name="pdfProvider" value="paddleocr"><span data-i18n="optPdfPaddle"></span></label>
+        <label><input type="radio" name="pdfProvider" value="mineru"><span data-i18n="optPdfMineru"></span></label>
+      </fieldset>
+      <p id="pdf-provider-note" class="help"></p>
+      <div class="field">
+        <label for="pdfToken" id="pdfToken-label"></label>
+        <div class="token-row">
+          <input id="pdfToken" type="password" spellcheck="false" autocomplete="off" aria-describedby="pdfToken-help pdf-status">
+          <button id="pdfTest" type="button" class="btn" data-i18n="optPdfTest"></button>
+        </div>
+        <p id="pdfToken-help" class="help"><span data-i18n="optPdfTokenHelp"></span> <a id="pdfKeyLink" href="#" target="_blank" rel="noopener noreferrer" data-i18n="optPdfGetToken"></a></p>
+      </div>
+      <p id="pdf-status" class="help pdf-status" role="status" aria-live="polite"></p>
+    </section>
+
     <section class="group" aria-labelledby="sec-sites">
       <h2 id="sec-sites" data-i18n="optSectionSites"></h2>
       <p class="help" data-i18n="optSitesHelp"></p>

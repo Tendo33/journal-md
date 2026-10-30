@@ -35,6 +35,18 @@
       <button id="zip" type="button" class="btn" data-i18n="btnZip" data-i18n-title="btnZipTitle"></button>
     </div>
 
+    <div id="pdf-row" class="pdf-row" hidden>
+      <button id="pdf" type="button" class="btn"></button>
+      <div id="pdf-confirm" class="confirm" role="group" aria-labelledby="pdf-confirm-text" hidden>
+        <p id="pdf-confirm-text"></p>
+        <div class="confirm-actions">
+          <button id="pdf-continue" type="button" class="btn primary" data-i18n="pdfConfirmContinue"></button>
+          <button id="pdf-cancel" type="button" class="btn" data-i18n="pdfConfirmCancel"></button>
+        </div>
+      </div>
+      <p id="pdf-status" class="pdf-status" role="status" aria-live="polite"></p>
+    </div>
+
     <div id="status" class="status" role="status" aria-live="polite"></div>
 
     <footer class="foot">

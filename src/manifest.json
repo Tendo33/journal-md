@@ -21,6 +21,9 @@
     "clipboardWrite",
     "scripting"
   ],
+  "optional_permissions": [
+    "declarativeNetRequestWithHostAccess"
+  ],
   "host_permissions": [
     "https://pmc.ncbi.nlm.nih.gov/*",
     "https://pubmed.ncbi.nlm.nih.gov/*",
@@ -34,6 +37,12 @@
     "https://www.mdpi.com/*",
     "https://journals.plos.org/*",
     "https://elifesciences.org/*"
+  ],
+  "optional_host_permissions": [
+    "https://paddleocr.aistudio-app.com/*",
+    "https://*.bj.bcebos.com/*",
+    "https://mineru.net/*",
+    "https://cdn-mineru.openxlab.org.cn/*"
   ],
   "background": {
     "service_worker": "background.js",

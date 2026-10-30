@@ -39,3 +39,10 @@ input[type="text"] { height: 36px; padding: 0 var(--space-3); border: 1px solid 
 
 .foot { display: grid; gap: var(--space-2); border-top: 1px solid var(--border); padding-top: var(--space-3); font-size: 12px; line-height: 16px; }
 .saved { color: var(--success); min-height: 16px; }
+
+.token-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-2); }
+input[type="password"] { height: 36px; padding: 0 var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); font: inherit; width: 100%; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.pdf-status[data-state="ok"] { color: var(--success); }
+.pdf-status[data-state="err"] { color: var(--error); }
+.group[data-pdf-off] #pdf-provider, .group[data-pdf-off] .field { opacity: .6; }

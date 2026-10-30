@@ -7,6 +7,8 @@ export const MSG = Object.freeze({
   LOOKUP_DOI: 'JMD_LOOKUP_DOI', // content → background：出版商页面按 DOI 查 Europe PMC 的 PMCID（只在导出时）
   DOWNLOAD: 'JMD_DOWNLOAD', // content → background：下载 .md
   DOWNLOAD_ZIP: 'JMD_DOWNLOAD_ZIP', // content → background：下载 ZIP（base64）
+  PDF_START: 'JMD_PDF_START', // popup → background：开始 PDF 解析（带本次的 OA 确认）
+  PDF_TEST: 'JMD_PDF_TEST', // options → background：测试后端 Token（不提交任务）
   FETCH_ASSET: 'JMD_FETCH_ASSET', // content → background：页面里被 CORS 拦下的图片，只限已授权的支持站点
 });
 

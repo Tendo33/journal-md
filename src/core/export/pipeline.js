@@ -17,6 +17,7 @@ import { normalizeSettings } from '../../config/settings';
 import { ERR, NOTICE } from '../errors';
 import { normalizePmcid } from '../ids';
 import { planAssets } from './zip-plan';
+import { isOpenAccessPdf } from '../../pdf/oa';
 
 const DOM_ADAPTERS = {
   pmc: extractPmc,
@@ -52,6 +53,9 @@ export function inspectPage(doc, url, rawSettings) {
     error: m.title ? undefined : ERR.NO_CONTENT,
     title: m.title,
     ids: { doi: m.doi, pmid: m.pmid, pmcid: m.pmcid },
+    // L3 PDF 解析用：PDF 地址、是否开放获取（决定要不要弹确认），任务文件名和 front matter 用的题录
+    pdf: m.pdfUrl ? { url: m.pdfUrl, openAccess: isOpenAccessPdf({ pageUrl: url, pdfUrl: m.pdfUrl, license: m.license }), license: m.license } : null,
+    meta: { title: m.title, year: m.year, doi: m.doi, pmid: m.pmid, pmcid: m.pmcid, journal: m.journal, authors: (m.authors || []).slice(0, 50).map((a) => ({ name: a.name })) },
     routes: {
       // jats：有 PMCID 才可能；是否真的可用（OA）要由后台探测
       jats: det.site.publisher

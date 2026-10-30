@@ -2,6 +2,8 @@
 // Chrome 对 MV3 的 background.scripts 报错，所以 Chrome/Edge 包去掉 scripts；Firefox 不支持 service_worker，保留 scripts。
 // browser_specific_settings 只给 Firefox 包（Chrome 会提示未知字段），见 cross-browser-plan §2。
 const TARGETS = ['chrome', 'firefox'];
+// 和 arxiv-md b2dc3a0 一样（FF-01 方案 A）：Firefox 包把 DNR 权限改成安装时必需，Chrome 包里仍是可选权限
+const FIREFOX_REQUIRED_DNR = 'declarativeNetRequestWithHostAccess';
 
 // 只有「没给」（undefined/null）才默认 chrome；给了空值、非字符串或未知值都报错，不能悄悄构建成 Chrome 包
 function normalizeTarget(target) {
@@ -44,6 +46,14 @@ function manifestForTarget(manifest, target) {
     delete out.browser_specific_settings;
   }
   if (t === 'firefox' && out.background) delete out.background.service_worker;
+  if (t === 'firefox') {
+    const opt = out.optional_permissions || [];
+    if (opt.includes(FIREFOX_REQUIRED_DNR)) {
+      out.optional_permissions = opt.filter((p) => p !== FIREFOX_REQUIRED_DNR);
+      if (!out.optional_permissions.length) delete out.optional_permissions;
+      out.permissions = [...(out.permissions || []), FIREFOX_REQUIRED_DNR];
+    }
+  }
   return out;
 }
 
@@ -69,4 +79,4 @@ function assertEnvTargetNotEmpty(argv) {
   }
 }
 
-module.exports = { TARGETS, normalizeTarget, parseVerifyArgs, assertEnvTargetNotEmpty, manifestForTarget, verifyBackground };
+module.exports = { TARGETS, FIREFOX_REQUIRED_DNR, normalizeTarget, parseVerifyArgs, assertEnvTargetNotEmpty, manifestForTarget, verifyBackground };

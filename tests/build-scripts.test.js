@@ -4,17 +4,29 @@ const os = require('os');
 const { manifestForTarget, verifyBackground, parseVerifyArgs, normalizeTarget } = require('../scripts/manifest-target');
 const { verifyPermissions, verifyBrowserSettings, verifyDist } = require('../scripts/verify-dist');
 const { scanText } = require('../scripts/check-no-keys');
-const { ALLOWED_PERMISSIONS, ALLOWED_HOST_PERMISSIONS } = require('../scripts/permission-allowlist');
+const { ALLOWED_PERMISSIONS, ALLOWED_HOST_PERMISSIONS, OPTIONAL_HOST_PERMISSIONS } = require('../scripts/permission-allowlist');
 const { png } = require('../scripts/generate-icons');
 const manifest = require('../src/manifest.json');
 
 describe('source manifest', () => {
-  test('permissions are exactly the M1 allowlist', () => {
+  test('permissions are exactly the allowlist; PDF backends only optional', () => {
     expect([...manifest.permissions].sort()).toEqual([...ALLOWED_PERMISSIONS].sort());
     expect([...manifest.host_permissions].sort()).toEqual([...ALLOWED_HOST_PERMISSIONS].sort());
-    expect(manifest.optional_permissions).toBeUndefined();
-    expect(manifest.optional_host_permissions).toBeUndefined();
+    expect(manifest.optional_permissions).toEqual(['declarativeNetRequestWithHostAccess']);
+    expect([...manifest.optional_host_permissions].sort()).toEqual([...OPTIONAL_HOST_PERMISSIONS].sort());
     expect(verifyPermissions(manifest)).toEqual([]);
+  });
+  test('Firefox build requires DNR (as arxiv-md), Chrome keeps it optional; nothing else changes', () => {
+    const ff = manifestForTarget(manifest, 'firefox');
+    const cr = manifestForTarget(manifest, 'chrome');
+    expect(ff.permissions).toEqual([...manifest.permissions, 'declarativeNetRequestWithHostAccess']);
+    expect(ff.optional_permissions).toBeUndefined();
+    expect(ff.optional_host_permissions).toEqual(manifest.optional_host_permissions);
+    expect(cr.permissions).toEqual(manifest.permissions);
+    expect(cr.optional_permissions).toEqual(['declarativeNetRequestWithHostAccess']);
+    expect(verifyPermissions(ff, 'firefox')).toEqual([]);
+    expect(verifyPermissions(cr, 'chrome')).toEqual([]);
+    expect(verifyPermissions(ff, 'chrome')).toContain('permission not in allowlist: declarativeNetRequestWithHostAccess');
   });
   test('shortcuts: export Alt+Shift+J (no clash with arxiv-md Alt+Shift+M / zhihu-md Alt+Shift+K), copy unassigned', () => {
     expect(manifest.commands['export-markdown'].suggested_key).toEqual({ default: 'Alt+Shift+J' });
@@ -54,11 +66,13 @@ describe('manifestForTarget', () => {
 
 describe('verifyPermissions rejects anything outside the allowlist', () => {
   test.each([
-    [{ permissions: ['tabs'] }, 'permission not in M1 allowlist: tabs'],
+    [{ permissions: ['tabs'] }, 'permission not in allowlist: tabs'],
     [{ host_permissions: ['<all_urls>'] }, 'forbidden host pattern: <all_urls>'],
-    [{ host_permissions: ['https://www.ncbi.nlm.nih.gov/pmc/*'] }, 'host_permission not in M1 allowlist: https://www.ncbi.nlm.nih.gov/pmc/*'],
+    [{ host_permissions: ['https://www.ncbi.nlm.nih.gov/pmc/*'] }, 'host_permission not in allowlist: https://www.ncbi.nlm.nih.gov/pmc/*'],
     [{ host_permissions: ['http://localhost/*'] }, 'forbidden host pattern: http://localhost/*'],
-    [{ optional_host_permissions: ['https://paddleocr.aistudio-app.com/*'] }, 'optional_host_permissions must not be declared in M1'],
+    [{ optional_host_permissions: ['https://api.example.com/*'] }, 'optional_host_permission not in allowlist: https://api.example.com/*'],
+    [{ optional_permissions: ['tabs'] }, 'optional_permission not in allowlist: tabs'],
+    [{ optional_permissions: [] }, 'Chrome build must keep declarativeNetRequestWithHostAccess optional'],
     [{ content_scripts: [{ matches: ['https://www.sciencedirect.com/*'] }] }, 'content_scripts match outside host_permissions: https://www.sciencedirect.com/*'],
   ])('%j', (m, msg) => {
     expect(verifyPermissions(m)).toContain(msg);

@@ -3,11 +3,15 @@ import { applyI18n, resolveLanguage, t } from '../../config/i18n';
 import { MSG, ACTIONS } from '../../utils/messages';
 import { describeResult, errorText } from '../shared/result-text';
 import { quickCheck, emptyText, routeItems, shortcutText } from './popup-view';
+import { loadPdfSettings, PDF_TASK_KEY } from '../../pdf/settings';
+import { pdfStatusText, providerLabel } from '../shared/pdf-text';
 
 const $ = (id) => document.getElementById(id);
 let lang = 'en';
 let tab = null;
 let busy = false;
+let pageInfo = null;
+let pdfSettings = null;
 
 function show(id, visible) {
   $(id).hidden = !visible;
@@ -105,6 +109,74 @@ async function inspect(settings) {
   setRow('pmid', info.ids.pmid);
   // 打开弹窗不联网（审查 M-1）：JATS 是否可用只在用户点导出 / 复制时才向 Europe PMC 请求
   renderRoutes(info.routes);
+  pageInfo = info;
+  await setupPdf();
+}
+
+// ---- L3 PDF 解析（默认关闭；设置页打开后才显示按钮）----
+function setPdfStatus(task) {
+  const el = $('pdf-status');
+  el.dataset.state = (task && task.state) || '';
+  el.textContent = '';
+  const text = task && pdfStatusText(lang, task);
+  if (text) requestAnimationFrame(() => { el.textContent = text; });
+}
+
+async function setupPdf() {
+  pdfSettings = await loadPdfSettings();
+  const pdf = pageInfo && pageInfo.pdf;
+  if (!pdfSettings.enabled || !pdf || !pdf.url) return;
+  const name = providerLabel(pdfSettings.provider);
+  $('pdf').textContent = t(lang, 'pdfButton', { provider: name });
+  $('pdf').title = t(lang, 'pdfButtonTitle', { provider: name });
+  show('pdf-row', true);
+  // 弹窗重新打开时显示这一页上次任务的状态
+  const got = await chrome.storage.local.get(PDF_TASK_KEY);
+  const task = got && got[PDF_TASK_KEY];
+  if (task && task.pageUrl === tab.url) setPdfStatus(task);
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && changes[PDF_TASK_KEY] && changes[PDF_TASK_KEY].newValue && changes[PDF_TASK_KEY].newValue.pageUrl === tab.url) setPdfStatus(changes[PDF_TASK_KEY].newValue);
+  });
+}
+
+async function startPdf(consent) {
+  const pdf = pageInfo.pdf;
+  $('pdf').setAttribute('aria-disabled', 'true');
+  setPdfStatus({ state: 'checking', provider: pdfSettings.provider });
+  let r;
+  try {
+    r = await chrome.runtime.sendMessage({
+      type: MSG.PDF_START,
+      request: { pdfUrl: pdf.url, pageUrl: tab.url, license: pdf.license, consent, meta: pageInfo.meta },
+    });
+  } catch (_) {
+    r = { ok: false, code: 'NETWORK' };
+  }
+  $('pdf').removeAttribute('aria-disabled');
+  // 任务开始后的状态由 storage 变化推送；没开始就失败（如另一个任务在跑）时在这里显示
+  if (r && !r.ok && ['BUSY', 'CONSENT_REQUIRED', 'PDF_DISABLED', 'FILE_UNSUPPORTED'].includes(r.code)) {
+    setPdfStatus({ state: 'failed', errorCode: r.code, provider: pdfSettings.provider });
+  }
+}
+
+/** PRD §2.11：非 OA 或拿不准的先确认，每次都问，没有「总是允许」 */
+function askPdfConsent() {
+  $('pdf-confirm-text').textContent = t(lang, 'pdfConfirmText', { provider: providerLabel(pdfSettings.provider) });
+  show('pdf-confirm', true);
+  $('pdf').hidden = true;
+  $('pdf-continue').focus();
+}
+
+function closePdfConsent() {
+  show('pdf-confirm', false);
+  $('pdf').hidden = false;
+  $('pdf').focus();
+}
+
+function onPdfClick() {
+  if ($('pdf').getAttribute('aria-disabled') === 'true') return;
+  if (pageInfo.pdf.openAccess) startPdf(false);
+  else askPdfConsent();
 }
 
 async function run(action) {
@@ -147,6 +219,10 @@ async function main() {
   $('export').addEventListener('click', () => run(ACTIONS.DOWNLOAD));
   $('copy').addEventListener('click', () => run(ACTIONS.COPY));
   $('zip').addEventListener('click', () => run(ACTIONS.ZIP));
+  $('pdf').addEventListener('click', onPdfClick);
+  $('pdf-continue').addEventListener('click', () => { closePdfConsent(); startPdf(true); });
+  $('pdf-cancel').addEventListener('click', () => { closePdfConsent(); setPdfStatus(null); $('pdf-status').textContent = t(lang, 'pdfCancelled'); });
+  $('pdf-confirm').addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.preventDefault(); $('pdf-cancel').click(); } });
   chrome.commands.getAll().then((cmds) => { $('shortcuts').textContent = shortcutText(lang, cmds); }, () => {});
   [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   await inspect(settings);

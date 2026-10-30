@@ -25,6 +25,17 @@ const ALLOWED_HOST_PERMISSIONS = [
   'https://elifesciences.org/*',
 ];
 
+// 可选权限（PDF 解析，PRD §2.6 / §2.11）：用户在设置页打开 PDF 解析、选后端时才申请。
+// Chrome 包：DNR 和四个后端域名都是可选；Firefox 包：DNR 改成安装时必需（同 arxiv-md），域名仍是可选。
+const OPTIONAL_PERMISSIONS = ['declarativeNetRequestWithHostAccess'];
+const FIREFOX_EXTRA_PERMISSIONS = ['declarativeNetRequestWithHostAccess'];
+const OPTIONAL_HOST_PERMISSIONS = [
+  'https://paddleocr.aistudio-app.com/*', // PaddleOCR（星河社区）任务接口
+  'https://*.bj.bcebos.com/*', // PaddleOCR 结果 JSONL 和图片
+  'https://mineru.net/*', // MinerU 任务接口
+  'https://cdn-mineru.openxlab.org.cn/*', // MinerU 结果 ZIP
+];
+
 // 明确禁止的写法（任何字段里出现都算失败）
 const FORBIDDEN_HOST_PATTERNS = [
   /<all_urls>/,
@@ -37,4 +48,4 @@ const FORBIDDEN_HOST_PATTERNS = [
 
 const GECKO_ID = 'journal-md@tendo33';
 
-module.exports = { ALLOWED_PERMISSIONS, ALLOWED_HOST_PERMISSIONS, FORBIDDEN_HOST_PATTERNS, GECKO_ID };
+module.exports = { ALLOWED_PERMISSIONS, ALLOWED_HOST_PERMISSIONS, OPTIONAL_PERMISSIONS, FIREFOX_EXTRA_PERMISSIONS, OPTIONAL_HOST_PERMISSIONS, FORBIDDEN_HOST_PATTERNS, GECKO_ID };

@@ -29,3 +29,14 @@ body { width: 360px; }
 
 .foot { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); border-top: 1px solid var(--border); padding-top: var(--space-2); font-size: 12px; line-height: 16px; }
 .foot .link { font-size: 12px; }
+
+/* L3 PDF 解析：默认关闭，打开后才出现；非 OA 时先在这里确认（PRD §2.11） */
+.pdf-row { display: grid; gap: var(--space-2); }
+.pdf-row > .btn { width: 100%; }
+.confirm { display: grid; gap: var(--space-2); border: 1px solid var(--warning); border-radius: var(--radius); padding: var(--space-3); }
+.confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+.confirm-actions .btn { width: 100%; }
+.pdf-status { color: var(--muted); overflow-wrap: anywhere; }
+.pdf-status:empty { display: none; }
+.pdf-status[data-state="done"] { color: var(--success); }
+.pdf-status[data-state="failed"] { color: var(--error); }
