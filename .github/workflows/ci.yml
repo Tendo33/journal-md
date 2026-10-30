@@ -55,7 +55,9 @@ jobs:
           npm init -y >/dev/null
           npm install --no-save --no-audit --no-fund "playwright@${PLAYWRIGHT_VERSION}"
           npx playwright install --with-deps chromium
-          sudo apt-get install -y xvfb
+          sudo apt-get install -y xvfb fonts-noto-core
           echo "E2E_PLAYWRIGHT_DIR=$RUNNER_TEMP/e2e-tools" >> "$GITHUB_ENV"
       - run: npm run build
       - run: xvfb-run -a node scripts/e2e-smoke.js
+        env:
+          FONTCONFIG_FILE: ${{ github.workspace }}/scripts/e2e-fonts.conf
