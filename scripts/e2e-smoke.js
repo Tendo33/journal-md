@@ -345,9 +345,26 @@ async function main() {
   await np.waitForSelector('#pdf-row:not([hidden])', { timeout: 3000 }).catch(() => {});
   check('PDF: button offered once the selected backend has a token', (await np.textContent('#pdf')) === 'Parse PDF with PaddleOCR', await np.textContent('#pdf'));
   check('PDF: no confirmation UI exists any more', (await np.locator('#pdf-confirm, #pdf-continue, #pdf-cancel').count()) === 0);
+  // 第二道保险：ctx.route 不一定拦得到 service worker 的请求，这里在后台里直接替换 fetch，PDF 后端一律回同样的 401，
+  // 保证无论如何都不会访问真实的 PaddleOCR / MinerU（vendored http.js 每次调用时才读 globalThis.fetch）
+  await sw.evaluate(() => {
+    const orig = self.fetch.bind(self);
+    self.__jmdPdfHits = [];
+    self.__jmdOrigFetch = orig;
+    self.fetch = (input, init) => {
+      const u = String((input && input.url) || input);
+      if (/paddleocr\.aistudio-app\.com|bcebos\.com|mineru\.net|openxlab\.org\.cn/.test(u)) {
+        self.__jmdPdfHits.push(u);
+        return Promise.resolve(new Response(JSON.stringify({ code: 401, msg: 'e2e mock: unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } }));
+      }
+      return orig(input, init);
+    };
+  });
   await np.click('#pdf');
   await np.waitForSelector('#pdf-status[data-state="failed"], #pdf-status[data-state="done"]', { timeout: 15000 }).catch(() => {});
-  check('PDF: non-OA article is sent straight away to the (mocked) backend', pdfBackendHits.length >= 1 && /paddleocr\.aistudio-app\.com/.test(pdfBackendHits[0]), JSON.stringify(pdfBackendHits.slice(0, 2)));
+  const swPdfHits = await sw.evaluate(() => { self.fetch = self.__jmdOrigFetch; return self.__jmdPdfHits; });
+  const allPdfHits = [...swPdfHits, ...pdfBackendHits];
+  check('PDF: non-OA article is sent straight away to the (mocked) backend', allPdfHits.length >= 1 && /paddleocr\.aistudio-app\.com/.test(allPdfHits[0]), JSON.stringify(allPdfHits.slice(0, 2)));
   check('PDF: backend refusal is shown clearly', /PaddleOCR rejected the token/.test(await np.textContent('#pdf-status')), await np.textContent('#pdf-status'));
   check('fix2c: nothing called permissions.request in the popup', (await np.evaluate(() => window.__permCalls.length)) === 0);
   const npNoToken = await (async () => {
