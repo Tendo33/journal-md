@@ -187,7 +187,7 @@ async function run(action) {
   const buttons = [$('export'), $('copy'), $('zip')];
   buttons.forEach((b) => b.setAttribute('aria-disabled', 'true'));
   $('actions').setAttribute('aria-busy', 'true');
-  setStatus([{ text: t(lang, 'statusWorking'), cls: 'note' }]);
+  setStatus([{ text: t(lang, 'statusWorking'), cls: 'alert info run' }]);
   let result;
   try {
     result = await sendToTab({ type: MSG.EXPORT, action: action === ACTIONS.COPY ? ACTIONS.NONE : action });
@@ -200,7 +200,7 @@ async function run(action) {
     result = { ok: false, error: action === ACTIONS.COPY && result && result.ok ? 'clipboard_failed' : 'content_unreachable' };
   }
   const text = describeResult(result, lang, action);
-  const lines = [{ text: text.status, cls: result && result.ok ? 'ok' : 'err' }];
+  const lines = [{ text: text.status, cls: result && result.ok ? 'alert ok' : 'alert err' }];
   if (result && result.ok) {
     lines.push({ text: text.route, cls: 'note' });
     for (const n of text.notes) lines.push({ text: n, cls: 'note' });

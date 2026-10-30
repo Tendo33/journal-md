@@ -1,19 +1,24 @@
-/* journal-md 品牌层：叠在系列共用的 ui-v2.css 之后（和 arxiv-md / zhihu-md 一样用 data-brand 换品牌色，只换 --brand-*）。
- * 品牌色 #0f766e（与图标 A 同色，Simon 决定）。对比度（tests/brand-colors.test.js 会算）：
- *   浅色 brand/白字 5.47、hover 7.58、press 9.48；作为链接色对 --bg 5.02；brand-text 对 brand-soft 4.84
- *   深色 brand #14b8a6 配 brand-on #04201d 6.86、hover 9.18、press 4.56；对 --bg 7.47、对 --surface 6.77 */
-[data-brand=journal]{--brand:#0f766e;--brand-hover:#115e59;--brand-press:#134e4a;--brand-on:#fff;--brand-soft:#e6f4f1;--brand-text:#0f766e}
-[data-theme=dark][data-brand=journal]{--brand:#14b8a6;--brand-hover:#2dd4bf;--brand-press:#0d9488;--brand-on:#04201d;--brand-soft:#0f2e2b;--brand-text:#2dd4bf}
+/* journal-md 品牌层：叠在系列共用的 ui-v2.css 之后（arxiv-md bdf0175 / zhihu-md a5957b4，系列一致性审计 2026-10-30 §4.1）。
+ * 规则：只覆盖 5 个品牌变量 --brand / --brand-hover / --brand-press / --brand-on / --brand-text，外加系列统一的中性焦点色
+ * --focus（#0969da / 深色 #79c0ff，焦点不用品牌色，R07）。其余表面色、文字色、状态色、圆角、阴影全部用 ui-v2 的值。
+ * 对比度（tests/brand-colors.test.js 会算）：
+ *   浅色 brand/白字 5.47、hover 7.52、press 9.85；brand-text 对 --bg 5.02
+ *   深色 brand #14b8a6 / brand-on #06142b 7.38、hover 9.87、press 4.91；brand-text #5eead4 对 --surface 11.4
+ *   焦点 #0969da 对 --bg 4.76，#79c0ff 对深色 --bg 9.56 */
+[data-brand=journal]{--brand:#0f766e;--brand-hover:#0b5f58;--brand-press:#084c46;--brand-on:#fff;--brand-text:#0f766e;--focus:#0969da}
+[data-theme=dark][data-brand=journal]{--brand:#14b8a6;--brand-hover:#2dd4bf;--brand-press:#0d9488;--brand-on:#06142b;--brand-text:#5eead4;--focus:#79c0ff}
 @media (prefers-color-scheme:dark){
-:root[data-brand=journal]:not([data-theme=light]){--brand:#14b8a6;--brand-hover:#2dd4bf;--brand-press:#0d9488;--brand-on:#04201d;--brand-soft:#0f2e2b;--brand-text:#2dd4bf}
+:root[data-brand=journal]:not([data-theme=light]){--brand:#14b8a6;--brand-hover:#2dd4bf;--brand-press:#0d9488;--brand-on:#06142b;--brand-text:#5eead4;--focus:#79c0ff}
 }
 
 /* 组件的 display 规则不能盖过 hidden 属性（设计 MF1/MF2） */
 [hidden]{display:none!important}
 .nw{white-space:nowrap}
 .muted{color:var(--text-2)}
+/* 系列规则：所有可交互元素的焦点环 2px --focus、偏移 2px；鼠标点击不出环 */
 :focus{outline:none}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-/* 文字链接样式的按钮（「设置」入口等）：品牌文字色，最小点击高度 24（R11） */
+/* 按钮、输入框显式继承字体（审计 §4.2：arxiv 的输入框回落到 Arial） */
+button,input,select,textarea{font-family:inherit}
 .link{appearance:none;border:0;background:none;padding:var(--sp-1) 0;min-height:24px;color:var(--brand-text);font:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 a{color:var(--brand-text)}

@@ -8,7 +8,7 @@ import { writeClipboard } from '../utils/clipboard';
 import { describeResult } from '../ui/shared/result-text';
 import { showToast } from './toast';
 import { buildArticleZip, base64FromBytes, zipFilename } from './zip-export';
-import { mountFab, fabMounted } from './fab';
+import { mountFab, fabBottom } from './fab';
 import { detectSite } from '../core/sites/registry';
 import { saveSettings, SETTINGS_KEY } from '../config/settings';
 
@@ -113,7 +113,7 @@ async function runExport(action, withToast) {
   try {
     const settings = await loadSettings();
     lang = resolveLanguage(settings.language);
-    if (withToast) showToast(t(lang, 'statusWorking'), 'working', { raised: fabMounted(document) });
+    if (withToast) showToast(t(lang, 'statusWorking'), 'working', { beside: fabBottom(document) });
     result = await exportOnce(settings, action);
     if (!result.ok && RETRY_ERRORS.includes(result.error)) {
       await waitForDomSettled(document);
@@ -126,7 +126,7 @@ async function runExport(action, withToast) {
   }
   if (withToast) {
     const text = describeResult(result, lang, action);
-    showToast([text.status, ...text.notes].filter(Boolean).join(' '), result.ok ? 'success' : 'error', { closeLabel: t(lang, 'btnClose'), raised: fabMounted(document) });
+    showToast([text.status, ...text.notes].filter(Boolean).join(' '), result.ok ? 'success' : 'error', { closeLabel: t(lang, 'btnClose'), beside: fabBottom(document) });
   }
   delete result.assets;
   return result;

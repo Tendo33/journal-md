@@ -5,43 +5,46 @@
 
 const HOST_TAG = 'journal-md-fab';
 
-// 外观取自系列共用 ui-v2.css（arxiv-md bdf0175 / zhihu-md a5957b4）：.fab 44px、品牌色、v2.1 投影（深色改中性投影），
-// 菜单面板按 ui-v2 .pcard（12px 圆角、shadow-3、13px 字），菜单项高度 32（--hit-min）、8px 圆角、悬停 --state-hover。
-// tokens 内联，因为 shadow root 里读不到扩展页面的样式表；只有品牌色和 arxiv / zhihu 不同（#0f766e，深色 #14b8a6）。
+// 系列统一（2026-10-30 审计）：球本体的尺寸、位置、字形和投影同 zhihu-md a5957b4 悬浮球——44px 圆、右 24 / 下 24、
+// 「M↓」700/14、平时 0 4px 12px rgba(0,0,0,.12)，悬停上移 2px、加深并换成 0 12px 32px / 0 4px 12px 两层投影，按下回到原位；
+// 成功 / 失败临时变 --success / --danger。焦点环用系列中性焦点色 #0969da / #79c0ff（不用品牌色，R07）。
+// 菜单面板按审计 §4.2：r-md 8、内边距 4、0 8px 24px rgba(0,0,0,.16)，菜单项 h32、6px 12px、r-sm 6，字 14/1.5。
+// tokens 内联，因为 shadow root 里读不到扩展页面的样式表；品牌色和 tokens.css 一致（#0f766e，深色 #14b8a6 配 #06142b）。
 const CSS = `
 :host { all: initial; }
 .wrap { position: fixed; right: 24px; bottom: var(--jmd-bottom, 24px); z-index: 2147483647; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
-  font: 13px/1.5 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  --brand: #0f766e; --brand-hover: #115e59; --brand-on: #ffffff; --success: #0f7a3d; --danger: #b42318; --focus: #2563eb;
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans", sans-serif;
+  --brand: #0f766e; --brand-hover: #0b5f58; --brand-press: #084c46; --brand-on: #ffffff; --success: #0f7a3d; --danger: #b42318; --focus: #0969da;
   --surface: #ffffff; --text: #1b1f24; --text-2: #5b6270; --border: #dde1e6; --state-hover: rgb(0 0 0 / .05);
-  --fab-shadow: 0 1px 2px rgb(16 24 40 / .16), 0 8px 20px -6px color-mix(in srgb, var(--brand) 60%, transparent);
-  --shadow-3: 0 20px 44px -12px rgb(16 24 40 / .24), 0 6px 14px -6px rgb(16 24 40 / .1); }
+  --ball-shadow: 0 4px 12px rgba(0, 0, 0, .12); --ball-shadow-hover: 0 12px 32px rgba(0, 0, 0, .2), 0 4px 12px rgba(0, 0, 0, .1);
+  --shadow-pop: 0 8px 24px rgba(0, 0, 0, .16); }
 @media (prefers-color-scheme: dark) {
-  .wrap { --brand: #14b8a6; --brand-hover: #2dd4bf; --brand-on: #04201d; --success: #4ade80; --danger: #f87171; --focus: #60a5fa;
+  .wrap { --brand: #14b8a6; --brand-hover: #2dd4bf; --brand-press: #0d9488; --brand-on: #06142b; --success: #4ade80; --danger: #f87171; --focus: #79c0ff;
     --surface: #1b1d22; --text: #e8eaed; --text-2: #a1a7b3; --border: #33373e; --state-hover: rgb(255 255 255 / .06);
-    --fab-shadow: 0 4px 12px rgb(0 0 0 / .5); --shadow-3: 0 20px 44px -12px rgb(0 0 0 / .6); }
+    --ball-shadow: 0 4px 12px rgba(0, 0, 0, .5); --ball-shadow-hover: 0 12px 32px rgba(0, 0, 0, .6); --shadow-pop: 0 8px 24px rgba(0, 0, 0, .5); }
 }
 .fab { position: relative; box-sizing: border-box; width: 44px; height: 44px; border-radius: 50%; border: 0; margin: 0; padding: 0; display: grid; place-items: center;
-  background: var(--brand); color: var(--brand-on); cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 700; line-height: 1; letter-spacing: 0;
-  box-shadow: var(--fab-shadow); transition: transform 200ms cubic-bezier(.2,0,0,1), background-color 120ms cubic-bezier(.2,0,0,1); }
-.fab:hover { transform: translateY(-2px); background: var(--brand-hover); }
+  background: var(--brand); color: var(--brand-on); cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 700; line-height: 1; letter-spacing: 0; user-select: none;
+  box-shadow: var(--ball-shadow); transition: transform .2s ease, background .2s ease, box-shadow .2s ease; }
+.fab:hover { transform: translateY(-2px); background: var(--brand-hover); box-shadow: var(--ball-shadow-hover); }
+.fab:active { transform: translateY(0); background: var(--brand-press); box-shadow: 0 2px 8px color-mix(in oklab, var(--brand) 30%, transparent); transition-duration: .1s; }
 .fab:focus { outline: none; }
 .fab:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .fab .ring { position: absolute; inset: -4px; border-radius: 50%; border: 3px solid transparent; pointer-events: none; }
 .fab.run .ring { border-color: var(--brand) transparent transparent transparent; animation: spin 1s linear infinite; }
 .fab.run { cursor: progress; }
-.fab.ok { background: var(--success); }
-.fab.err { background: var(--danger); }
+.fab.ok { background: var(--success); color: var(--brand-on); }
+.fab.err { background: var(--danger); color: var(--brand-on); }
 .fab svg { width: 18px; height: 18px; }
-.menu { box-sizing: border-box; min-width: 220px; margin: 0; padding: 4px; list-style: none; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text);
-  box-shadow: var(--shadow-3); }
+.menu { box-sizing: border-box; min-width: 200px; margin: 0; padding: 4px; list-style: none; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text);
+  box-shadow: var(--shadow-pop); }
 .menu[hidden] { display: none; }
-.item { all: unset; box-sizing: border-box; display: flex; align-items: center; width: 100%; min-height: 32px; padding: 6px 12px; border-radius: 8px; cursor: pointer;
-  font-family: inherit; font-size: 13px; font-weight: 500; line-height: 1.5; color: var(--text); transition: background-color 120ms cubic-bezier(.2,0,0,1); }
+.item { all: unset; box-sizing: border-box; display: flex; align-items: center; width: 100%; min-height: 32px; padding: 6px 12px; border-radius: 6px; cursor: pointer;
+  font-family: inherit; font-size: 14px; line-height: 1.5; color: var(--text); transition: background-color 120ms cubic-bezier(.2,0,0,1); }
 .item:hover { background: var(--state-hover); }
 .item:focus { outline: none; }
 .item:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
-.item.quiet { color: var(--text-2); font-weight: 400; }
+.item.quiet { color: var(--text-2); }
 .sep { height: 1px; margin: 4px 8px; background: var(--border); }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .fab, .item { transition: none; } .fab:hover { transform: none; } .fab.run .ring { animation: none; border-color: var(--brand); } }
@@ -256,4 +259,12 @@ export function mountFab(doc, { labels, onAction, onHide }) {
 
 export function fabMounted(doc) {
   return !!doc.querySelector(HOST_TAG);
+}
+
+/** 悬浮按钮当前的 bottom（px，可能被抬到 Cookie 横幅上面）；没有按钮时 null。页内提示用它贴在按钮旁边 */
+export function fabBottom(doc) {
+  const host = doc.querySelector(HOST_TAG);
+  if (!host) return null;
+  const v = parseInt(host.style.getPropertyValue('--jmd-bottom'), 10);
+  return Number.isFinite(v) ? v : BASE_BOTTOM;
 }

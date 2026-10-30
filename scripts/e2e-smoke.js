@@ -206,6 +206,17 @@ async function main() {
   const btnBoxes = await Promise.all(['#export', '#copy', '#zip'].map((id) => popup.locator(id).boundingBox()));
   // 系列 ui-v2：主按钮独占一行、40 高；同一行的复制 / ZIP 必须同高同顶（R04 只比较同一行）
   check('popup: ZIP button shown; same-row buttons share one height (R04)', btnBoxes.every(Boolean) && Math.abs(btnBoxes[1].height - btnBoxes[2].height) < 0.5 && Math.abs(btnBoxes[1].y - btnBoxes[2].y) < 0.5 && btnBoxes[0].y < btnBoxes[1].y, JSON.stringify(btnBoxes));
+  // 系列一致性审计 §4.3 验收清单（ui-v2 迁移）
+  const geo = await popup.evaluate(() => {
+    const r = (sel) => document.querySelector(sel).getBoundingClientRect();
+    const cs = (sel, p) => getComputedStyle(document.querySelector(sel))[p];
+    return { hd: r('.hd').height, ft: r('.ft').height, w: document.documentElement.clientWidth, card: cs('.card', 'borderTopLeftRadius'),
+      bodyBg: cs('body', 'backgroundColor'), cardBg: cs('.card', 'backgroundColor'), cardImg: cs('.card', 'backgroundImage'), font: cs('#export', 'fontFamily'),
+      focus: getComputedStyle(document.documentElement).getPropertyValue('--focus').trim() };
+  });
+  check('series ui: popup 360 wide, 48px header, 36px footer, 12px cards', geo.w === 360 && Math.round(geo.hd) === 48 && Math.round(geo.ft) === 36 && geo.card === '12px', JSON.stringify(geo));
+  check('series ui: page grey, cards white (surface hierarchy)', geo.bodyBg === 'rgb(244, 245, 247)' && (geo.cardBg === 'rgb(255, 255, 255)' || /gradient/.test(geo.cardImg)), JSON.stringify(geo));
+  check('series ui: neutral focus colour #0969da, buttons use the system font', geo.focus === '#0969da' && /system-ui/.test(geo.font), JSON.stringify(geo));
   check('series ui: primary button is the full-width 40px row (ui-v2 .acts)', Math.abs(btnBoxes[0].height - 40) < 0.5 && btnBoxes[0].width > btnBoxes[1].width * 1.8, JSON.stringify(btnBoxes[0]));
 
   // 页内悬浮按钮（PMC fixture 页）：键盘打开菜单、方向键、Esc 回到按钮
@@ -234,6 +245,9 @@ async function main() {
   await page.waitForTimeout(4500); // ok 状态 4 秒后回到空闲
   check('FAB follows dark mode', (await fabBtn.evaluate((b) => getComputedStyle(b).backgroundColor)) === 'rgb(20, 184, 166)', await fabBtn.evaluate((b) => getComputedStyle(b).backgroundColor));
   await page.emulateMedia({ colorScheme: 'light' });
+  await page.waitForTimeout(400); // box-shadow 有 .2s 过渡
+  const fabGeo = await fabBtn.evaluate((b) => { const c = getComputedStyle(b); const r = b.getBoundingClientRect(); return { w: r.width, h: r.height, right: document.documentElement.clientWidth - r.right, shadow: c.boxShadow, font: c.fontFamily }; });
+  check('series ui: FAB 44px at right 24, zhihu ball shadow, system font', fabGeo.w === 44 && fabGeo.h === 44 && Math.round(fabGeo.right) === 24 && /rgba\(0, 0, 0, 0\.12\) 0px 4px 12px/.test(fabGeo.shadow) && /system-ui/.test(fabGeo.font), JSON.stringify(fabGeo));
 
   // 出版商页面（Nature 真实页面 fixture）：按 DOI 查 Europe PMC（无结果）→ 页面 DOM
   const nat = await ctx.newPage();

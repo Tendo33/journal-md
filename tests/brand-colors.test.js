@@ -32,14 +32,23 @@ describe('teal brand on the shared ui-v2 tokens', () => {
     for (const t of ['brand', 'brand-hover', 'brand-press']) expect(ratio(token(lightBrand, t), token(lightBrand, 'brand-on'))).toBeGreaterThanOrEqual(4.5);
     expect(ratio(token(lightBrand, 'brand-text'), token(lightRoot, 'bg'))).toBeGreaterThanOrEqual(4.5);
     expect(ratio(token(lightBrand, 'brand-text'), token(lightRoot, 'surface'))).toBeGreaterThanOrEqual(4.5);
-    expect(ratio(token(lightBrand, 'brand-text'), token(lightBrand, 'brand-soft'))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('only the five --brand* variables and the neutral focus colour are overridden (series audit §4.1)', () => {
+    for (const block of [lightBrand, darkBrand]) {
+      const names = [...block.matchAll(/--([a-z-]+):/g)].map((m) => m[1]).sort();
+      expect(names).toEqual(['brand', 'brand-hover', 'brand-on', 'brand-press', 'brand-text', 'focus']);
+    }
+    expect(token(lightBrand, 'focus')).toBe('#0969da');
+    expect(token(darkBrand, 'focus')).toBe('#79c0ff');
+    expect(ratio('#0969da', token(lightRoot, 'bg'))).toBeGreaterThanOrEqual(3);
+    expect(ratio('#79c0ff', token(darkRoot, 'bg'))).toBeGreaterThanOrEqual(3);
   });
 
   test('dark: teal with dark text, links on dark page and surface', () => {
     for (const t of ['brand', 'brand-hover', 'brand-press']) expect(ratio(token(darkBrand, t), token(darkBrand, 'brand-on'))).toBeGreaterThanOrEqual(4.5);
     expect(ratio(token(darkBrand, 'brand-text'), token(darkRoot, 'bg'))).toBeGreaterThanOrEqual(4.5);
     expect(ratio(token(darkBrand, 'brand-text'), token(darkRoot, 'surface'))).toBeGreaterThanOrEqual(4.5);
-    expect(ratio(token(darkBrand, 'brand-text'), token(darkBrand, 'brand-soft'))).toBeGreaterThanOrEqual(4.5);
     // 媒体查询里的深色品牌和 data-theme=dark 一致
     expect(brandCss).toMatch(/prefers-color-scheme:dark[\s\S]*--brand:#14b8a6/);
   });
@@ -50,6 +59,8 @@ describe('teal brand on the shared ui-v2 tokens', () => {
     expect(token(fabDark, 'brand')).toBe(token(darkBrand, 'brand'));
     expect(ratio(token(fabLight, 'brand'), token(fabLight, 'brand-on'))).toBeGreaterThanOrEqual(4.5);
     expect(ratio(token(fabDark, 'brand'), token(fabDark, 'brand-on'))).toBeGreaterThanOrEqual(4.5);
+    expect(token(fabLight, 'focus')).toBe('#0969da');
+    expect(token(fabDark, 'focus')).toBe('#79c0ff');
     expect(brandCss + fab).not.toMatch(/#1d4e89|#4c8fd6/i);
   });
 });

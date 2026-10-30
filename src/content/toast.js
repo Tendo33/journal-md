@@ -1,38 +1,41 @@
 // 右键菜单 / 快捷键 / 悬浮按钮触发时的页内提示（shadow DOM，不受页面样式影响）。
-// 页面上有悬浮按钮时提示上移，不压住按钮。
+// 系列统一（2026-10-30）：样式和位置同 zhihu-md a5957b4 悬浮球的提示气泡——12px/18px 500、内边距 6/10、圆角 6、
+// 90% 不透明表面 + 1px 边框 + 背景模糊、0 4px 12px rgba(0,0,0,.06)；有悬浮按钮时贴在按钮左侧 16px、和按钮垂直居中，
+// 没有按钮时在悬浮球的位置（右 24 / 下 24）。失败用 role=alert（审计 §4.2）。
 const HOST_ID = 'journal-md-toast-host';
 const HIDE_MS = 6000;
 
-// 样式取自系列共用 ui-v2.css 的 .toast / .icon-btn（arxiv-md bdf0175 / zhihu-md a5957b4）：12px 圆角、左侧 4px 状态色条、
-// shadow-2、13px/1.5；tokens 内联，因为 shadow root 里读不到扩展页面的样式表
 const STYLE = `
 :host { all: initial; }
-.toast { --surface: #fff; --text: #1b1f24; --text-2: #5b6270; --border: #dde1e6; --info: #1f5fbf; --success: #0f7a3d; --danger: #b42318;
-  --focus: #2563eb; --state-hover: rgb(0 0 0 / .05);
-  position: fixed; right: 16px; bottom: 16px; z-index: 2147483647; max-width: min(360px, calc(100vw - 32px));
-  box-sizing: border-box; display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border-radius: 12px;
-  font: 13px/1.5 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: var(--surface); color: var(--text); border: 1px solid var(--border); border-left: 4px solid var(--info);
-  box-shadow: 0 6px 16px -4px rgb(16 24 40 / .12), 0 2px 4px -2px rgb(16 24 40 / .06);
-  transition: opacity 200ms cubic-bezier(.2,0,0,1); }
-.toast[data-raised] { bottom: 80px; }
-.toast[data-kind="error"] { border-left-color: var(--danger); }
-.toast[data-kind="success"] { border-left-color: var(--success); }
-.msg { flex: 1; min-width: 0; overflow-wrap: anywhere; padding: 6px 0; }
-button { all: unset; box-sizing: border-box; cursor: pointer; width: 32px; height: 32px; display: inline-grid; place-items: center;
-  border-radius: 8px; color: var(--text-2); flex: none; margin: 0 -8px 0 0; font-size: 16px; }
+.toast { --surface: #fff; --text: #1b1f24; --text-2: #5b6270; --border: #dde1e6; --success: #0f7a3d; --danger: #b42318;
+  --focus: #0969da; --state-hover: rgb(0 0 0 / .05);
+  position: fixed; right: 24px; bottom: 24px; z-index: 2147483647; max-width: min(280px, calc(100vw - 48px));
+  box-sizing: border-box; display: flex; gap: 4px; align-items: flex-start; padding: 6px 4px 6px 10px; border-radius: 6px;
+  font: 500 12px/18px system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans", sans-serif;
+  background: color-mix(in oklab, var(--surface) 90%, transparent); color: var(--text); border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .06); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  transition: opacity 200ms cubic-bezier(.25,.1,.25,1); }
+/* 贴在悬浮按钮左边：按钮右 24 + 宽 44 + 间距 16；垂直中线对齐按钮中心（--fab-bottom + 22px） */
+.toast[data-beside] { right: 84px; bottom: calc(var(--fab-bottom, 24px) + 22px); transform: translateY(50%); max-width: min(280px, calc(100vw - 96px)); }
+.toast[data-kind="error"] { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 40%, var(--border)); }
+.msg { flex: 1; min-width: 0; overflow-wrap: anywhere; padding: 3px 0; }
+button { all: unset; box-sizing: border-box; cursor: pointer; width: 24px; height: 24px; display: inline-grid; place-items: center;
+  border-radius: 6px; color: var(--text-2); flex: none; font-size: 14px; line-height: 1; }
 button:hover { background: var(--state-hover); color: var(--text); }
 button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 @media (prefers-color-scheme: dark) {
-  .toast { --surface: #1b1d22; --text: #e8eaed; --text-2: #a1a7b3; --border: #33373e; --info: #7cb2ff; --success: #4ade80; --danger: #f87171;
-    --focus: #60a5fa; --state-hover: rgb(255 255 255 / .06); box-shadow: 0 6px 16px -4px rgb(0 0 0 / .55); }
+  .toast { --surface: #1b1d22; --text: #e8eaed; --text-2: #a1a7b3; --border: #33373e; --success: #4ade80; --danger: #f87171;
+    --focus: #79c0ff; --state-hover: rgb(255 255 255 / .06); box-shadow: 0 4px 12px rgba(0, 0, 0, .4); }
 }
 @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
 `;
 
 let hideTimer = null;
 
-export function showToast(message, kind = 'info', { closeLabel = 'Close', raised = false } = {}) {
+/**
+ * @param {{closeLabel?:string, beside?:number|null}} opts beside：悬浮按钮的 bottom（px），给了就贴在按钮左边
+ */
+export function showToast(message, kind = 'info', { closeLabel = 'Close', beside = null } = {}) {
   let host = document.getElementById(HOST_ID);
   if (!host) {
     host = document.createElement('div');
@@ -60,7 +63,15 @@ export function showToast(message, kind = 'info', { closeLabel = 'Close', raised
   const msg = root.querySelector('.msg');
   root.querySelector('button').setAttribute('aria-label', closeLabel);
   box.dataset.kind = kind;
-  if (raised) box.dataset.raised = ''; else delete box.dataset.raised;
+  box.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+  box.setAttribute('aria-live', kind === 'error' ? 'assertive' : 'polite');
+  if (typeof beside === 'number') {
+    box.dataset.beside = '';
+    box.style.setProperty('--fab-bottom', `${beside}px`);
+  } else {
+    delete box.dataset.beside;
+    box.style.removeProperty('--fab-bottom');
+  }
   // 同一句话再次出现也要能被读屏播报：先清空，下一帧再写
   msg.textContent = '';
   requestAnimationFrame(() => { msg.textContent = message; });

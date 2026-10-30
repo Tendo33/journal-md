@@ -11,3 +11,30 @@ test('toast builds its DOM without innerHTML and announces via role=status', () 
   expect(root.querySelector('img')).toBeNull();
   expect(root.querySelector('button').getAttribute('aria-label')).toBe('Close');
 });
+
+describe('series ui-v2 (zhihu ball tooltip style)', () => {
+  const { showToast } = require('@/content/toast');
+  beforeEach(() => { document.body.innerHTML = ''; global.requestAnimationFrame = (f) => f(); });
+
+  test('beside the floating button: left of it, centred on it; failures are alerts', () => {
+    showToast('Saved', 'success', { beside: 116 });
+    const box = document.getElementById('journal-md-toast-host').shadowRoot.querySelector('.toast');
+    expect(box.hasAttribute('data-beside')).toBe(true);
+    expect(box.style.getPropertyValue('--fab-bottom')).toBe('116px');
+    expect(box.getAttribute('role')).toBe('status');
+    showToast('Failed', 'error', {});
+    expect(box.hasAttribute('data-beside')).toBe(false);
+    expect(box.getAttribute('role')).toBe('alert');
+  });
+
+  test('geometry and colours follow the zhihu tooltip and the neutral focus colour', () => {
+    showToast('x', 'info');
+    const css = document.getElementById('journal-md-toast-host').shadowRoot.querySelector('style').textContent;
+    expect(css).toContain('font: 500 12px/18px');
+    expect(css).toContain('border-radius: 6px');
+    expect(css).toContain('box-shadow: 0 4px 12px rgba(0, 0, 0, .06)');
+    expect(css).toContain('right: 84px');
+    expect(css).toContain('--focus: #0969da');
+    expect(css).toContain('--focus: #79c0ff');
+  });
+});
