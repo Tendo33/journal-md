@@ -84,7 +84,7 @@ async function main() {
   check('popup shows platform', (await popup.textContent('#platform')) === 'PubMed Central');
   check('popup shows PMCID', (await popup.textContent('#pmcid')) === 'PMC11000001');
   check('popup routes: JATS checked on export / Page ✓', /JATS.*(export|导出时检查).*✓/.test(await popup.textContent('#routes')), await popup.textContent('#routes'));
-  check('shortcut hint shows Alt+Shift+J', /Alt\+Shift\+J/.test(await popup.textContent('#shortcuts')), await popup.textContent('#shortcuts'));
+  check('shortcut hint shows Alt+Shift+J', /Alt\+Shift\+J|⌥⇧J/.test(await popup.textContent('#shortcuts')), await popup.textContent('#shortcuts'));
   check('M-1: opening the popup sends no request', jatsHits.length === 0 && external.length === 0, jatsHits.concat(external).join(', '));
   const rowBefore = await popup.locator('#actions').boundingBox();
   await popup.click('#export');
