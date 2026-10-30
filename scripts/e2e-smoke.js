@@ -259,10 +259,13 @@ async function main() {
   await page.waitForFunction(() => document.querySelector('journal-md-fab').shadowRoot.querySelector('.fab.ok, .fab.err'), null, { timeout: 8000 }).catch(() => {});
   await page.waitForTimeout(500);
   check('FAB: Download .md saves a file and shows the done state', (await dlCount()) === before + 1 && /\bok\b/.test(await fabBtn.getAttribute('class')), await fabBtn.getAttribute('class'));
+  // 复审 N6：后台标签页里 CSS 过渡会停住，计算样式还是旧值；先把文章页切到前台再看颜色和投影
+  await page.bringToFront();
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.waitForTimeout(4500); // ok 状态 4 秒后回到空闲
   check('FAB follows dark mode', (await fabBtn.evaluate((b) => getComputedStyle(b).backgroundColor)) === 'rgb(20, 184, 166)', await fabBtn.evaluate((b) => getComputedStyle(b).backgroundColor));
   await page.emulateMedia({ colorScheme: 'light' });
+  await page.bringToFront();
   await page.waitForTimeout(400); // box-shadow 有 .2s 过渡
   const fabGeo = await fabBtn.evaluate((b) => { const c = getComputedStyle(b); const r = b.getBoundingClientRect(); return { w: r.width, h: r.height, right: document.documentElement.clientWidth - r.right, shadow: c.boxShadow, font: c.fontFamily }; });
   check('series ui: FAB 44px at right 24, zhihu ball shadow, system font', fabGeo.w === 44 && fabGeo.h === 44 && Math.round(fabGeo.right) === 24 && /rgba\(0, 0, 0, 0\.12\) 0px 4px 12px/.test(fabGeo.shadow) && /system-ui/.test(fabGeo.font), JSON.stringify(fabGeo));
