@@ -44,6 +44,8 @@
 }
 
 * { box-sizing: border-box; }
+/* 组件的 display 规则不能盖过 hidden 属性（设计 MF1/MF2） */
+[hidden] { display: none !important; }
 html, body { margin: 0; background: var(--bg); color: var(--text); font: var(--font-size)/var(--line) var(--font); }
 h1, h2, h3, p { margin: 0; }
 .muted { color: var(--muted); }
