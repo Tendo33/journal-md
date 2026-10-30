@@ -7,6 +7,8 @@ PDF 解析内核（PaddleOCR / MinerU 两个 provider、统一错误码、输出
 - 来源提交：`b2dc3a0992c18b6d9f60b4c0169e2a5864ac2278`（`b2dc3a0`，2026-10-29）
 - 路径：`packages/pdf-parse-core/`
 - 取法：`git -C ../arxiv-md archive b2dc3a0 packages/pdf-parse-core | tar -x`
+- 许可：MIT，版权行「Copyright (c) 2025 SimonSun」。上游许可文件在 arxiv-md 仓库根目录（不在包目录里），
+  原样复制为本目录的 `LICENSE`（`git -C ../arxiv-md show b2dc3a0:LICENSE`；审查 N5）
 
 规则：
 

@@ -70,7 +70,7 @@ A PDF that needs a login or a subscription usually cannot be downloaded by these
 | Optional: `https://mineru.net/*`, `https://cdn-mineru.openxlab.org.cn/*` | Requested only when you turn on PDF parsing with MinerU |
 | `declarativeNetRequestWithHostAccess` (optional in Chrome/Edge; required at install in Firefox, as in arXiv to Markdown) | Remove the `Origin` header on the extension's own requests to `paddleocr.aistudio-app.com` only. In Firefox the permission is granted at install, so the rule is present from the start, but no request goes to that domain unless you turn on PaddleOCR |
 
-In Firefox the extension declares the data collection category `websiteContent`: article content is read in your browser to build the Markdown and, for PDF parsing, the PDF link goes to the service you chose.
+In Firefox the extension declares the data collection category `websiteContent` as required, the same declaration as arXiv to Markdown, which shares the PDF parsing code: article content is read in your browser to build the Markdown and, only if you turn on PDF parsing, the article's PDF link is sent to the service you chose. Your PDF service token is your own credential for that service; it is stored only in this browser and sent only to that service.
 
 ## Your choices
 

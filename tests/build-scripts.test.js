@@ -131,3 +131,14 @@ test('icons: icon A (open journal, teal) PNGs at their declared sizes, same set 
     expect(fs.readFileSync(path.join(__dirname, '..', page), 'utf8')).toContain('src="assets/icon.svg"');
   }
 });
+
+test('review N4: Firefox data collection declaration mirrors arxiv-md (required websiteContent only)', () => {
+  const ff = manifestForTarget(manifest, 'firefox');
+  expect(ff.browser_specific_settings.gecko.data_collection_permissions).toEqual({ required: ['websiteContent'] });
+});
+
+test('review N5: the vendored pdf-parse-core carries the upstream MIT licence', () => {
+  const lic = fs.readFileSync(path.join(__dirname, '../vendor/pdf-parse-core/LICENSE'), 'utf8');
+  expect(lic).toMatch(/^MIT License/);
+  expect(lic).toContain('Copyright (c) 2025 SimonSun');
+});
