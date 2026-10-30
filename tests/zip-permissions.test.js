@@ -7,7 +7,7 @@ import { buildArticleZip } from '@/content/zip-export';
 import { describeResult } from '@/ui/shared/result-text';
 import { requestZipImagePermission } from '@/ui/popup/popup-view';
 const manifest = require('../src/manifest.json');
-const { OPTIONAL_HOST_PERMISSIONS, FORBIDDEN_HOST_PATTERNS } = require('../scripts/permission-allowlist');
+const { ALLOWED_HOST_PERMISSIONS, FORBIDDEN_HOST_PATTERNS } = require('../scripts/permission-allowlist');
 const { manifestForTarget } = require('../scripts/manifest-target');
 const { verifyPermissions } = require('../scripts/verify-dist');
 
@@ -27,28 +27,28 @@ describe('which images need an optional permission', () => {
   ])('%s', (url, origin) => expect(originNeededFor(url)).toBe(origin));
 });
 
-describe('manifest: optional only, exact hosts, both browsers', () => {
-  test('the two hosts are optional_host_permissions in Chrome and Firefox and nowhere else', () => {
+describe('manifest: image CDNs granted at install, exact hosts, both browsers (Simon 10-30 18:06)', () => {
+  test('the two hosts are host_permissions in Chrome and Firefox; no optional_* at all', () => {
     for (const target of ['chrome', 'firefox']) {
       const m = manifestForTarget(manifest, target);
       for (const o of ZIP_IMAGE_ORIGINS) {
-        expect(m.optional_host_permissions).toContain(o);
-        expect(m.host_permissions).not.toContain(o);
-        expect(OPTIONAL_HOST_PERMISSIONS).toContain(o);
+        expect(m.host_permissions).toContain(o);
+        expect(ALLOWED_HOST_PERMISSIONS).toContain(o);
       }
+      expect(m.optional_host_permissions).toBeUndefined();
       expect(verifyPermissions(m, target)).toEqual([]);
     }
   });
 
   test('no broad wildcard was added', () => {
-    for (const o of manifest.optional_host_permissions) {
+    for (const o of manifest.host_permissions) {
       expect(o).not.toMatch(/^\*:|:\/\/\*\/|<all_urls>|:\/\/\*\.r2\.cloudflarestorage\.com|:\/\/\*\.springernature\.com/);
       for (const re of FORBIDDEN_HOST_PATTERNS) expect(re.test(o)).toBe(false);
     }
   });
 
-  test('verify:dist rejects any other optional host', () => {
-    expect(verifyPermissions({ optional_permissions: ['declarativeNetRequestWithHostAccess'], optional_host_permissions: ['https://*.r2.cloudflarestorage.com/*'] })).toContain('optional_host_permission not in allowlist: https://*.r2.cloudflarestorage.com/*');
+  test('verify:dist rejects a wildcard bucket host', () => {
+    expect(verifyPermissions({ permissions: ['declarativeNetRequestWithHostAccess'], host_permissions: ['https://*.r2.cloudflarestorage.com/*'] })).toContain('host_permission not in allowlist: https://*.r2.cloudflarestorage.com/*');
   });
 });
 

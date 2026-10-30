@@ -19,9 +19,7 @@
     "downloads",
     "contextMenus",
     "clipboardWrite",
-    "scripting"
-  ],
-  "optional_permissions": [
+    "scripting",
     "declarativeNetRequestWithHostAccess"
   ],
   "host_permissions": [
@@ -36,9 +34,7 @@
     "https://www.frontiersin.org/*",
     "https://www.mdpi.com/*",
     "https://journals.plos.org/*",
-    "https://elifesciences.org/*"
-  ],
-  "optional_host_permissions": [
+    "https://elifesciences.org/*",
     "https://paddleocr.aistudio-app.com/*",
     "https://*.bj.bcebos.com/*",
     "https://mineru.net/*",
@@ -105,7 +101,8 @@
       "strict_min_version": "140.0",
       "data_collection_permissions": {
         "required": [
-          "websiteContent"
+          "websiteContent",
+          "authenticationInfo"
         ]
       }
     },

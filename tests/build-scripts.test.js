@@ -4,28 +4,33 @@ const os = require('os');
 const { manifestForTarget, verifyBackground, parseVerifyArgs, normalizeTarget } = require('../scripts/manifest-target');
 const { verifyPermissions, verifyBrowserSettings, verifyDist } = require('../scripts/verify-dist');
 const { scanText } = require('../scripts/check-no-keys');
-const { ALLOWED_PERMISSIONS, ALLOWED_HOST_PERMISSIONS, OPTIONAL_HOST_PERMISSIONS } = require('../scripts/permission-allowlist');
+const { ALLOWED_PERMISSIONS, ALLOWED_HOST_PERMISSIONS, FIREFOX_DATA_COLLECTION } = require('../scripts/permission-allowlist');
 const manifest = require('../src/manifest.json');
 
 describe('source manifest', () => {
-  test('permissions are exactly the allowlist; PDF backends only optional', () => {
+  test('permissions are exactly the allowlist, all granted at install (Simon 10-30 18:06)', () => {
     expect([...manifest.permissions].sort()).toEqual([...ALLOWED_PERMISSIONS].sort());
     expect([...manifest.host_permissions].sort()).toEqual([...ALLOWED_HOST_PERMISSIONS].sort());
-    expect(manifest.optional_permissions).toEqual(['declarativeNetRequestWithHostAccess']);
-    expect([...manifest.optional_host_permissions].sort()).toEqual([...OPTIONAL_HOST_PERMISSIONS].sort());
+    expect(manifest.permissions).toContain('declarativeNetRequestWithHostAccess');
+    for (const h of ['https://paddleocr.aistudio-app.com/*', 'https://*.bj.bcebos.com/*', 'https://mineru.net/*', 'https://cdn-mineru.openxlab.org.cn/*',
+      'https://corpus-prod.f505aadad1e46610c8f8563037eb3c4b.r2.cloudflarestorage.com/*', 'https://media.springernature.com/*']) {
+      expect(manifest.host_permissions).toContain(h);
+    }
+    expect(manifest.optional_permissions).toBeUndefined();
+    expect(manifest.optional_host_permissions).toBeUndefined();
     expect(verifyPermissions(manifest)).toEqual([]);
   });
-  test('Firefox build requires DNR (as arxiv-md), Chrome keeps it optional; nothing else changes', () => {
+  test('Chrome and Firefox builds carry the same permissions; no optional_* in either', () => {
     const ff = manifestForTarget(manifest, 'firefox');
     const cr = manifestForTarget(manifest, 'chrome');
-    expect(ff.permissions).toEqual([...manifest.permissions, 'declarativeNetRequestWithHostAccess']);
-    expect(ff.optional_permissions).toBeUndefined();
-    expect(ff.optional_host_permissions).toEqual(manifest.optional_host_permissions);
-    expect(cr.permissions).toEqual(manifest.permissions);
-    expect(cr.optional_permissions).toEqual(['declarativeNetRequestWithHostAccess']);
+    for (const m of [ff, cr]) {
+      expect(m.permissions).toEqual(manifest.permissions);
+      expect(m.host_permissions).toEqual(manifest.host_permissions);
+      expect(m.optional_permissions).toBeUndefined();
+      expect(m.optional_host_permissions).toBeUndefined();
+    }
     expect(verifyPermissions(ff, 'firefox')).toEqual([]);
     expect(verifyPermissions(cr, 'chrome')).toEqual([]);
-    expect(verifyPermissions(ff, 'chrome')).toContain('permission not in allowlist: declarativeNetRequestWithHostAccess');
   });
   test('shortcuts: export Alt+Shift+J (no clash with arxiv-md Alt+Shift+M / zhihu-md Alt+Shift+K), copy unassigned', () => {
     expect(manifest.commands['export-markdown'].suggested_key).toEqual({ default: 'Alt+Shift+J' });
@@ -49,7 +54,7 @@ describe('manifestForTarget', () => {
   test('firefox: scripts only, gecko id and data collection', () => {
     const m = manifestForTarget(manifest, 'firefox');
     expect(m.background).toEqual({ scripts: ['background.js'] });
-    expect(m.browser_specific_settings.gecko).toMatchObject({ id: 'journal-md@tendo33', data_collection_permissions: { required: ['websiteContent'] } });
+    expect(m.browser_specific_settings.gecko).toMatchObject({ id: 'journal-md@tendo33', data_collection_permissions: { required: ['websiteContent', 'authenticationInfo'] } });
     expect(verifyBackground(m, 'firefox')).toEqual([]);
     expect(verifyBrowserSettings(m, 'firefox')).toEqual([]);
   });
@@ -69,9 +74,9 @@ describe('verifyPermissions rejects anything outside the allowlist', () => {
     [{ host_permissions: ['<all_urls>'] }, 'forbidden host pattern: <all_urls>'],
     [{ host_permissions: ['https://www.ncbi.nlm.nih.gov/pmc/*'] }, 'host_permission not in allowlist: https://www.ncbi.nlm.nih.gov/pmc/*'],
     [{ host_permissions: ['http://localhost/*'] }, 'forbidden host pattern: http://localhost/*'],
-    [{ optional_host_permissions: ['https://api.example.com/*'] }, 'optional_host_permission not in allowlist: https://api.example.com/*'],
-    [{ optional_permissions: ['tabs'] }, 'optional_permission not in allowlist: tabs'],
-    [{ optional_permissions: [] }, 'Chrome build must keep declarativeNetRequestWithHostAccess optional'],
+    [{ optional_host_permissions: ['https://api.example.com/*'] }, 'optional_host_permissions must not be declared (all hosts are granted at install)'],
+    [{ optional_permissions: ['declarativeNetRequestWithHostAccess'] }, 'optional_permissions must not be declared (all permissions are granted at install)'],
+    [{ permissions: ['storage'] }, 'declarativeNetRequestWithHostAccess must be a required permission in every build'],
     [{ content_scripts: [{ matches: ['https://www.sciencedirect.com/*'] }] }, 'content_scripts match outside host_permissions: https://www.sciencedirect.com/*'],
   ])('%j', (m, msg) => {
     expect(verifyPermissions(m)).toContain(msg);
@@ -132,9 +137,12 @@ test('icons: icon A (open journal, teal) PNGs at their declared sizes, same set 
   }
 });
 
-test('review N4: Firefox data collection declaration mirrors arxiv-md (required websiteContent only)', () => {
+test('fix2c: Firefox data collection declares website content and the user\'s PDF service token (required, no runtime prompt)', () => {
   const ff = manifestForTarget(manifest, 'firefox');
-  expect(ff.browser_specific_settings.gecko.data_collection_permissions).toEqual({ required: ['websiteContent'] });
+  expect(ff.browser_specific_settings.gecko.data_collection_permissions).toEqual({ required: ['websiteContent', 'authenticationInfo'] });
+  expect(FIREFOX_DATA_COLLECTION).toEqual(['websiteContent', 'authenticationInfo']);
+  expect(verifyBrowserSettings({ ...ff, browser_specific_settings: { gecko: { id: 'journal-md@tendo33', data_collection_permissions: { required: ['websiteContent'] } } } }, 'firefox'))
+    .toEqual(['Firefox build must declare data_collection_permissions.required ["websiteContent","authenticationInfo"]']);
 });
 
 test('review N5: the vendored pdf-parse-core carries the upstream MIT licence', () => {

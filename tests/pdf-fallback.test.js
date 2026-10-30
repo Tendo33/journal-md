@@ -64,11 +64,9 @@ describe('providers and permissions', () => {
     expect(permissionsFor(journalMineruProvider)).toEqual({ origins: ['https://mineru.net/*', 'https://cdn-mineru.openxlab.org.cn/*'], permissions: [] });
     // vendored core unchanged: MinerU stays install-mode there
     expect(mineruProvider.permissionMode).toBe('install');
-    const optional = manifest.optional_host_permissions;
-    for (const o of [...paddleocrProvider.hosts, ...mineruProvider.hosts]) {
-      expect(optional).toContain(o);
-      expect(manifest.host_permissions).not.toContain(o);
-    }
+    // Simon 10-30 18:06：后端域名安装时授予
+    expect(manifest.optional_host_permissions).toBeUndefined();
+    for (const o of [...paddleocrProvider.hosts, ...mineruProvider.hosts]) expect(manifest.host_permissions).toContain(o);
   });
 
   test('settings live in storage.local; tokens are trimmed and never synced', async () => {

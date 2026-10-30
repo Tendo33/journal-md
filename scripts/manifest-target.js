@@ -2,7 +2,8 @@
 // Chrome 对 MV3 的 background.scripts 报错，所以 Chrome/Edge 包去掉 scripts；Firefox 不支持 service_worker，保留 scripts。
 // browser_specific_settings 只给 Firefox 包（Chrome 会提示未知字段），见 cross-browser-plan §2。
 const TARGETS = ['chrome', 'firefox'];
-// 和 arxiv-md b2dc3a0 一样（FF-01 方案 A）：Firefox 包把 DNR 权限改成安装时必需，Chrome 包里仍是可选权限
+// 以前（arxiv-md FF-01 方案 A）：Firefox 包把可选的 DNR 改成必需。Simon 2026-10-30 18:06 起两个浏览器都在安装时授予，
+// 源 manifest 里已经没有 optional_permissions，下面这段只在旧写法下才起作用，保留以免回退
 const FIREFOX_REQUIRED_DNR = 'declarativeNetRequestWithHostAccess';
 
 // 只有「没给」（undefined/null）才默认 chrome；给了空值、非字符串或未知值都报错，不能悄悄构建成 Chrome 包

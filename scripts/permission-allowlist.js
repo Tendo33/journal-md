@@ -1,5 +1,5 @@
-// M1 权限白名单（PRD §2.6 P0）。manifest、verify:dist 和测试都以这里为准；
-// 想加新权限先写进 .task/REPORT.md 等 Simon 决定，不要直接改这里。
+// 权限白名单。manifest、verify:dist 和测试都以这里为准；想加新权限先写进报告等 Simon 决定，不要直接改这里。
+// Simon 2026-10-30 18:06：全部改为安装时授予，不再有可选权限、也不在使用时申请（fix round 2 part 3）。
 const ALLOWED_PERMISSIONS = [
   'activeTab',
   'storage',
@@ -7,9 +7,11 @@ const ALLOWED_PERMISSIONS = [
   'contextMenus',
   'clipboardWrite',
   'scripting',
+  // PaddleOCR 网关拒绝带扩展 Origin 的请求：只对本扩展发往 paddleocr.aistudio-app.com 的请求去掉 Origin 头（同 arxiv-md）
+  'declarativeNetRequestWithHostAccess',
 ];
 
-// 安装时授予的 host：PRD §2.6 的 P0 列表里、代码真正用到的（M1 的 4 个 + M2 随出版商适配器加回的 8 个），见 docs/permissions.md。
+// 安装时授予的 host：出版商和 Europe PMC（PRD §2.6 P0），加上 PDF 解析后端和 ZIP 图片 CDN（原来是可选权限，Simon 18:06 改为安装时授予）。
 const ALLOWED_HOST_PERMISSIONS = [
   'https://pmc.ncbi.nlm.nih.gov/*',
   'https://pubmed.ncbi.nlm.nih.gov/*',
@@ -23,22 +25,17 @@ const ALLOWED_HOST_PERMISSIONS = [
   'https://www.mdpi.com/*',
   'https://journals.plos.org/*',
   'https://elifesciences.org/*',
-];
-
-// 可选权限（PDF 解析，PRD §2.6 / §2.11）：用户在设置页打开 PDF 解析、选后端时才申请。
-// Chrome 包：DNR 和四个后端域名都是可选；Firefox 包：DNR 改成安装时必需（同 arxiv-md），域名仍是可选。
-const OPTIONAL_PERMISSIONS = ['declarativeNetRequestWithHostAccess'];
-const FIREFOX_EXTRA_PERMISSIONS = ['declarativeNetRequestWithHostAccess'];
-const OPTIONAL_HOST_PERMISSIONS = [
   'https://paddleocr.aistudio-app.com/*', // PaddleOCR（星河社区）任务接口
   'https://*.bj.bcebos.com/*', // PaddleOCR 结果 JSONL 和图片
   'https://mineru.net/*', // MinerU 任务接口
   'https://cdn-mineru.openxlab.org.cn/*', // MinerU 结果 ZIP
-  // ZIP 打包图片（Simon 2026-10-30 17:52 批准）：用户在 PLOS / Springer / Nature / BMC 文章上点「下载 ZIP」、
-  // 而图片在这两个不带 CORS 头的 CDN 上时才申请。PLOS 所有 /article/figure/image 地址都 302 到这一个 R2 存储桶（只取这个确切主机）
+  // ZIP 打包图片：PLOS 的图片地址都 302 到这一个 R2 存储桶（只取这个确切主机），Springer / BMC / Nature 的图片 CDN；两者都不发 CORS 头
   'https://corpus-prod.f505aadad1e46610c8f8563037eb3c4b.r2.cloudflarestorage.com/*',
   'https://media.springernature.com/*',
 ];
+
+// Firefox 数据收集声明（data_collection_permissions.required）：读文章内容；用户填了 PDF 服务 Token 时会把它发给该服务
+const FIREFOX_DATA_COLLECTION = ['websiteContent', 'authenticationInfo'];
 
 // 明确禁止的写法（任何字段里出现都算失败）
 const FORBIDDEN_HOST_PATTERNS = [
@@ -52,4 +49,4 @@ const FORBIDDEN_HOST_PATTERNS = [
 
 const GECKO_ID = 'journal-md@tendo33';
 
-module.exports = { ALLOWED_PERMISSIONS, ALLOWED_HOST_PERMISSIONS, OPTIONAL_PERMISSIONS, FIREFOX_EXTRA_PERMISSIONS, OPTIONAL_HOST_PERMISSIONS, FORBIDDEN_HOST_PATTERNS, GECKO_ID };
+module.exports = { ALLOWED_PERMISSIONS, ALLOWED_HOST_PERMISSIONS, FIREFOX_DATA_COLLECTION, FORBIDDEN_HOST_PATTERNS, GECKO_ID };
