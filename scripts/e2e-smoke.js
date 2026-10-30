@@ -229,7 +229,7 @@ async function main() {
   check('FAB: Download .md saves a file and shows the done state', (await dlCount()) === before + 1 && /\bok\b/.test(await fabBtn.getAttribute('class')), await fabBtn.getAttribute('class'));
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.waitForTimeout(4500); // ok 状态 4 秒后回到空闲
-  check('FAB follows dark mode', (await fabBtn.evaluate((b) => getComputedStyle(b).backgroundColor)) === 'rgb(76, 143, 214)', await fabBtn.evaluate((b) => getComputedStyle(b).backgroundColor));
+  check('FAB follows dark mode', (await fabBtn.evaluate((b) => getComputedStyle(b).backgroundColor)) === 'rgb(20, 184, 166)', await fabBtn.evaluate((b) => getComputedStyle(b).backgroundColor));
   await page.emulateMedia({ colorScheme: 'light' });
 
   // 出版商页面（Nature 真实页面 fixture）：按 DOI 查 Europe PMC（无结果）→ 页面 DOM

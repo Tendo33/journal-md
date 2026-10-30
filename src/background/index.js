@@ -41,7 +41,7 @@ function downloadPromise(opts) {
 function pdfBadge(state) {
   try {
     const text = state === 'run' ? '…' : state === 'ok' ? '✓' : '!';
-    chrome.action.setBadgeBackgroundColor({ color: state === 'ok' ? '#1a7f37' : state === 'err' ? '#b42318' : '#1d4e89' });
+    chrome.action.setBadgeBackgroundColor({ color: state === 'ok' ? '#1a7f37' : state === 'err' ? '#b42318' : '#0f766e' });
     chrome.action.setBadgeText({ text });
     if (state !== 'run') setTimeout(() => chrome.action.setBadgeText({ text: '' }), 6000);
   } catch (_) { /* 没有 action API（测试环境） */ }

@@ -64,7 +64,7 @@ export function createActionRunner({ tabs, scripting, action, timers = globalThi
       await notice(tab.id, error);
       return { ok: false, error };
     }
-    badge(tab.id, '…', '#1d4e89');
+    badge(tab.id, '…', '#0f766e');
     let result;
     try {
       result = await send(tab.id, { type: MSG.EXPORT, action: actionName, toast: true });

@@ -9,10 +9,10 @@ const CSS = `
 :host { all: initial; }
 .wrap { position: fixed; right: 24px; bottom: 24px; z-index: 2147483646; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
   font: 14px/20px system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  --brand: #1d4e89; --brand-on: #ffffff; --success: #1a7f37; --error: #b42318; --focus: #0969da;
+  --brand: #0f766e; --brand-on: #ffffff; --success: #1a7f37; --error: #b42318; --focus: #0969da;
   --panel: #ffffff; --text: #1f2328; --muted: #59636e; --border: #d0d7de; --hover: #f6f8fa; }
 @media (prefers-color-scheme: dark) {
-  .wrap { --brand: #4c8fd6; --brand-on: #0d1117; --success: #3fb950; --error: #f47067; --focus: #79c0ff;
+  .wrap { --brand: #14b8a6; --brand-on: #0d1117; --success: #3fb950; --error: #f47067; --focus: #79c0ff;
     --panel: #1f2428; --text: #e6edf3; --muted: #9198a1; --border: #3d444d; --hover: #2a3036; }
 }
 .fab { position: relative; width: 44px; height: 44px; border-radius: 50%; border: 0; margin: 0; padding: 0; display: grid; place-items: center;

@@ -17,8 +17,8 @@
   --text: #1f2328;
   --muted: #59636e;
   --border: #d0d7de;
-  --brand: #1d4e89;
-  --brand-hover: #163d6b;
+  --brand: #0f766e; /* 与图标 A 同色（Simon 决定）：白字 5.47:1 */
+  --brand-hover: #115e59; /* 白字 7.58:1 */
   --on-brand: #ffffff;
   --success: #1a7f37;
   --error: #b42318;
@@ -33,8 +33,8 @@
     --text: #e6edf3;
     --muted: #9198a1;
     --border: #3d444d;
-    --brand: #4c8fd6;
-    --brand-hover: #6aa3e0;
+    --brand: #14b8a6; /* 深色：配 --on-brand #0d1117 为 7.6:1，对页面背景 7.09:1 */
+    --brand-hover: #2dd4bf;
     --on-brand: #0d1117;
     --success: #3fb950;
     --error: #f47067;
