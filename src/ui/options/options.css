@@ -1,6 +1,12 @@
 .page { max-width: 720px; margin: 0 auto; padding: var(--space-6) var(--space-4); display: grid; gap: var(--space-6); }
 .head { display: flex; align-items: center; gap: var(--space-3); }
 .head h1 { font-size: 20px; line-height: 28px; }
+/* 320 宽时标题不折行（设计 backlog 1）：缩小字号和图标，最后两个词包在 .nw 里 */
+@media (max-width: 400px) {
+  .head { gap: var(--space-2); }
+  .head img { width: 24px; height: 24px; }
+  .head h1 { font-size: 16px; line-height: 24px; }
+}
 .welcome { border: 1px solid var(--brand); border-radius: var(--radius); padding: var(--space-4); display: grid; gap: var(--space-2); }
 .welcome h2 { font-size: 16px; line-height: 24px; }
 .group { display: grid; gap: var(--space-3); }

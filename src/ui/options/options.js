@@ -66,9 +66,23 @@ function renderSites() {
   }
 }
 
+/** 标题最后两个词（「Markdown 设置」/「Markdown settings」）不拆行（设计 backlog 1，R09） */
+function renderTitle() {
+  const h1 = document.querySelector('h1');
+  const text = t(lang, 'optTitle');
+  const m = text.match(/^(.*\s)?(\S+\s\S+)$/);
+  h1.textContent = '';
+  if (!m) { h1.textContent = text; return; }
+  const nw = document.createElement('span');
+  nw.className = 'nw';
+  nw.textContent = m[2];
+  h1.append(m[1] || '', nw);
+}
+
 function render() {
   lang = resolveLanguage(settings.language);
   applyI18n(document, lang);
+  renderTitle();
   $('version').textContent = t(lang, 'optVersion', { version: chrome.runtime.getManifest().version });
   renderPreview();
   renderSites();
