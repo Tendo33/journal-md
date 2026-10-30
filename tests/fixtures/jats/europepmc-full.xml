@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//NLM//DTD JATS (Z39.96) Journal Archiving and Interchange DTD v1.2 20190208//EN" "JATS-archivearticle1.dtd">
+<!-- Hand-made fixture modelled on Europe PMC fullTextXML output. Content is synthetic. -->
+<article xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ali="http://www.niso.org/schemas/ali/1.0/" article-type="research-article">
+  <front>
+    <journal-meta>
+      <journal-id journal-id-type="nlm-ta">Genet Sel Evol</journal-id>
+      <journal-title-group>
+        <journal-title>Genetics Selection Evolution</journal-title>
+      </journal-title-group>
+      <issn pub-type="epub">1297-9686</issn>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type="pmcid">PMC11000001</article-id>
+      <article-id pub-id-type="pmid">40000001</article-id>
+      <article-id pub-id-type="doi">10.1186/s12711-025-00001-2</article-id>
+      <title-group>
+        <article-title>Genomic heritability of egg weight in <italic>Gallus gallus</italic>: a GBLUP study</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author" corresp="yes">
+          <name><surname>Li</surname><given-names>Wei</given-names></name>
+          <xref ref-type="aff" rid="Aff1">1</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <name><surname>Smith</surname><given-names>Jane A.</given-names></name>
+          <xref ref-type="aff" rid="Aff1 Aff2">1,2</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <collab>Poultry Genomics Consortium</collab>
+        </contrib>
+        <contrib contrib-type="editor">
+          <name><surname>Editor</surname><given-names>Not</given-names></name>
+        </contrib>
+      </contrib-group>
+      <aff id="Aff1"><label>1</label>College of Animal Science, Example University, Beijing, China</aff>
+      <aff id="Aff2"><label>2</label>Roslin Institute, Edinburgh, UK</aff>
+      <author-notes>
+        <fn fn-type="conflict"><p>The authors declare that they have no competing interests.</p></fn>
+      </author-notes>
+      <pub-date pub-type="collection"><year>2026</year></pub-date>
+      <pub-date pub-type="epub"><day>3</day><month>2</month><year>2025</year></pub-date>
+      <volume>57</volume>
+      <elocation-id>12</elocation-id>
+      <permissions>
+        <copyright-statement>© The Author(s) 2025</copyright-statement>
+        <license license-type="open-access" xlink:href="http://creativecommons.org/licenses/by/4.0/">
+          <license-p>This article is licensed under a Creative Commons Attribution 4.0 International License.</license-p>
+        </license>
+      </permissions>
+      <abstract>
+        <sec>
+          <title>Background</title>
+          <p>Egg weight (EW) is a key trait with heritability <inline-formula><mml:math id="M1"><mml:msup><mml:mi>h</mml:mi><mml:mn>2</mml:mn></mml:msup></mml:math></inline-formula> reported between 0.4 and 0.6.</p>
+        </sec>
+        <sec>
+          <title>Results</title>
+          <p>Using 12,000 SNPs we estimated <italic>h</italic><sup>2</sup> = 0.45.</p>
+        </sec>
+        <sec>
+          <title>Conclusions</title>
+          <p>Genomic selection for EW is feasible.</p>
+        </sec>
+      </abstract>
+      <abstract abstract-type="graphical"><p>Graphical abstract should be ignored.</p></abstract>
+      <kwd-group kwd-group-type="author">
+        <kwd>GBLUP</kwd>
+        <kwd>Egg weight</kwd>
+        <kwd>Heritability</kwd>
+      </kwd-group>
+      <funding-group>
+        <award-group><funding-source>National Natural Science Foundation of China</funding-source><award-id>32000001</award-id></award-group>
+        <funding-statement>This work was funded by NSFC (32000001).</funding-statement>
+      </funding-group>
+      <custom-meta-group>
+        <custom-meta><meta-name>Data Availability</meta-name><meta-value>Genotypes are available at <ext-link ext-link-type="uri" xlink:href="https://zenodo.org/record/1">Zenodo</ext-link>.</meta-value></custom-meta>
+      </custom-meta-group>
+    </article-meta>
+  </front>
+  <body>
+    <sec id="Sec1" sec-type="intro">
+      <title>Introduction</title>
+      <p>Egg weight has been studied extensively [<xref ref-type="bibr" rid="CR1">1</xref>, <xref ref-type="bibr" rid="CR2">2</xref>–<xref ref-type="bibr" rid="CR3">3</xref>]. Earlier work (<xref ref-type="bibr" rid="CR4">Wang et al. 2020</xref>) used pedigree BLUP. See also <xref ref-type="bibr" rid="CR1 CR2">1,2</xref>.</p>
+      <p>Prices were up 5% and costs were $3 per hen; gene_name stays intact.</p>
+    </sec>
+    <sec id="Sec2" sec-type="methods">
+      <label>2</label>
+      <title>Methods</title>
+      <sec id="Sec3">
+        <title>Statistical model</title>
+        <p>The model was
+          <disp-formula id="Equ1"><label>(1)</label><alternatives><tex-math id="M2">\documentclass[12pt]{minimal}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\setlength{\oddsidemargin}{-69pt}
+\begin{document}$$\mathbf{y}=\mathbf{X}\mathbf{b}+\mathbf{Z}\mathbf{u}+\mathbf{e}$$\end{document}</tex-math><mml:math id="M3" display="block"><mml:mi>y</mml:mi></mml:math><graphic xlink:href="12711_2025_1_Article_Equ1.gif"/></alternatives></disp-formula>
+          where <inline-formula><mml:math id="M4"><mml:mi mathvariant="bold">u</mml:mi><mml:mo>∼</mml:mo><mml:mi>N</mml:mi><mml:mfenced><mml:mrow><mml:mn>0</mml:mn><mml:mo>,</mml:mo><mml:mi mathvariant="bold">G</mml:mi><mml:msubsup><mml:mi>σ</mml:mi><mml:mi>u</mml:mi><mml:mn>2</mml:mn></mml:msubsup></mml:mrow></mml:mfenced></mml:math></inline-formula>.</p>
+        <disp-formula id="Equ2"><mml:math id="M5" display="block"><mml:msup><mml:mi>h</mml:mi><mml:mn>2</mml:mn></mml:msup><mml:mo>=</mml:mo><mml:mfrac><mml:msubsup><mml:mi>σ</mml:mi><mml:mi>u</mml:mi><mml:mn>2</mml:mn></mml:msubsup><mml:mrow><mml:msubsup><mml:mi>σ</mml:mi><mml:mi>u</mml:mi><mml:mn>2</mml:mn></mml:msubsup><mml:mo>+</mml:mo><mml:msubsup><mml:mi>σ</mml:mi><mml:mi>e</mml:mi><mml:mn>2</mml:mn></mml:msubsup></mml:mrow></mml:mfrac></mml:math></disp-formula>
+        <disp-formula id="Equ3"><graphic xlink:href="12711_2025_1_Article_Equ3"/></disp-formula>
+      </sec>
+      <sec id="Sec4">
+        <title>Animals</title>
+        <list list-type="bullet">
+          <list-item><p>Line A: 1,200 hens</p></list-item>
+          <list-item><p>Line B: 800 hens</p></list-item>
+        </list>
+        <list list-type="order">
+          <list-item><p>Genotype</p></list-item>
+          <list-item><p>Phenotype</p></list-item>
+        </list>
+      </sec>
+    </sec>
+    <sec id="Sec5" sec-type="results">
+      <title>Results</title>
+      <p>Variance components are in <xref ref-type="table" rid="Tab1">Table 1</xref> and the GWAS in <xref ref-type="fig" rid="Fig1">Fig. 1</xref>.</p>
+      <fig id="Fig1">
+        <label>Fig. 1</label>
+        <caption><title>Manhattan plot for egg weight.</title><p>The dashed line marks genome-wide significance.</p></caption>
+        <graphic xlink:href="12711_2025_1_Fig1_HTML"/>
+      </fig>
+      <table-wrap id="Tab1">
+        <label>Table 1</label>
+        <caption><p>Estimated variance components</p></caption>
+        <table>
+          <thead><tr><th>Trait</th><th>σ<sub>u</sub><sup>2</sup></th><th>h<sup>2</sup> (SE)</th></tr></thead>
+          <tbody>
+            <tr><td>EW</td><td>4.12</td><td>0.45 (0.02)</td></tr>
+            <tr><td>EN</td><td>10.3</td><td>0.21 (0.03)<sup>a</sup></td></tr>
+          </tbody>
+        </table>
+        <table-wrap-foot><fn id="tfn1"><label>a</label><p>Egg number until 72 weeks.</p></fn></table-wrap-foot>
+      </table-wrap>
+      <table-wrap id="Tab2">
+        <label>Table 2</label>
+        <caption><p>Accuracy by model</p></caption>
+        <table>
+          <thead>
+            <tr><th rowspan="2">Model</th><th colspan="2">Accuracy</th></tr>
+            <tr><th>EW</th><th>EN</th></tr>
+          </thead>
+          <tbody><tr><td>GBLUP</td><td>0.61</td><td>0.48</td></tr></tbody>
+        </table>
+      </table-wrap>
+      <supplementary-material id="MOESM1" content-type="local-data">
+        <caption><p><bold>Additional file 1.</bold> Genotype quality control summary.</p></caption>
+        <media xlink:href="12711_2025_1_MOESM1_ESM.xlsx"/>
+      </supplementary-material>
+    </sec>
+    <sec sec-type="data-availability">
+      <title>Availability of data and materials</title>
+      <p>All scripts are on GitHub.</p>
+    </sec>
+  </body>
+  <back>
+    <ack><title>Acknowledgements</title><p>We thank the farm staff.</p></ack>
+    <sec><title>Author contributions</title><p>WL analysed the data. JAS wrote the paper.</p></sec>
+    <ref-list>
+      <title>References</title>
+      <ref id="CR1"><label>1.</label><element-citation publication-type="journal"><person-group person-group-type="author"><name><surname>Wang</surname><given-names>L</given-names></name><name><surname>Zhang</surname><given-names>Hong Mei</given-names></name></person-group><article-title>Genomic selection in layers</article-title><source>Poult Sci</source><year>2020</year><volume>99</volume><issue>2</issue><fpage>100</fpage><lpage>110</lpage><pub-id pub-id-type="doi">10.1016/j.psj.2019.12.001</pub-id><pub-id pub-id-type="pmid">32000001</pub-id></element-citation></ref>
+      <ref id="CR2"><label>2.</label><mixed-citation publication-type="journal">Smith J, Brown K. Pedigree BLUP revisited. <italic>J Anim Sci</italic>. 2018;96:1–9. doi: <pub-id pub-id-type="doi">10.1093/jas/sky001</pub-id>.</mixed-citation></ref>
+      <ref id="CR3"><label>3.</label><mixed-citation publication-type="book">Falconer DS, Mackay TFC. Introduction to Quantitative Genetics. 4th ed. Harlow: Longman; 1996. <pub-id pub-id-type="pmid">11111111</pub-id></mixed-citation></ref>
+      <ref id="CR4"><label>4.</label><mixed-citation publication-type="other">Wang X, et al. A preprint. 2020. <ext-link ext-link-type="uri" xlink:href="https://www.biorxiv.org/content/10.1101/2020.01.01.000001">bioRxiv</ext-link></mixed-citation></ref>
+    </ref-list>
+  </back>
+</article>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hand-made fixture: sparse metadata, figures in floats-group, author-year citations. Content is synthetic. -->
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article">
+  <front>
+    <journal-meta><journal-title>Animals (Basel)</journal-title></journal-meta>
+    <article-meta>
+      <article-id pub-id-type="pmc">7000002</article-id>
+      <title-group><article-title>Short communication on duck plumage</article-title></title-group>
+      <contrib-group><contrib contrib-type="author"><name><surname>Zhao</surname><given-names>Min</given-names></name></contrib></contrib-group>
+      <pub-date pub-type="ppub"><month>5</month><year>2021</year></pub-date>
+      <permissions><ali:license_ref xmlns:ali="http://www.niso.org/schemas/ali/1.0/">https://creativecommons.org/licenses/by-nc/4.0/</ali:license_ref></permissions>
+    </article-meta>
+  </front>
+  <body>
+    <p>Plumage colour varies (<xref ref-type="bibr" rid="r1">Zhao and Li, 2019</xref>); see <xref ref-type="fig" rid="f1">Figure 1</xref>.</p>
+    <sec><title>Conflict of Interest</title><p>None declared.</p></sec>
+  </body>
+  <back>
+    <fn-group><fn fn-type="financial-disclosure"><p>Funded by a provincial grant.</p></fn><fn><p>Published as part of a special issue.</p></fn></fn-group>
+    <ref-list><ref id="r1"><mixed-citation>Zhao M, Li Q (2019) Duck genetics. Poult Sci 98:1. <ext-link ext-link-type="doi" xlink:href="10.3382/ps/pey001">10.3382/ps/pey001</ext-link></mixed-citation></ref></ref-list>
+  </back>
+  <floats-group>
+    <fig id="f1"><label>Figure 1</label><caption><p>Two plumage types.</p></caption><graphic xlink:href="animals-11-00002-g001.jpg"/></fig>
+  </floats-group>
+</article>

@@ -94,12 +94,19 @@ function renderInline(n, ctx) {
     if (!num) return label;
     ctx.cited && ctx.cited.add(num);
     // 纯数字引用（"12"、"[12]"、"(12)"）直接换成脚注；作者-年份格式保留原文再加脚注
-    if (!label || /^[[(]?\d+[\])]?$/.test(label.replace(/\\/g, ''))) return `[^${num}]`;
+    if (!label || /^[[(]?\d+(?:\s*[,–-]\s*\d+)*[\])]?$/.test(label.replace(/\\/g, ''))) return `[^${num}]`;
     return `${label}[^${num}]`;
   }
   default:
     return renderInlines(n.c || [], ctx);
   }
+}
+
+const FOOTNOTE_GROUP = /(?:\\\[|\()((?:\[\^\d+\])(?:[\s,;–-]*\[\^\d+\])*)(?:\\\]|\))/g;
+
+/** 只包着脚注的方括号或圆括号去掉：\[[^1], [^2]\] → [^1], [^2] */
+export function unwrapFootnoteGroups(md) {
+  return md.replace(FOOTNOTE_GROUP, '$1');
 }
 
 /** HTML 表格单元格内的行内内容（原样 HTML 表格里 Markdown 不会被解析） */

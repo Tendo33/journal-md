@@ -1,7 +1,7 @@
 // ArticleIR → Markdown（PRD §2.3）。JATS 和 DOM 两条路共用这一个渲染器。
 import { inlinesToPlain, blocksToPlain } from '../article-ir';
 import { renderFrontMatter, formatExported } from './frontmatter';
-import { renderInlines, escapeLineStart, texForMarkdown } from './inline';
+import { renderInlines, escapeLineStart, texForMarkdown, unwrapFootnoteGroups } from './inline';
 import { renderTableBody } from './table';
 
 export const ABSTRACT_ONLY_MARKER = 'Abstract only / 仅摘要';
@@ -65,7 +65,7 @@ class Renderer {
   block(b) {
     switch (b.type) {
     case 'paragraph': {
-      const md = this.inl(b.inlines).trim();
+      const md = unwrapFootnoteGroups(this.inl(b.inlines).trim());
       return md.split('\n').map(escapeLineStart).join('\n');
     }
     case 'list':
