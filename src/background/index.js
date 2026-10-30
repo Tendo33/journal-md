@@ -4,7 +4,8 @@ import { createJatsService, createDoiLookupService } from '../core/europepmc/cli
 import { loadSettings, SETTINGS_KEY } from '../config/settings';
 import { resolveLanguage } from '../config/i18n';
 import { MSG } from '../utils/messages';
-import { downloadMarkdown } from './download';
+import { downloadMarkdown, downloadZip } from './download';
+import { fetchAsset } from './fetch-asset';
 import { createMenuBuilder, menuAction } from './context-menu';
 import { createActionRunner } from './run-action';
 import { isTrustedSender } from './message-guards';
@@ -27,6 +28,10 @@ export function handleMessage(message, sender) {
     return doiLookup.get(message.doi);
   case MSG.DOWNLOAD:
     return downloadMarkdown({ markdown: message.markdown, filename: message.filename });
+  case MSG.DOWNLOAD_ZIP:
+    return downloadZip({ base64: message.base64, filename: message.filename });
+  case MSG.FETCH_ASSET:
+    return fetchAsset(message.url);
   default:
     return null;
   }

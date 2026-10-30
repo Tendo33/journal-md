@@ -22,18 +22,22 @@ export function markdownDownloadUrl(markdown, env = globalThis) {
   return { url: `data:text/markdown;charset=utf-8;base64,${utf8Base64(markdown)}`, kind: 'data', revoke: () => {} };
 }
 
-/**
- * @param {{markdown:string, filename:string}} payload
- * @param {{ downloads?:object, env?:object, runtime?:object, setTimeout?:Function }} deps
- * @returns {Promise<{ok:boolean, id?:number, error?:string}>}
- */
-export function downloadMarkdown({ markdown, filename }, { downloads = chrome.downloads, env = globalThis, runtime = chrome.runtime, setTimeoutFn = setTimeout } = {}) {
-  if (typeof markdown !== 'string' || !markdown) return Promise.resolve({ ok: false, error: 'empty' });
-  const name = typeof filename === 'string' && filename.trim() ? filename : 'article.md';
-  const { url, revoke, kind } = markdownDownloadUrl(markdown, env);
+/** 二进制（content script 传来的 base64）：Firefox 后台转成 blob URL，Chrome SW 直接用 data URL */
+export function binaryDownloadUrl(base64, mime, env = globalThis) {
+  if (canUseBlobUrl(env)) {
+    const bin = atob(base64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i += 1) bytes[i] = bin.charCodeAt(i);
+    const url = env.URL.createObjectURL(new env.Blob([bytes], { type: mime }));
+    return { url, kind: 'blob', revoke: () => { try { env.URL.revokeObjectURL(url); } catch (_) { /* noop */ } } };
+  }
+  return { url: `data:${mime};base64,${base64}`, kind: 'data', revoke: () => {} };
+}
+
+function save(downloads, runtime, setTimeoutFn, { url, revoke, kind }, filename) {
   return new Promise((resolve) => {
     try {
-      downloads.download({ url, filename: name, saveAs: false, conflictAction: 'uniquify' }, (id) => {
+      downloads.download({ url, filename, saveAs: false, conflictAction: 'uniquify' }, (id) => {
         const err = runtime && runtime.lastError;
         if (kind === 'blob') setTimeoutFn(revoke, 60000);
         if (err || id === undefined) resolve({ ok: false, error: (err && err.message) || 'download_failed' });
@@ -43,4 +47,22 @@ export function downloadMarkdown({ markdown, filename }, { downloads = chrome.do
       resolve({ ok: false, error: e.message });
     }
   });
+}
+
+/** ZIP 下载（article.md + images/） */
+export function downloadZip({ base64, filename }, { downloads = chrome.downloads, env = globalThis, runtime = chrome.runtime, setTimeoutFn = setTimeout } = {}) {
+  if (typeof base64 !== 'string' || !base64 || !/^[A-Za-z0-9+/]+=*$/.test(base64)) return Promise.resolve({ ok: false, error: 'empty' });
+  const name = typeof filename === 'string' && /\.zip$/i.test(filename.trim()) ? filename.trim() : 'article.zip';
+  return save(downloads, runtime, setTimeoutFn, binaryDownloadUrl(base64, 'application/zip', env), name);
+}
+
+/**
+ * @param {{markdown:string, filename:string}} payload
+ * @param {{ downloads?:object, env?:object, runtime?:object, setTimeout?:Function }} deps
+ * @returns {Promise<{ok:boolean, id?:number, error?:string}>}
+ */
+export function downloadMarkdown({ markdown, filename }, { downloads = chrome.downloads, env = globalThis, runtime = chrome.runtime, setTimeoutFn = setTimeout } = {}) {
+  if (typeof markdown !== 'string' || !markdown) return Promise.resolve({ ok: false, error: 'empty' });
+  const name = typeof filename === 'string' && filename.trim() ? filename : 'article.md';
+  return save(downloads, runtime, setTimeoutFn, markdownDownloadUrl(markdown, env), name);
 }

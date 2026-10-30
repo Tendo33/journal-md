@@ -2,6 +2,7 @@ module.exports = {
   // DOM 解析（DOMParser、XML 命名空间）依赖 jsdom
   testEnvironment: 'jsdom',
   testMatch: ['<rootDir>/tests/**/*.test.js'],
+  setupFiles: ['<rootDir>/tests/setup-globals.js'],
   transform: {
     '^.+\\.js$': ['babel-jest', {
       babelrc: false,

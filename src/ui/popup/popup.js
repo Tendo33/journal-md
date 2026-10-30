@@ -110,13 +110,13 @@ async function inspect(settings) {
 async function run(action) {
   if (busy) return;
   busy = true;
-  const buttons = [$('export'), $('copy')];
+  const buttons = [$('export'), $('copy'), $('zip')];
   buttons.forEach((b) => b.setAttribute('aria-disabled', 'true'));
   $('actions').setAttribute('aria-busy', 'true');
   setStatus([{ text: t(lang, 'statusWorking'), cls: 'note' }]);
   let result;
   try {
-    result = await sendToTab({ type: MSG.EXPORT, action: action === ACTIONS.COPY ? ACTIONS.NONE : ACTIONS.DOWNLOAD });
+    result = await sendToTab({ type: MSG.EXPORT, action: action === ACTIONS.COPY ? ACTIONS.NONE : action });
     if (result && result.ok && action === ACTIONS.COPY) {
       // popup 有焦点和用户手势，在这里写剪贴板最稳
       await navigator.clipboard.writeText(result.markdown);
@@ -146,6 +146,7 @@ async function main() {
   $('settings').addEventListener('click', () => chrome.runtime.openOptionsPage());
   $('export').addEventListener('click', () => run(ACTIONS.DOWNLOAD));
   $('copy').addEventListener('click', () => run(ACTIONS.COPY));
+  $('zip').addEventListener('click', () => run(ACTIONS.ZIP));
   chrome.commands.getAll().then((cmds) => { $('shortcuts').textContent = shortcutText(lang, cmds); }, () => {});
   [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   await inspect(settings);

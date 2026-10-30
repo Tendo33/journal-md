@@ -226,5 +226,17 @@
   },
   "noticeJats_not_found": {
     "message": "Europe PMC 上没有这个 DOI 对应的全文。"
+  },
+  "btnZip": {
+    "message": "下载 ZIP"
+  },
+  "btnZipTitle": {
+    "message": "把 article.md 和图片打包成一个 ZIP 下载"
+  },
+  "noticeZipAll": {
+    "message": "{total} 张图片都已打包，链接指向 images/。"
+  },
+  "noticeZipPartial": {
+    "message": "已打包 {packed}/{total} 张图片；其余图片无法从原网站下载，保留网络链接。"
   }
 }

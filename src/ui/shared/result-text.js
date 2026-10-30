@@ -14,6 +14,9 @@ export function describeResult(result, lang, action) {
   if (action === 'download' || result.saved) status = t(lang, 'statusSaved', { filename: result.filename });
   else if (action === 'copy' || result.copied) status = t(lang, 'statusCopied', { count: result.markdown.length.toLocaleString(lang === 'zh' ? 'zh-CN' : 'en') });
   const notes = [];
+  if (result.zip && result.zip.total) {
+    notes.push(t(lang, result.zip.packed === result.zip.total ? 'noticeZipAll' : 'noticeZipPartial', { packed: result.zip.packed, total: result.zip.total }));
+  }
   for (const n of result.notices || []) {
     if (n.code === 'jats_fallback') {
       const reason = t(lang, `noticeJats_${n.reason}`);

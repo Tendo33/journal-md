@@ -7,6 +7,7 @@ import { MSG, ACTIONS } from '../utils/messages';
 import { writeClipboard } from '../utils/clipboard';
 import { describeResult } from '../ui/shared/result-text';
 import { showToast } from './toast';
+import { buildArticleZip, base64FromBytes, zipFilename } from './zip-export';
 
 const SITE_XML_TIMEOUT_MS = 8000;
 
@@ -43,12 +44,24 @@ async function runExport(action, withToast) {
   if (withToast) showToast(t(lang, 'statusWorking'), 'working');
   let result;
   try {
-    result = await exportArticle({ doc: document, url: location.href, settings, fetchJats, services: { lookupDoi, fetchSiteXml } });
+    result = await exportArticle({ doc: document, url: location.href, settings, fetchJats, services: { lookupDoi, fetchSiteXml }, format: action === ACTIONS.ZIP ? 'zip' : 'md' });
   } catch (e) {
     console.error('[journal-md] export failed', e);
     result = { ok: false, error: 'unknown' };
   }
-  if (result.ok && action === ACTIONS.DOWNLOAD) {
+  if (result.ok && action === ACTIONS.ZIP) {
+    let zip = null;
+    try {
+      zip = await buildArticleZip(result);
+    } catch (e) {
+      console.error('[journal-md] zip failed', e);
+    }
+    const filename = zipFilename(result.filename);
+    const dl = zip ? await chrome.runtime.sendMessage({ type: MSG.DOWNLOAD_ZIP, base64: base64FromBytes(zip.bytes), filename }) : null;
+    if (!dl || !dl.ok) result = { ...result, ok: false, error: 'download_failed' };
+    // markdown 换成 ZIP 里那份（下载失败的图片已换回原网址），供调用方复制
+    else result = { ...result, saved: true, filename, zip: { packed: zip.packed, total: zip.total } };
+  } else if (result.ok && action === ACTIONS.DOWNLOAD) {
     const dl = await chrome.runtime.sendMessage({ type: MSG.DOWNLOAD, markdown: result.markdown, filename: result.filename });
     if (!dl || !dl.ok) result = { ...result, ok: false, error: 'download_failed' };
     else result = { ...result, saved: true };
@@ -61,6 +74,7 @@ async function runExport(action, withToast) {
     const text = describeResult(result, lang, action);
     showToast([text.status, ...text.notes].filter(Boolean).join(' '), result.ok ? 'success' : 'error', { closeLabel: t(lang, 'btnClose') });
   }
+  delete result.assets;
   return result;
 }
 

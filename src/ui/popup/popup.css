@@ -17,6 +17,8 @@ body { width: 360px; }
 
 .actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
 .actions .btn { width: 100%; }
+/* 主按钮独占一行；复制和 ZIP 在第二行（三个按钮同高同字号，R04） */
+.actions .btn.primary { grid-column: 1 / -1; }
 
 .status { display: grid; gap: var(--space-1); overflow-wrap: anywhere; }
 .status:empty { display: none; }

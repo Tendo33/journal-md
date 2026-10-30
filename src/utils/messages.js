@@ -6,6 +6,8 @@ export const MSG = Object.freeze({
   FETCH_JATS: 'JMD_FETCH_JATS', // content → background：取 Europe PMC fullTextXML
   LOOKUP_DOI: 'JMD_LOOKUP_DOI', // content → background：出版商页面按 DOI 查 Europe PMC 的 PMCID（只在导出时）
   DOWNLOAD: 'JMD_DOWNLOAD', // content → background：下载 .md
+  DOWNLOAD_ZIP: 'JMD_DOWNLOAD_ZIP', // content → background：下载 ZIP（base64）
+  FETCH_ASSET: 'JMD_FETCH_ASSET', // content → background：页面里被 CORS 拦下的图片，只限已授权的支持站点
 });
 
-export const ACTIONS = Object.freeze({ NONE: 'none', DOWNLOAD: 'download', COPY: 'copy' });
+export const ACTIONS = Object.freeze({ NONE: 'none', DOWNLOAD: 'download', COPY: 'copy', ZIP: 'zip' });

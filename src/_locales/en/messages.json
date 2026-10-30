@@ -226,5 +226,17 @@
   },
   "noticeJats_not_found": {
     "message": "Europe PMC has no full text for this DOI."
+  },
+  "btnZip": {
+    "message": "Download ZIP"
+  },
+  "btnZipTitle": {
+    "message": "Download article.md and its images in one ZIP file"
+  },
+  "noticeZipAll": {
+    "message": "All {total} images are in the ZIP; links point to images/."
+  },
+  "noticeZipPartial": {
+    "message": "{packed} of {total} images are in the ZIP. The others could not be downloaded from their site and keep their web links."
   }
 }
