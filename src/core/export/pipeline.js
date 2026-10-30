@@ -99,9 +99,12 @@ export function jatsMatchesPage(jatsMeta, pageMeta, urlIds = {}) {
   return same(urlIds.pmcid, jatsMeta.pmcid);
 }
 
-/** URL 和页面都给出了同一种 ID 却不相同 */
+/**
+ * URL 和页面都给出了 PMCID / PMID 却不相同。DOI 不比：出版商地址里的 DOI 是按路径推出来的（Nature 的 slug），
+ * 推错了会把正常页面也拦下来
+ */
 export function staleDom(urlIds = {}, pageMeta = {}) {
-  return ['pmcid', 'pmid', 'doi'].some((k) => urlIds[k] && pageMeta[k] && !same(urlIds[k], pageMeta[k]));
+  return ['pmcid', 'pmid'].some((k) => urlIds[k] && pageMeta[k] && !same(urlIds[k], pageMeta[k]));
 }
 
 /** 页面声明的同站 XML（citation_xml_url）；跨站的不用 */
