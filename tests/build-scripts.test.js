@@ -5,7 +5,6 @@ const { manifestForTarget, verifyBackground, parseVerifyArgs, normalizeTarget } 
 const { verifyPermissions, verifyBrowserSettings, verifyDist } = require('../scripts/verify-dist');
 const { scanText } = require('../scripts/check-no-keys');
 const { ALLOWED_PERMISSIONS, ALLOWED_HOST_PERMISSIONS, OPTIONAL_HOST_PERMISSIONS } = require('../scripts/permission-allowlist');
-const { png } = require('../scripts/generate-icons');
 const manifest = require('../src/manifest.json');
 
 describe('source manifest', () => {
@@ -86,7 +85,7 @@ describe('verifyDist on a temp directory', () => {
     fs.writeFileSync(path.join(dir, 'manifest.json'), JSON.stringify(m));
     for (const f of ['background.js', 'content.js', 'popup.html', 'options.html']) fs.writeFileSync(path.join(dir, f), '// ok\n');
     fs.mkdirSync(path.join(dir, 'assets'));
-    for (const s of [16, 32, 48, 128]) fs.writeFileSync(path.join(dir, `assets/icon-${s}.png`), png(s));
+    for (const s of [16, 32, 48, 128]) fs.copyFileSync(path.join(__dirname, `../assets/icon-${s}.png`), path.join(dir, `assets/icon-${s}.png`));
     for (const loc of ['en', 'zh_CN']) {
       fs.mkdirSync(path.join(dir, '_locales', loc), { recursive: true });
       fs.copyFileSync(path.join(__dirname, `../src/_locales/${loc}/messages.json`), path.join(dir, `_locales/${loc}/messages.json`));
@@ -116,6 +115,19 @@ test('check-no-keys detects common key formats', () => {
   expect(scanText('Bearer ${token}')).toEqual([]);
 });
 
-test('icon generator writes valid PNG signatures', () => {
-  expect(png(16).subarray(0, 8)).toEqual(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+test('icons: icon A (open journal, teal) PNGs at their declared sizes, same set for manifest and toolbar', () => {
+  const sizes = { 16: 'assets/icon-16.png', 32: 'assets/icon-32.png', 48: 'assets/icon-48.png', 128: 'assets/icon-128.png' };
+  expect(manifest.icons).toEqual(sizes);
+  expect(manifest.action.default_icon).toEqual(sizes);
+  for (const [size, file] of Object.entries(sizes)) {
+    const buf = fs.readFileSync(path.join(__dirname, '..', file));
+    expect(buf.subarray(0, 8)).toEqual(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+    // IHDR：宽高在第 16–23 字节
+    expect([buf.readUInt32BE(16), buf.readUInt32BE(20)]).toEqual([Number(size), Number(size)]);
+  }
+  const svg = fs.readFileSync(path.join(__dirname, '../assets/icon.svg'), 'utf8');
+  expect(svg).toContain('fill="#0f766e"');
+  for (const page of ['src/ui/popup/popup.html', 'src/ui/options/options.html']) {
+    expect(fs.readFileSync(path.join(__dirname, '..', page), 'utf8')).toContain('src="assets/icon.svg"');
+  }
 });

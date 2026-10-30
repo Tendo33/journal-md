@@ -117,6 +117,7 @@ async function main() {
   await popup.waitForSelector('#info:not([hidden])', { timeout: 5000 });
   await popup.waitForTimeout(1000);
   check('popup shows platform', (await popup.textContent('#platform')) === 'PubMed Central');
+  check('icon: popup header logo (assets/icon.svg) loads', await popup.$eval('.head img', (img) => img.complete && img.naturalWidth > 0 && img.getAttribute('src') === 'assets/icon.svg'));
   check('popup shows PMCID', (await popup.textContent('#pmcid')) === 'PMC11000001');
   check('popup routes: JATS checked on export / Page ✓', /JATS.*(export|导出时检查).*✓/.test(await popup.textContent('#routes')), await popup.textContent('#routes'));
   check('shortcut hint shows Alt+Shift+J', /Alt\+Shift\+J|⌥⇧J/.test(await popup.textContent('#shortcuts')), await popup.textContent('#shortcuts'));
@@ -173,6 +174,7 @@ async function main() {
   opt.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(`options: ${m.text()}`); });
   await opt.goto(`chrome-extension://${extId}/options.html`);
   check('MF2: welcome card hidden without ?welcome=1', !(await opt.isVisible('#welcome')));
+  check('icon: options header logo (assets/icon.svg) loads', await opt.$eval('.head img', (img) => img.complete && img.naturalWidth > 0 && img.getAttribute('src') === 'assets/icon.svg'));
   await opt.click('input[name="language"][value="zh"]', { force: true });
   await opt.waitForFunction(() => document.querySelector('h1').textContent.includes('设置'));
   check('options switches to Chinese immediately', true);

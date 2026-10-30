@@ -15,6 +15,7 @@ First public release.
 - Optional PDF parsing (off by default) with PaddleOCR (default) or MinerU using your own token, built on the pdf-parse-core shared with arXiv to Markdown. Open-access PDFs only by default; any other article asks for confirmation every time.
 - Toolbar popup, right-click menu, `Alt+Shift+J` shortcut, options page, English and Chinese interface (extension name 「期刊全文转 Markdown」 in Chinese).
 - Chrome / Edge and Firefox (140+) builds; release workflow on tag push.
+- Icon: an open journal with an M↓ mark on teal (#0f766e), with a hand-tuned 16px toolbar version.
 
 ### Fixed (since the M1 preview)
 - Nature JATS: "is available for this paper at 10.1038/…" sentences now keep their subject and link the DOI; a supplementary file listed twice appears once (QA JM-09).
