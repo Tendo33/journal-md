@@ -33,3 +33,29 @@ jobs:
           name: journal-md-packages
           path: build/*.zip
           if-no-files-found: error
+
+  # 扩展冒烟（有界面的 Chromium + xvfb，网络全部 route 到 tests/fixtures）。
+  # 本仓库不依赖 playwright，装到仓库外的临时目录，经 E2E_PLAYWRIGHT_DIR 交给脚本（同 arxiv-md）。
+  e2e:
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      PLAYWRIGHT_VERSION: 1.60.0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Install Playwright Chromium
+        run: |
+          mkdir -p "$RUNNER_TEMP/e2e-tools"
+          cd "$RUNNER_TEMP/e2e-tools"
+          npm init -y >/dev/null
+          npm install --no-save --no-audit --no-fund "playwright@${PLAYWRIGHT_VERSION}"
+          npx playwright install --with-deps chromium
+          sudo apt-get install -y xvfb
+          echo "E2E_PLAYWRIGHT_DIR=$RUNNER_TEMP/e2e-tools" >> "$GITHUB_ENV"
+      - run: npm run build
+      - run: xvfb-run -a node scripts/e2e-smoke.js

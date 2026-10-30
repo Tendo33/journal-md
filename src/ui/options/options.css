@@ -11,10 +11,10 @@
 .preview { color: var(--text); }
 input[type="text"] { height: 36px; padding: 0 var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); font: inherit; width: 100%; }
 
-.switch-row { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: var(--space-4); }
+.switch-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: var(--space-4); }
 /* 开关：只有一个旋钮，左右/上下内边距相等（R06） */
 .switch { appearance: none; margin: 0; position: relative; width: 40px; height: 24px; border-radius: 12px; background: var(--border); cursor: pointer; flex: none; }
-.switch::before { content: ""; position: absolute; top: 4px; left: 4px; width: 16px; height: 16px; border-radius: 50%; background: var(--bg); transition: transform .15s ease; }
+.switch::before { content: ""; position: absolute; top: 4px; left: 4px; width: 16px; height: 16px; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,.24); transition: transform .15s ease; }
 .switch:checked { background: var(--brand); }
 .switch:checked::before { transform: translateX(16px); }
 .switch:disabled { opacity: .5; cursor: default; }
@@ -28,8 +28,8 @@ input[type="text"] { height: 36px; padding: 0 var(--space-3); border: 1px solid 
 .segmented input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: -2px; }
 
 .sites { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
-.sites li { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: var(--space-4); min-height: 32px; }
-.sites .planned { color: var(--muted); font-size: 12px; line-height: 16px; }
+.sites li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-4); min-height: 32px; }
+.sites .planned { color: var(--muted); font-size: 12px; line-height: 16px; max-width: 128px; text-align: right; }
 
 .foot { display: grid; gap: var(--space-2); border-top: 1px solid var(--border); padding-top: var(--space-3); font-size: 12px; line-height: 16px; }
 .saved { color: var(--success); min-height: 16px; }

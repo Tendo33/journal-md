@@ -16,7 +16,8 @@
     "test": "jest --runInBand",
     "package": "npm run build && npm run build:firefox && npm run verify:dist && node scripts/package.js",
     "check:keys": "node scripts/check-no-keys.js",
-    "icons": "node scripts/generate-icons.js"
+    "icons": "node scripts/generate-icons.js",
+    "test:e2e": "npm run build && node scripts/e2e-smoke.js"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
