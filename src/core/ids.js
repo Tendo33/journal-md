@@ -13,7 +13,7 @@ export function normalizeDoi(value) {
 }
 
 export function normalizePmcid(value) {
-  const m = String(value || '').match(/\bPMC\s*(\d{4,10})\b/i) || String(value || '').match(/^\s*(\d{4,10})\s*$/);
+  const m = String(value || '').match(/\bPMC\s*(\d{1,10})\b/i) || String(value || '').match(/^\s*(\d{1,10})\s*$/);
   return m ? `PMC${m[1]}` : '';
 }
 
