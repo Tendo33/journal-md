@@ -1,0 +1,218 @@
+{
+  "extName": {
+    "message": "Journal to Markdown"
+  },
+  "extDescription": {
+    "message": "Export open-access journal articles from PMC, Europe PMC and PubMed as clean Markdown with formulas, tables and references."
+  },
+  "actionTitle": {
+    "message": "Journal to Markdown — export this article"
+  },
+  "cmdExport": {
+    "message": "Export this article as Markdown"
+  },
+  "cmdCopy": {
+    "message": "Copy full-text Markdown"
+  },
+  "menuExport": {
+    "message": "Export this article as Markdown"
+  },
+  "menuCopy": {
+    "message": "Copy full-text Markdown"
+  },
+  "popupHeading": {
+    "message": "Journal to Markdown"
+  },
+  "popupPlatform": {
+    "message": "Platform"
+  },
+  "popupRoutes": {
+    "message": "Sources"
+  },
+  "routeJats": {
+    "message": "JATS"
+  },
+  "routeDom": {
+    "message": "Page"
+  },
+  "routeAbstract": {
+    "message": "Abstract"
+  },
+  "routeChecking": {
+    "message": "checking…"
+  },
+  "routeYes": {
+    "message": "available"
+  },
+  "routeNo": {
+    "message": "not available"
+  },
+  "btnExport": {
+    "message": "Export Markdown"
+  },
+  "btnExportTitle": {
+    "message": "Download this article as a .md file"
+  },
+  "btnCopy": {
+    "message": "Copy Markdown"
+  },
+  "btnCopyTitle": {
+    "message": "Copy the full-text Markdown to the clipboard"
+  },
+  "btnRetry": {
+    "message": "Try again"
+  },
+  "linkSettings": {
+    "message": "Settings"
+  },
+  "popupShortcuts": {
+    "message": "Shortcuts: {export} export · {copy} copy"
+  },
+  "popupNoShortcut": {
+    "message": "not set"
+  },
+  "popupLoading": {
+    "message": "Reading this page…"
+  },
+  "statusWorking": {
+    "message": "Converting…"
+  },
+  "statusSaved": {
+    "message": "Saved {filename}"
+  },
+  "statusCopied": {
+    "message": "Copied {count} characters to the clipboard."
+  },
+  "routeUsedJats": {
+    "message": "Source: Europe PMC JATS (structured full text)."
+  },
+  "routeUsedDom": {
+    "message": "Source: this page."
+  },
+  "noticeAbstractOnly": {
+    "message": "Abstract only: no open full text was found."
+  },
+  "noticeFullTextLink": {
+    "message": "Full text"
+  },
+  "noticeJats_timeout": {
+    "message": "Europe PMC did not respond in time."
+  },
+  "noticeJats_not_available": {
+    "message": "Europe PMC has no open-access full text for this article."
+  },
+  "noticeJats_network": {
+    "message": "Could not reach Europe PMC."
+  },
+  "noticeJats_http": {
+    "message": "Europe PMC returned an error."
+  },
+  "noticeJats_parse": {
+    "message": "Europe PMC returned XML that could not be read."
+  },
+  "noticeJats_invalid_id": {
+    "message": "The PMCID on this page looks invalid."
+  },
+  "noticeFallbackDom": {
+    "message": "Exported from this page instead."
+  },
+  "noticePubmedFulltext": {
+    "message": "Full text found through Europe PMC ({pmcid})."
+  },
+  "noticeEquationImage": {
+    "message": "Some equations only exist as images and were kept as image links."
+  },
+  "err_unsupported_page": {
+    "message": "This page is not supported. Open an article on PMC, Europe PMC or PubMed."
+  },
+  "err_site_planned": {
+    "message": "{site} is not supported yet; it is planned for a later version."
+  },
+  "err_site_disabled": {
+    "message": "{site} is turned off in Settings."
+  },
+  "err_not_article": {
+    "message": "Open a single article page, not a search or list page."
+  },
+  "err_no_content": {
+    "message": "No article content was found on this page. If it is a sign-in or preview page, check your access and reload."
+  },
+  "err_content_unreachable": {
+    "message": "Cannot read this tab. Reload the page and try again."
+  },
+  "err_download_failed": {
+    "message": "The download failed. Check the browser download settings and try again."
+  },
+  "err_clipboard_failed": {
+    "message": "Could not write to the clipboard. Click the page and try again."
+  },
+  "err_unknown": {
+    "message": "Something went wrong. Reload the page and try again."
+  },
+  "optTitle": {
+    "message": "Journal to Markdown settings"
+  },
+  "optWelcomeTitle": {
+    "message": "Thanks for installing"
+  },
+  "optWelcomeBody": {
+    "message": "Open an article on PMC, Europe PMC or PubMed, then click the toolbar icon, press Alt+Shift+M, or right-click the page."
+  },
+  "optSectionOutput": {
+    "message": "Output"
+  },
+  "optFilename": {
+    "message": "File name template"
+  },
+  "optFilenameHelp": {
+    "message": "Tokens: {title} {year} {journal} {firstAuthor} {doi} {pmid} {pmcid}"
+  },
+  "optFilenamePreview": {
+    "message": "Preview: {name}"
+  },
+  "optIncludeImages": {
+    "message": "Include figure images"
+  },
+  "optIncludeImagesHelp": {
+    "message": "When off, figures keep their captions only."
+  },
+  "optPreferJats": {
+    "message": "Prefer structured full text"
+  },
+  "optPreferJatsHelp": {
+    "message": "On PMC and Europe PMC pages, fetch the open-access article XML from Europe PMC first. If it fails or times out, the page itself is used."
+  },
+  "optSectionLanguage": {
+    "message": "Language"
+  },
+  "optLangAuto": {
+    "message": "Follow browser"
+  },
+  "optLangEn": {
+    "message": "English"
+  },
+  "optLangZh": {
+    "message": "中文"
+  },
+  "optSectionSites": {
+    "message": "Sites"
+  },
+  "optSitesHelp": {
+    "message": "Turn a site off to stop exporting from it."
+  },
+  "optSitePlanned": {
+    "message": "Coming in a later version"
+  },
+  "optSaved": {
+    "message": "Saved"
+  },
+  "optVersion": {
+    "message": "Version {version}"
+  },
+  "optPrivacy": {
+    "message": "Articles are converted inside your browser. The only network request is to Europe PMC for open-access article XML."
+  },
+  "btnClose": {
+    "message": "Close"
+  }
+}
