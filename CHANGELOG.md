@@ -22,5 +22,10 @@ First public release.
 - Europe PMC pages without full text no longer include site chrome (author information, full-text links, share panel, affiliation numbers, a second abstract) and are marked `abstract_only` (QA JM-10).
 - Review nits N-A..N-E: identity check tests, no PMCID back-fill from the request, parentheses in image links, stale single-page DOM detection, permission notes; background messages are accepted only from extension pages and supported-site content scripts.
 - Options title stays on one line at 320px; the "JATS: checked on export" hint is shown in the muted colour.
+- ZIP: images on publisher pages come from the publisher's own image URLs (PMC as fallback); the message names the site that refused images (QA JM-M2-01).
+- MDPI: reliable export after the page re-renders (formulas read from the page's server HTML), figure images kept; every failed export shows a message (QA JM-M2-02, M2-03).
+- PLOS JATS: figures no longer point at formula images from their captions (QA JM-M2-04); placeholder "undefined" author names dropped (M2-06); JM-09 also fixed on the PMC page route.
+- PDF parsing: the licence is read only from the article's licence box or metadata, and only CC BY / CC0 skip the confirmation (review M-1, N7, N2).
+- Brand colour is teal #0f766e (matching the icon) in light and dark mode; the floating button stays clear of cookie banners (QA JM-M2-07).
 
 [1.0.0]: https://github.com/Tendo33/journal-md/releases/tag/v1.0.0
