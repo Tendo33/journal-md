@@ -1,0 +1,37 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2022": true,
+    "webextensions": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "rules": {
+    "indent": ["error", 2, { "SwitchCase": 0 }],
+    "linebreak-style": ["error", "unix"],
+    "quotes": ["error", "single", { "avoidEscape": true }],
+    "semi": ["error", "always"],
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "no-console": ["warn", { "allow": ["warn", "error"] }]
+  },
+  "globals": {
+    "chrome": "readonly",
+    "browser": "readonly"
+  },
+  "overrides": [
+    {
+      "files": ["scripts/**/*.js", "webpack.config.js", "jest.config.js"],
+      "env": { "node": true, "browser": false },
+      "parserOptions": { "sourceType": "script" },
+      "rules": { "no-console": "off" }
+    },
+    {
+      "files": ["tests/**/*.js"],
+      "env": { "node": true, "jest": true }
+    }
+  ]
+}

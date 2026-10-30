@@ -1,0 +1,45 @@
+// 打包 dist/（Chrome、Edge 共用）和 dist-firefox/ 为 zip，放进 build/。
+// 移植自 arxiv-md scripts/package.js，多了 Firefox 包。
+const fs = require('fs');
+const path = require('path');
+const archiver = require('archiver');
+
+const root = path.resolve(__dirname, '..');
+const buildDir = path.join(root, 'build');
+const { version } = require('../package.json');
+
+const TARGETS = [
+  { dir: 'dist', name: `journal-md-v${version}-chrome.zip` },
+  { dir: 'dist-firefox', name: `journal-md-v${version}-firefox.zip` },
+];
+
+function zipDir(srcDir, zipPath) {
+  return new Promise((resolve, reject) => {
+    const output = fs.createWriteStream(zipPath);
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    output.on('close', () => resolve(archive.pointer()));
+    archive.on('error', reject);
+    archive.pipe(output);
+    archive.directory(srcDir, false);
+    archive.finalize();
+  });
+}
+
+async function main() {
+  fs.mkdirSync(buildDir, { recursive: true });
+  for (const t of TARGETS) {
+    const src = path.join(root, t.dir);
+    if (!fs.existsSync(path.join(src, 'manifest.json'))) {
+      console.error(`${t.dir}/ is missing. Run npm run build && npm run build:firefox first.`);
+      process.exit(1);
+    }
+    const bytes = await zipDir(src, path.join(buildDir, t.name));
+    console.log(`Package created: build/${t.name} (${(bytes / 1024).toFixed(2)} KB)`);
+  }
+  console.log('The chrome zip is also the Edge Add-ons package.');
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

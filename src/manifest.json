@@ -1,0 +1,94 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extName__",
+  "short_name": "journal-md",
+  "version": "0.1.0",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
+  "author": "SimonSun",
+  "minimum_chrome_version": "121",
+  "icons": {
+    "16": "assets/icon-16.png",
+    "32": "assets/icon-32.png",
+    "48": "assets/icon-48.png",
+    "128": "assets/icon-128.png"
+  },
+  "permissions": [
+    "activeTab",
+    "storage",
+    "downloads",
+    "contextMenus",
+    "clipboardWrite",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://pmc.ncbi.nlm.nih.gov/*",
+    "https://pubmed.ncbi.nlm.nih.gov/*",
+    "https://europepmc.org/*",
+    "https://www.ebi.ac.uk/europepmc/*",
+    "https://*.biomedcentral.com/*",
+    "https://*.springeropen.com/*",
+    "https://link.springer.com/*",
+    "https://www.nature.com/*",
+    "https://www.frontiersin.org/*",
+    "https://www.mdpi.com/*",
+    "https://journals.plos.org/*",
+    "https://elifesciences.org/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/*",
+        "https://pubmed.ncbi.nlm.nih.gov/*",
+        "https://europepmc.org/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "assets/icon-16.png",
+      "32": "assets/icon-32.png",
+      "48": "assets/icon-48.png",
+      "128": "assets/icon-128.png"
+    },
+    "default_title": "__MSG_actionTitle__"
+  },
+  "commands": {
+    "export-markdown": {
+      "suggested_key": {
+        "default": "Alt+Shift+M"
+      },
+      "description": "__MSG_cmdExport__"
+    },
+    "copy-markdown": {
+      "suggested_key": {
+        "default": "Alt+Shift+C"
+      },
+      "description": "__MSG_cmdCopy__"
+    }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "journal-md@tendo33",
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": ["websiteContent"]
+      }
+    }
+  }
+}

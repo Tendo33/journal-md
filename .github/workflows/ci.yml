@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      # Chrome/Edge 包（dist/）和 Firefox 包（dist-firefox/）
+      - run: npm run build
+      - run: npm run build:firefox
+      # 权限白名单、background 字段、gecko id、locales、source map、字面量 Key
+      - run: npm run verify:dist
+      - run: npm run check:keys
+      - run: node scripts/package.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: journal-md-packages
+          path: build/*.zip
+          if-no-files-found: error

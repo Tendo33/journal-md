@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Build outputs
+dist/
+dist-firefox/
+build/
+*.zip
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Extension tooling
+web-ext-artifacts/
+
+# Logs
+logs/
+*.log
+
+# Test
+coverage/
+
+# Temporary files
+tmp/
+*.tmp
+
+# Local task briefs and reports (never committed)
+.task/
