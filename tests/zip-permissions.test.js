@@ -55,11 +55,17 @@ describe('manifest: image CDNs granted at install, exact hosts, both browsers (S
 
 describe('fix2c: nothing asks for a permission at use time', () => {
   const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(dir, e.name)) : [path.join(dir, e.name)]));
-  const sources = [...walk(path.join(__dirname, '../src')), ...walk(path.join(__dirname, '../vendor/pdf-parse-core/src'))].filter((f) => /\.(js|html)$/.test(f));
+  const sources = walk(path.join(__dirname, '../src')).filter((f) => /\.(js|html)$/.test(f));
+  const rel = (f) => path.relative(path.join(__dirname, '..'), f);
 
-  test('no source file calls permissions.request (popup, options, content, background, vendored core)', () => {
+  test('no source file calls permissions.request (popup, options, content, background)', () => {
     const offenders = sources.filter((f) => /permissions\s*\.\s*request\s*\(|\.request\(\s*\{\s*origins/.test(fs.readFileSync(f, 'utf8')));
-    expect(offenders.map((f) => path.relative(path.join(__dirname, '..'), f))).toEqual([]);
+    expect(offenders.map(rel)).toEqual([]);
+  });
+
+  test("nothing uses the vendored core's permission helpers (kept unchanged from arxiv-md, never called here)", () => {
+    const helpers = /\b(requestProviderPermission|ensureProviderPermission|withRequiredPermissions|hasProviderPermission|removeProviderPermission)\b|pdf-core\/permissions/;
+    expect(sources.filter((f) => helpers.test(fs.readFileSync(f, 'utf8'))).map(rel)).toEqual([]);
   });
 
   test('the request helpers and per-page origin lists are gone', () => {

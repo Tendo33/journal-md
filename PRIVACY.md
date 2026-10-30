@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Last updated: 2026-10-30 (fix round 1)** · applies to Journal to Markdown（期刊全文转 Markdown）1.0.0
+**Last updated: 2026-10-30 (fix round 2: all permissions granted at install, no confirmations)** · applies to Journal to Markdown（期刊全文转 Markdown）1.0.0
 
 ## Overview
 
@@ -14,7 +14,7 @@ Settings only: interface language, file name template, whether to include images
 
 ### `chrome.storage.local` (never synced)
 
-- **PDF parsing settings**: whether PDF parsing is on, which service you chose (PaddleOCR or MinerU) and **the tokens you entered**. Tokens are stored only in this browser profile and are sent only to the service they belong to.
+- **PDF parsing settings**: which service you chose (PaddleOCR or MinerU) and **the tokens you entered**. Tokens are stored only in this browser profile and are sent only to the service they belong to.
 - **The last PDF parsing task**: service, article title and page address, state and progress, the job ID returned by the service, an error code if it failed, and the saved file name. It is overwritten by the next task.
 
 Copying an article writes its Markdown to your clipboard. Downloads go to your browser's download folder.
@@ -31,16 +31,16 @@ Nothing is requested when a page loads or when you open the popup. The in-page b
 | `https://www.ebi.ac.uk/europepmc/` | On Springer/BMC, Nature, Frontiers, MDPI, PLOS and eLife pages, when "Prefer structured full text" is on (default) | The article's DOI, to look up its PMCID; then the PMCID if the article is open access |
 | `https://www.frontiersin.org/` | On Frontiers pages, when "Prefer structured full text" is on | A request for the article's own XML file, made from the page itself like any other request the page makes |
 | `https://www.mdpi.com/` | On MDPI pages | One request for the article page you are viewing (same address), made from the page itself like a reload, because the site re-renders its formulas after loading; nothing else is sent |
-| The sites hosting the article's images | Only for "Download ZIP" with images included | Requests for the images shown on the page, without cookies. Images on hosts the extension already has access to (the supported sites) may be fetched by the extension's background page when the image server does not allow it otherwise |
-| `media.springernature.com`, PLOS's image storage (`corpus-prod.…r2.cloudflarestorage.com`) | Only for "Download ZIP" on Springer / BMC / Nature / PLOS articles, and only after you allow the optional permission the popup asks for | Requests for the article's images, without cookies. If you decline, nothing is requested from these hosts: the ZIP is still saved, those images keep their web links in article.md, and a message explains how to allow them later |
+| The sites hosting the article's images | Only for "Download ZIP" with images included | Requests for the images shown on the page, without cookies. Images on hosts the extension has access to (the supported sites and the two image servers below) may be fetched by the extension's background page when the image server does not allow it otherwise |
+| `media.springernature.com`, PLOS's image storage (`corpus-prod.…r2.cloudflarestorage.com`) | Only for "Download ZIP" on Springer / BMC / Nature / PLOS articles | Requests for the article's images, without cookies. Access to these two hosts is granted when you install the extension; nothing is asked when you export. If an image still cannot be downloaded, the ZIP is saved anyway, that image keeps its web link in article.md, and a message names the host |
 
 Requests to Europe PMC carry no cookies and no page address. When Europe PMC cannot be reached, is slow, or has no open-access copy, the extension uses the page you are viewing instead. Turning off "Prefer structured full text" stops all Europe PMC requests except the PubMed full-text lookup for articles that show a PMCID.
 
-### PDF parsing (optional, off by default)
+### PDF parsing (optional, used only when you set it up)
 
-PDF parsing is used only after you turn it on in Settings, choose a service and enter your own token, and then click "Parse PDF" in the popup. The extension contacts **only the service you chose** and never switches to another one on failure.
+PDF parsing is used only after you choose a service in Settings and enter your own token for it, and then click "Parse PDF" in the popup. Without a token the button is not shown and nothing is sent. The extension contacts **only the service you chose** and never switches to another one on failure. Access to the services' hosts is granted when you install the extension; nothing is asked when you parse.
 
-**Open access.** A PDF is sent without asking only when it is on the same site as the article and either (a) the article's licence is **CC BY** (any version) or **CC0**, or (b) the whole site is open access (BMC, SpringerOpen, Frontiers, MDPI, PLOS, eLife) and the page does not state a more restrictive licence. The licence is read only from the article's own licence or copyright box, a `rel="license"` link, or `citation_license` / `dc.rights` metadata — never from links elsewhere on the page such as the reference list. Articles under **CC BY-NC, CC BY-ND, CC BY-SA, CC BY-NC-SA, CC BY-NC-ND** or any other licence, and articles whose status cannot be determined, are treated as not open access: the popup asks "This article is not open access. Uploading it to {service} may violate the publisher's terms. Continue?" before anything is sent. Your answer applies to that one request; there is no "always allow". Only the popup can start PDF parsing; web pages cannot.
+**No confirmation.** Clicking "Parse PDF" sends the request straight away, whatever the article's licence. The extension still notes internally whether an article looks open access (CC BY / CC0, or a fully open-access site without a stricter licence), but this never blocks or delays the request. Only send PDFs you are allowed to share with a third party; the publisher's terms may forbid uploading subscription articles. Only the popup can start PDF parsing; web pages cannot.
 
 What is sent:
 
@@ -67,19 +67,20 @@ A PDF that needs a login or a subscription usually cannot be downloaded by these
 | `clipboardWrite` | Copy Markdown |
 | `https://pmc.ncbi.nlm.nih.gov/*`, `https://pubmed.ncbi.nlm.nih.gov/*`, `https://europepmc.org/*`, `https://link.springer.com/*`, `https://*.biomedcentral.com/*`, `https://*.springeropen.com/*`, `https://www.nature.com/*`, `https://www.frontiersin.org/*`, `https://www.mdpi.com/*`, `https://journals.plos.org/*`, `https://elifesciences.org/*` | Run the converter on article pages of these sites (and fetch images from them for ZIP files) |
 | `https://www.ebi.ac.uk/europepmc/*` | Europe PMC REST API (full text and DOI lookup), only on export |
-| Optional: `https://paddleocr.aistudio-app.com/*`, `https://*.bj.bcebos.com/*` | Requested only when you turn on PDF parsing with PaddleOCR |
-| Optional: `https://mineru.net/*`, `https://cdn-mineru.openxlab.org.cn/*` | Requested only when you turn on PDF parsing with MinerU |
-| Optional: `https://media.springernature.com/*` | Requested only when you click **Download ZIP** in the toolbar popup on a Springer Link / BMC / Nature article whose images are on this image server. Used only to download those images into the ZIP |
-| Optional: `https://corpus-prod.f505aadad1e46610c8f8563037eb3c4b.r2.cloudflarestorage.com/*` | PLOS's image storage (every PLOS figure and formula image redirects to this one Cloudflare R2 bucket). Requested only when you click **Download ZIP** in the toolbar popup on a PLOS article. Used only to download those images into the ZIP |
-| `declarativeNetRequestWithHostAccess` (optional in Chrome/Edge; required at install in Firefox, as in arXiv to Markdown) | Remove the `Origin` header on the extension's own requests to `paddleocr.aistudio-app.com` only. In Firefox the permission is granted at install, so the rule is present from the start, but no request goes to that domain unless you turn on PaddleOCR |
+| `https://paddleocr.aistudio-app.com/*`, `https://*.bj.bcebos.com/*` | PDF parsing with PaddleOCR. Contacted only when you click "Parse PDF" with PaddleOCR selected and a token entered |
+| `https://mineru.net/*`, `https://cdn-mineru.openxlab.org.cn/*` | PDF parsing with MinerU. Contacted only when you click "Parse PDF" with MinerU selected and a token entered |
+| `https://media.springernature.com/*` | Download the images of Springer Link / BMC / Nature articles into the ZIP (this image server does not allow web pages to download them). Contacted only for "Download ZIP" |
+| `https://corpus-prod.f505aadad1e46610c8f8563037eb3c4b.r2.cloudflarestorage.com/*` | PLOS's image storage (every PLOS figure and formula image redirects to this one Cloudflare R2 bucket). Contacted only for "Download ZIP" on a PLOS article |
+| `declarativeNetRequestWithHostAccess` | Remove the `Origin` header on the extension's own requests to `paddleocr.aistudio-app.com` only. The rule is present from install, but no request goes to that domain unless you parse a PDF with PaddleOCR |
 
-In Firefox the extension declares the data collection category `websiteContent` as required, the same declaration as arXiv to Markdown, which shares the PDF parsing code: article content is read in your browser to build the Markdown and, only if you turn on PDF parsing, the article's PDF link is sent to the service you chose. Your PDF service token is your own credential for that service; it is stored only in this browser and sent only to that service.
+All of these are granted when you install the extension, in both Chrome/Edge and Firefox. The extension declares no optional permissions and never asks for a permission while you use it.
+
+In Firefox the extension declares two required data collection categories: `websiteContent` (as arXiv to Markdown, which shares the PDF parsing code: article content is read in your browser to build the Markdown and, when you parse a PDF, the article's PDF link is sent to the service you chose) and `authenticationInfo` (the PDF service token you enter is sent to that service with each parsing request). The token is your own credential; it is stored only in this browser and sent only to the service it belongs to.
 
 ## Your choices
 
-- Turn off "Prefer structured full text", the in-page button, individual sites, or PDF parsing in Settings.
+- Turn off "Prefer structured full text", the in-page button or individual sites in Settings. To stop PDF parsing, delete your token.
 - Delete a token in Settings; it is removed from the browser profile.
-- Revoke optional permissions in your browser's extension settings.
 - Uninstall the extension to remove all of its local data.
 
 ## Open source
