@@ -2,6 +2,8 @@
 // 系列统一（2026-10-30）：样式和位置同 zhihu-md a5957b4 悬浮球的提示气泡——12px/18px 500、内边距 6/10、圆角 6、
 // 90% 不透明表面 + 1px 边框 + 背景模糊、0 4px 12px rgba(0,0,0,.06)；有悬浮按钮时贴在按钮左侧 16px、和按钮垂直居中，
 // 没有按钮时在悬浮球的位置（右 24 / 下 24）。失败用 role=alert（审计 §4.2）。
+import { t } from '../config/i18n';
+
 const HOST_ID = 'journal-md-toast-host';
 const HIDE_MS = 6000;
 
@@ -33,9 +35,10 @@ button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 let hideTimer = null;
 
 /**
- * @param {{closeLabel?:string, beside?:number|null}} opts beside：悬浮按钮的 bottom（px），给了就贴在按钮左边
+ * @param {{lang?:'en'|'zh', closeLabel?:string, beside?:number|null}} opts
+ *   lang：设置里的界面语言（关闭按钮的读屏名称用它，不再默认英文）；beside：悬浮按钮的 bottom（px），给了就贴在按钮左边
  */
-export function showToast(message, kind = 'info', { closeLabel = 'Close', beside = null } = {}) {
+export function showToast(message, kind = 'info', { lang = 'en', closeLabel, beside = null } = {}) {
   let host = document.getElementById(HOST_ID);
   if (!host) {
     host = document.createElement('div');
@@ -61,7 +64,7 @@ export function showToast(message, kind = 'info', { closeLabel = 'Close', beside
   const root = host.shadowRoot;
   const box = root.querySelector('.toast');
   const msg = root.querySelector('.msg');
-  root.querySelector('button').setAttribute('aria-label', closeLabel);
+  root.querySelector('button').setAttribute('aria-label', closeLabel || t(lang, 'btnClose'));
   box.dataset.kind = kind;
   box.setAttribute('role', kind === 'error' ? 'alert' : 'status');
   box.setAttribute('aria-live', kind === 'error' ? 'assertive' : 'polite');

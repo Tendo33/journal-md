@@ -135,3 +135,28 @@ test('series ui-v2: ball geometry and shadow as zhihu-md, menu per audit §4.2',
   expect(css).toMatch(/\.item \{[^}]*min-height: 32px; padding: 6px 12px; border-radius: 6px/);
   f.remove();
 });
+
+describe('fix2b-1: floating button language follows the settings language', () => {
+  const { mountFab: mount, fabLabels } = require('@/content/fab');
+
+  test('labels come from the chosen language, not the page or browser', () => {
+    expect(fabLabels('zh')).toMatchObject({ button: '导出为 Markdown（菜单）', download: '下载 .md', zip: '下载 ZIP（含图片）', copy: '复制 Markdown', hide: '隐藏此按钮', menu: '期刊全文转 Markdown' });
+    expect(fabLabels('en')).toMatchObject({ button: 'Export as Markdown (menu)', download: 'Download .md', hide: 'Hide this button' });
+  });
+
+  test('setLabels switches the language in place (menu open, state kept)', () => {
+    document.documentElement.lang = 'en';
+    const f = mount(document, { labels: fabLabels('en'), onAction: async () => ({ ok: true }), onHide: () => {} });
+    f.button.click();
+    f.setLabels(fabLabels('zh'));
+    expect(f.menu.hidden).toBe(false);
+    expect(f.menu.getAttribute('aria-label')).toBe('期刊全文转 Markdown');
+    expect(Array.from(f.menu.querySelectorAll('[role=menuitem]')).map((i) => i.textContent)).toEqual(['下载 .md', '下载 ZIP（含图片）', '复制 Markdown', '隐藏此按钮']);
+    expect(f.button.getAttribute('aria-label')).toBe('导出为 Markdown（菜单）');
+    f.setState('err', 'x');
+    f.setLabels(fabLabels('en'));
+    expect(f.getState()).toBe('err');
+    expect(f.button.getAttribute('aria-label')).toBe('Failed: x');
+    f.remove();
+  });
+});

@@ -227,6 +227,17 @@ async function main() {
   // 页内悬浮按钮（PMC fixture 页）：键盘打开菜单、方向键、Esc 回到按钮
   const fabBtn = page.locator('journal-md-fab button.fab');
   check('FAB shown on an article page', await fabBtn.isVisible());
+  // fix2b-1：悬浮按钮的语言跟设置走（浏览器是英文时设成中文），并且切换后原地生效
+  const prevSettings = (await sw.evaluate(() => chrome.storage.sync.get('settings'))).settings || {};
+  await sw.evaluate((st) => chrome.storage.sync.set({ settings: { ...st, language: 'zh' } }), prevSettings);
+  await page.waitForTimeout(600);
+  const fabItems = () => page.evaluate(() => [...document.querySelector('journal-md-fab').shadowRoot.querySelectorAll('.item')].map((i) => i.textContent).join('|'));
+  check('fix2b-1: FAB menu follows the settings language (zh)', (await fabItems()) === '下载 .md|下载 ZIP（含图片）|复制 Markdown|隐藏此按钮' && (await fabBtn.getAttribute('aria-label')) === '导出为 Markdown（菜单）', await fabItems());
+  await sw.evaluate((st) => chrome.storage.sync.set({ settings: { ...st, language: 'en' } }), prevSettings);
+  await page.waitForTimeout(600);
+  check('fix2b-1: switching the setting updates the FAB live (en)', (await fabItems()) === 'Download .md|Download ZIP (with images)|Copy Markdown|Hide this button', await fabItems());
+  await sw.evaluate((st) => chrome.storage.sync.set({ settings: st }), prevSettings);
+  await page.waitForTimeout(300);
   check('FAB has an accessible name and menu semantics', /Markdown/.test(await fabBtn.getAttribute('aria-label')) && (await fabBtn.getAttribute('aria-haspopup')) === 'menu');
   const fabFocus = () => page.evaluate(() => {
     const a = document.querySelector('journal-md-fab').shadowRoot.activeElement;

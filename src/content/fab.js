@@ -3,7 +3,24 @@
 // 放在 Shadow DOM 里，不受页面样式影响；键盘：Enter/空格/↓ 打开菜单，↑↓ Home End 移动，Esc 关闭并回到按钮。
 // 结果文字由页内 toast（role=status）播报，按钮本身只更新 aria-label 和 aria-busy，避免读屏念两遍。
 
+import { t } from '../config/i18n';
+
 const HOST_TAG = 'journal-md-fab';
+
+/** 悬浮按钮的全部文案，语言取自设置（resolveLanguage(settings.language)，和弹窗、设置页同一规则），不看页面或浏览器语言 */
+export function fabLabels(lang) {
+  return {
+    button: t(lang, 'fabButton'),
+    menu: t(lang, 'fabMenu'),
+    download: t(lang, 'fabDownload'),
+    zip: t(lang, 'fabZip'),
+    copy: t(lang, 'fabCopy'),
+    hide: t(lang, 'fabHide'),
+    run: t(lang, 'statusWorking').replace(/[….]+$/, ''),
+    ok: t(lang, 'fabDone'),
+    err: t(lang, 'fabFailed'),
+  };
+}
 
 // 系列统一（2026-10-30 审计）：球本体的尺寸、位置、字形和投影同 zhihu-md a5957b4 悬浮球——44px 圆、右 24 / 下 24、
 // 「M↓」700/14、平时 0 4px 12px rgba(0,0,0,.12)，悬停上移 2px、加深并换成 0 12px 32px / 0 4px 12px 两层投影，按下回到原位；
@@ -111,7 +128,8 @@ const FACE = {
  * @param {{ labels: Record<string,string>, onAction: (action:'download'|'zip'|'copy') => Promise<{ok:boolean}>, onHide: () => void }} opts
  *   labels: button / menu / download / zip / copy / hide / run / ok / err
  */
-export function mountFab(doc, { labels, onAction, onHide }) {
+export function mountFab(doc, { labels: initialLabels, onAction, onHide }) {
+  let labels = { ...initialLabels };
   const existing = doc.querySelector(HOST_TAG);
   if (existing && existing.__jmdFab) return existing.__jmdFab;
   const host = doc.createElement(HOST_TAG);
@@ -163,6 +181,7 @@ export function mountFab(doc, { labels, onAction, onHide }) {
   let timer = null;
   const setState = (next, message) => {
     state = next;
+    btn.dataset.message = message || '';
     btn.className = next === 'idle' ? 'fab' : `fab ${next}`;
     const ring = doc.createElement('span');
     ring.className = 'ring';
@@ -251,6 +270,15 @@ export function mountFab(doc, { labels, onAction, onHide }) {
     getState: () => state,
     run,
     reposition,
+    /** 设置里换了语言：原地换文案（菜单开着、按钮状态都不变） */
+    setLabels(next) {
+      labels = { ...next };
+      menu.setAttribute('aria-label', labels.menu);
+      for (const it of items) it.textContent = labels[it.dataset.action] || it.textContent;
+      const msg = btn.dataset.message || '';
+      setState(state, msg);
+    },
+    getLabels: () => ({ ...labels }),
     remove: () => { clearTimeout(timer); clearInterval(poll); if (win) win.removeEventListener('resize', reposition); doc.removeEventListener('pointerdown', outside, true); doc.removeEventListener('close', reposition, true); host.remove(); },
   };
   host.__jmdFab = api;

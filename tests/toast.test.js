@@ -38,3 +38,16 @@ describe('series ui-v2 (zhihu ball tooltip style)', () => {
     expect(css).toContain('--focus: #79c0ff');
   });
 });
+
+describe('fix2b-1: toast language follows the settings language', () => {
+  const { showToast: show } = require('@/content/toast');
+  beforeEach(() => { document.body.innerHTML = ''; global.requestAnimationFrame = (f) => f(); });
+
+  test('the working toast has a Chinese close label when the setting is zh (no English default)', () => {
+    show('正在转换…', 'working', { lang: 'zh' });
+    const btn = document.getElementById('journal-md-toast-host').shadowRoot.querySelector('button');
+    expect(btn.getAttribute('aria-label')).toBe('关闭');
+    show('Done', 'success', { lang: 'en' });
+    expect(btn.getAttribute('aria-label')).toBe('Close');
+  });
+});
