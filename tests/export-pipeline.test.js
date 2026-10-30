@@ -223,7 +223,7 @@ describe('QA JM-10: real Europe PMC pages (2026-10 layout)', () => {
 });
 
 test('N-D does not compare DOIs guessed from publisher URLs', async () => {
-  const doc = new DOMParser().parseFromString('<meta name="citation_title" content="T"><meta name="citation_doi" content="10.1038/nature12373"><article><h2>Intro</h2><p>Body.</p></article>', 'text/html');
+  const doc = new DOMParser().parseFromString('<meta name="citation_title" content="T"><meta name="citation_doi" content="10.1038/nature12373"><article><div class="main-content"><section><h2>Intro</h2><p>Body.</p></section></div></article>', 'text/html');
   const r = await exportArticle({ doc, url: 'https://www.nature.com/articles/s99999-000-00000-0', fetchJats: ok, settings: { preferJats: false }, now: NOW });
   expect(r).toMatchObject({ ok: true, route: 'dom-nature' });
 });
