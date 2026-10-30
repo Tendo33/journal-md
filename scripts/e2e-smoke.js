@@ -128,7 +128,7 @@ async function main() {
   check('popup shows platform', (await popup.textContent('#platform')) === 'PubMed Central');
   check('icon: popup header logo (assets/icon.svg) loads', await popup.$eval('.hd .logo img', (img) => img.complete && img.naturalWidth > 0 && img.getAttribute('src') === 'assets/icon.svg'));
   check('popup shows PMCID', (await popup.textContent('#pmcid')) === 'PMC11000001');
-  check('popup routes: JATS checked on export / Page ✓', /JATS.*(export|导出时检查).*✓/.test(await popup.textContent('#routes')), await popup.textContent('#routes'));
+  check('popup routes: structured full text checked on export / This page ✓', /(Structured full text|结构化全文).*(export|导出时检查).*✓/.test(await popup.textContent('#routes')), await popup.textContent('#routes'));
   check('shortcut hint shows Alt+Shift+J', /Alt\+Shift\+J|⌥⇧J/.test(await popup.textContent('#shortcuts')), await popup.textContent('#shortcuts'));
   check('M-1: opening the popup sends no request', jatsHits.length === 0 && external.length === 0, jatsHits.concat(external).join(', '));
   const rowBefore = await popup.locator('#actions').boundingBox();
@@ -213,7 +213,7 @@ async function main() {
   const deferredColor = await popup.$eval('.route[data-state="deferred"]', (el) => getComputedStyle(el).color);
   const mutedColor = await popup.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--text-2').trim());
   const toRgb = (hex) => `rgb(${parseInt(hex.slice(1, 3), 16)}, ${parseInt(hex.slice(3, 5), 16)}, ${parseInt(hex.slice(5, 7), 16)})`;
-  check('design: "JATS: checked on export" is muted', deferredColor === toRgb(mutedColor), `${deferredColor} vs ${mutedColor}`);
+  check('design: "Structured full text: checked on export" is muted', deferredColor === toRgb(mutedColor), `${deferredColor} vs ${mutedColor}`);
   const btnBoxes = await Promise.all(['#export', '#copy', '#zip'].map((id) => popup.locator(id).boundingBox()));
   // 系列 ui-v2：主按钮独占一行、40 高；同一行的复制 / ZIP 必须同高同顶（R04 只比较同一行）
   check('popup: ZIP button shown; same-row buttons share one height (R04)', btnBoxes.every(Boolean) && Math.abs(btnBoxes[1].height - btnBoxes[2].height) < 0.5 && Math.abs(btnBoxes[1].y - btnBoxes[2].y) < 0.5 && btnBoxes[0].y < btnBoxes[1].y, JSON.stringify(btnBoxes));

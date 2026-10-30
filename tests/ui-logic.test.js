@@ -59,9 +59,9 @@ describe('popup view logic', () => {
     expect(errorText('en', 'nonsense')).toBe(t('en', 'err_unknown'));
   });
   test('routes: JATS is only checked on export (no request when the popup opens)', () => {
-    expect(routeItems('en', { jats: true, dom: true, abstract: true }).map((i) => i.text)).toEqual(['JATS: checked on export', 'Page ✓']);
-    expect(routeItems('zh', { jats: true, dom: true }).map((i) => i.text)).toEqual(['JATS：导出时检查', '页面 ✓']);
-    expect(routeItems('zh', { jats: false, dom: false, abstract: true }).map((i) => i.text)).toEqual(['页面 ✗', '摘要 ✓']);
+    expect(routeItems('en', { jats: true, dom: true, abstract: true }).map((i) => i.text)).toEqual(['Structured full text: checked on export', 'This page ✓']);
+    expect(routeItems('zh', { jats: true, dom: true }).map((i) => i.text)).toEqual(['结构化全文：导出时检查', '当前页面 ✓']);
+    expect(routeItems('zh', { jats: false, dom: false, abstract: true }).map((i) => i.text)).toEqual(['当前页面 ✗', '摘要 ✓']);
   });
   test('shortcut hint', () => {
     expect(shortcutText('en', [{ name: 'export-markdown', shortcut: 'Alt+Shift+J' }, { name: 'copy-markdown', shortcut: '' }])).toBe('Shortcuts: export Alt+Shift+J · copy not set');
@@ -72,13 +72,13 @@ describe('popup view logic', () => {
 describe('describeResult', () => {
   test('download success via JATS', () => {
     expect(describeResult({ ok: true, filename: 'a.md', route: 'jats-europepmc', notices: [] }, 'en', 'download'))
-      .toEqual({ status: 'Saved a.md', notes: [], route: 'Source: Europe PMC JATS (structured full text).' });
+      .toEqual({ status: 'Saved a.md', notes: [], route: 'Source: Europe PMC (structured full text).' });
   });
   test('timeout fallback and abstract-only notes', () => {
     const r = describeResult({ ok: true, filename: 'a.md', route: 'dom-pmc', notices: [{ code: 'jats_fallback', reason: 'timeout' }] }, 'en', 'download');
     expect(r.notes).toEqual(['Europe PMC did not respond in time. Exported from this page instead.']);
     const a = describeResult({ ok: true, abstractOnly: true, markdown: 'abc', route: 'dom-pubmed', notices: [{ code: 'jats_fallback', reason: 'not_available' }, { code: 'abstract_only' }] }, 'zh', 'copy');
-    expect(a.status).toBe('已复制 3 个字符到剪贴板。');
+    expect(a.status).toBe('已复制 3 个字符。');
     expect(a.notes).toEqual(['Europe PMC 上没有这篇文章的开放获取全文。', '仅摘要：没有找到可公开获取的全文。']);
   });
   test('errors', () => {

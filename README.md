@@ -32,8 +32,8 @@
 
 - **四个入口**：页面右下角的 **M↓ 悬浮按钮**（菜单：下载 .md、下载 ZIP、复制）、工具栏弹窗、右键菜单、快捷键 `Alt+Shift+J`（导出）。悬浮按钮可以用键盘操作、读屏可读，跟随系统深色模式，可在设置里或按钮菜单里隐藏。
 - **输出**：YAML front matter（title、authors、journal、year、doi、pmid、pmcid、license、url、`source_route`、exported）；公式写成 `$…$` / `$$…$$`；没有合并单元格的表格写成 GFM 表格，有合并单元格的保留 HTML；正文引用变成 `[^n]` 脚注，参考文献带 DOI 链接；数据可用性、基金、利益冲突、致谢各自成节；补充材料列出文件名和链接。
-- **下载 ZIP**：`article.md` + `images/`，正文里的图片链接改成包内路径。Springer / BMC / Nature 和 PLOS 的图片放在不允许跨站下载的服务器上（`media.springernature.com`、PLOS 的图片存储），扩展安装时就有这两个域名的权限，由后台下载，使用时不再询问。个别图片下载失败时照样生成 ZIP，这些图片保留网络链接并给出提示。
-- **PDF 解析（可选）**：页面上没有可用全文时，可以用你自己的 Token 让 **PaddleOCR**（默认）或 **MinerU** 解析文章 PDF，结果下载为 ZIP。在设置里给所选后端填好 Token，弹窗里就会出现「用 … 解析 PDF」按钮；点击后直接发送 PDF 链接，不弹确认，也不申请权限（两个后端的域名安装时已授予）。请只解析你有权分享给第三方的 PDF。Token 只存在本浏览器（`chrome.storage.local`）。
+- **下载 ZIP**：`article.md` + `images/`，正文里的图片链接改成包内路径。Springer / BMC / Nature 和 PLOS 的图片服务器（`media.springernature.com`、PLOS 的图片存储）不允许跨站下载，由后台下载。个别图片下载失败时照样生成 ZIP，这些图片保留网络链接并给出提示。
+- **PDF 解析（可选）**：页面上没有可用全文时，可以用你自己的 Token 让 **PaddleOCR**（默认）或 **MinerU** 解析文章 PDF，结果下载为 ZIP。在设置里给所选服务填好 Token，弹窗里就会出现「用 … 解析 PDF」按钮；点击后直接发送 PDF 链接，不再确认。请只解析你有权分享给第三方的 PDF。Token 只存在本浏览器（`chrome.storage.local`）。
 - **中英文界面**，跟随浏览器语言，也可在设置里切换。
 
 ## 隐私
