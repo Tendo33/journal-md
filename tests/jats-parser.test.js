@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { parseJats, europePmcAssetUrl } from '@core/parsers/jats';
+import { parseJats } from '@core/parsers/jats';
+import { pmcAssetUrl, rewriteAssetUrl } from '@core/assets';
 import { renderMarkdown } from '@core/render/markdown';
 import { inlinesToPlain } from '@core/article-ir';
 
@@ -37,7 +38,7 @@ describe('parseJats — full Europe PMC article', () => {
     expect(md).toContain('$$\n\\mathbf{y}=\\mathbf{X}\\mathbf{b}+\\mathbf{Z}\\mathbf{u}+\\mathbf{e}\n$$');
     expect(md).toContain('$\\mathbf{u}\\sim N\\left( 0,\\mathbf{G}\\sigma_u^2 \\right)$');
     expect(md).toContain('$$\nh^2=\\frac{\\sigma_u^2}{\\sigma_u^2+\\sigma_e^2}\n$$');
-    expect(md).toContain('![equation](https://europepmc.org/articles/PMC11000001/bin/12711_2025_1_Article_Equ3.jpg)');
+    expect(md).toContain('![equation](https://pmc.ncbi.nlm.nih.gov/articles/instance/11000001/bin/12711_2025_1_Article_Equ3.jpg)');
     expect(ir.notices).toContain('equation_image');
   });
 
@@ -63,7 +64,7 @@ describe('parseJats — full Europe PMC article', () => {
   });
 
   test('figures and tables', () => {
-    expect(md).toContain('![Fig. 1 Manhattan plot for egg weight.](https://europepmc.org/articles/PMC11000001/bin/12711_2025_1_Fig1_HTML.jpg)');
+    expect(md).toContain('![Fig. 1 Manhattan plot for egg weight.](https://pmc.ncbi.nlm.nih.gov/articles/instance/11000001/bin/12711_2025_1_Fig1_HTML.jpg)');
     expect(md).toContain('> **Fig. 1** **Manhattan plot for egg weight.** The dashed line marks genome-wide significance.');
     expect(md).toContain('| Trait | σ<sub>u</sub><sup>2</sup> | h<sup>2</sup> (SE) |\n| --- | --- | --- |\n| EW | 4.12 | 0.45 (0.02) |');
     expect(md).toContain('> <sup>a</sup> Egg number until 72 weeks.');
@@ -76,7 +77,7 @@ describe('parseJats — full Europe PMC article', () => {
     expect(md).toContain('## Funding\n\nThis work was funded by NSFC (32000001).');
     expect(md).toContain('## Competing interests\n\nThe authors declare that they have no competing interests.');
     expect(md).toContain('## Author contributions');
-    expect(md).toContain('- [Additional file 1](https://europepmc.org/articles/PMC11000001/bin/12711_2025_1_MOESM1_ESM.xlsx) — Genotype quality control summary.');
+    expect(md).toContain('- [Additional file 1](https://pmc.ncbi.nlm.nih.gov/articles/instance/11000001/bin/12711_2025_1_MOESM1_ESM.xlsx) — Genotype quality control summary.');
     // 数据可用性不能再留在正文里
     expect(md.indexOf('All scripts are on GitHub')).toBeGreaterThan(md.indexOf('## Data availability'));
   });
@@ -97,7 +98,7 @@ describe('parseJats — sparse article', () => {
   });
 
   test('floats-group figures are rendered, fn-group and body COI classified', () => {
-    expect(md).toContain('## Figures and tables\n\n![Figure 1 Two plumage types.](https://europepmc.org/articles/PMC7000002/bin/animals-11-00002-g001.jpg)');
+    expect(md).toContain('## Figures and tables\n\n![Figure 1 Two plumage types.](https://pmc.ncbi.nlm.nih.gov/articles/instance/7000002/bin/animals-11-00002-g001.jpg)');
     expect(md).toContain('## Funding\n\nFunded by a provincial grant.');
     expect(md).toContain('## Competing interests\n\nNone declared.');
     expect(md).toContain('## Notes\n\nPublished as part of a special issue.');
@@ -109,10 +110,13 @@ describe('parseJats errors and helpers', () => {
     expect(() => parseJats('<article><front>')).toThrow(expect.objectContaining({ code: 'jats_parse' }));
     expect(() => parseJats('<html><body>Not found</body></html>')).toThrow(expect.objectContaining({ code: 'jats_parse' }));
   });
-  test('europePmcAssetUrl adds .jpg only for extension-less images', () => {
-    expect(europePmcAssetUrl('PMC1', 'fig1', 'image')).toBe('https://europepmc.org/articles/PMC1/bin/fig1.jpg');
-    expect(europePmcAssetUrl('PMC1', 'fig1.gif', 'image')).toBe('https://europepmc.org/articles/PMC1/bin/fig1.gif');
-    expect(europePmcAssetUrl('PMC1', 'data.xlsx', 'file')).toBe('https://europepmc.org/articles/PMC1/bin/data.xlsx');
-    expect(europePmcAssetUrl('', 'x', 'image')).toBe('');
+  test('pmcAssetUrl uses the verified PMC instance pattern and adds .jpg only for extension-less images (QA JM-02)', () => {
+    expect(pmcAssetUrl('PMC7095418', '41586_2020_2012_Fig1_HTML.jpg')).toBe('https://pmc.ncbi.nlm.nih.gov/articles/instance/7095418/bin/41586_2020_2012_Fig1_HTML.jpg');
+    expect(pmcAssetUrl('PMC1', 'fig1', 'image')).toBe('https://pmc.ncbi.nlm.nih.gov/articles/instance/1/bin/fig1.jpg');
+    expect(pmcAssetUrl('PMC1', 'fig1.gif', 'image')).toBe('https://pmc.ncbi.nlm.nih.gov/articles/instance/1/bin/fig1.gif');
+    expect(pmcAssetUrl('PMC1', 'data.xlsx', 'file')).toBe('https://pmc.ncbi.nlm.nih.gov/articles/instance/1/bin/data.xlsx');
+    expect(pmcAssetUrl('', 'x', 'image')).toBe('');
+    expect(rewriteAssetUrl('https://europepmc.org/articles/PMC7095418/bin/f1.jpg')).toBe('https://pmc.ncbi.nlm.nih.gov/articles/instance/7095418/bin/f1.jpg');
+    expect(rewriteAssetUrl('https://cdn.ncbi.nlm.nih.gov/pmc/blobs/a/1/b/f.jpg')).toBe('https://cdn.ncbi.nlm.nih.gov/pmc/blobs/a/1/b/f.jpg');
   });
 });

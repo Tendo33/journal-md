@@ -5,19 +5,11 @@ import { stripTexDocument } from '../math/clean-latex';
 import { normalizeDoi, normalizePmcid, normalizePmid, extractYear } from '../ids';
 import { normalizeLicense } from '../license';
 import { classifyBackSection } from './back-matter';
+import { pmcAssetUrl } from '../assets';
 import { ln, kids, child, find, findAll, attr, textOf } from './dom-utils';
 
 const CITATION_TAGS = ['element-citation', 'mixed-citation', 'citation', 'nlm-citation'];
 const SKIP_ABSTRACT_TYPES = new Set(['graphical', 'teaser', 'author-highlights', 'precis', 'editor-summary', 'web-summary', 'toc']);
-
-/** Europe PMC 上图片和附件的地址 */
-export function europePmcAssetUrl(pmcid, href, kind = 'image') {
-  if (!href) return '';
-  if (/^https?:\/\//i.test(href)) return href;
-  if (!pmcid) return '';
-  const file = kind === 'image' && !/\.[a-z0-9]{2,4}$/i.test(href) ? `${href}.jpg` : href;
-  return `https://europepmc.org/articles/${pmcid}/bin/${encodeURI(file)}`;
-}
 
 /** 解析 XML 文本；格式错误时抛出 code=jats_parse 的错误 */
 export function parseJatsXml(xmlText, DOMParserImpl = globalThis.DOMParser) {
@@ -132,7 +124,7 @@ class JatsParser {
   }
 
   asset(href, kind) {
-    return europePmcAssetUrl(this.ir.meta.pmcid || this.pmcidHint, href, kind);
+    return pmcAssetUrl(this.ir.meta.pmcid || this.pmcidHint, href, kind);
   }
 
   // ---------- blocks ----------

@@ -4,6 +4,7 @@ import { mathmlToLatex, isDisplayMath } from '../math/mathml-to-latex';
 import { stripTexDocument } from '../math/clean-latex';
 import { normalizeDoi, normalizePmid } from '../ids';
 import { ln, resolveUrl, textOf } from './dom-utils';
+import { rewriteAssetUrl } from '../assets';
 
 const HEADINGS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 const BLOCK_TAGS = new Set(['p', 'div', 'section', 'article', 'main', 'aside', 'header', 'footer', 'ul', 'ol', 'dl', 'table',
@@ -256,7 +257,7 @@ export class HtmlConverter {
     this.seenFig.add(id);
     const { label, caption } = this.labelAndCaption(el);
     const img = el.querySelector('img');
-    const src = img ? this.url(img.getAttribute('data-src') || img.getAttribute('src')) : '';
+    const src = img ? rewriteAssetUrl(this.url(img.getAttribute('data-src') || img.getAttribute('src'))) : '';
     this.ir.figures.push({ id, label, caption, src, alt: img ? img.getAttribute('alt') || '' : '' });
     return id;
   }

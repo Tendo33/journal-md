@@ -81,7 +81,7 @@ describe('Europe PMC DOM adapter (dom-europepmc)', () => {
   test('body, figure, COI and references', () => {
     expect(md).toContain('## 1. Introduction\n\nPlumage colour varies (Zhao and Li, 2019[^1]).');
     expect(md).toContain('### 2.1. Genotypes\n\nAllele frequency $p=0.3$.');
-    expect(md).toContain('![Figure 1 Two plumage types.](https://europepmc.org/articles/PMC7000002/bin/animals-11-01300-g001.jpg)');
+    expect(md).toContain('![Figure 1 Two plumage types.](https://pmc.ncbi.nlm.nih.gov/articles/instance/7000002/bin/animals-11-01300-g001.jpg)');
     expect(md).toContain('## Competing interests\n\nThe authors declare no conflict of interest.');
     expect(md).toContain('[^1]: Zhao M, Li Q. Duck genetics. Poult Sci. 2019;98:1. https://doi.org/10.3382/ps/pey001');
     expect(md).not.toContain('Cite');
