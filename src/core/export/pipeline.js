@@ -12,6 +12,7 @@ import { renderMarkdown } from '../render/markdown';
 import { buildFilename } from '../filename';
 import { normalizeSettings } from '../../config/settings';
 import { ERR, NOTICE } from '../errors';
+import { normalizePmcid } from '../ids';
 
 const DOM_ADAPTERS = {
   pmc: extractPmc,
@@ -84,6 +85,11 @@ export function jatsMatchesPage(jatsMeta, pageMeta, urlIds = {}) {
   return same(urlIds.pmcid, jatsMeta.pmcid);
 }
 
+/** URL 和页面都给出了同一种 ID 却不相同 */
+export function staleDom(urlIds = {}, pageMeta = {}) {
+  return ['pmcid', 'pmid', 'doi'].some((k) => urlIds[k] && pageMeta[k] && !same(urlIds[k], pageMeta[k]));
+}
+
 async function tryJats(pmcid, url, fetchJats, notices, verify) {
   let res;
   try {
@@ -102,6 +108,7 @@ async function tryJats(pmcid, url, fetchJats, notices, verify) {
       notices.push({ code: NOTICE.JATS_FALLBACK, reason: 'mismatch' });
       return null;
     }
+    if (!ir.meta.pmcid) ir.meta.pmcid = normalizePmcid(pmcid);
     return ir;
   } catch (_) {
     notices.push({ code: NOTICE.JATS_FALLBACK, reason: 'parse' });
@@ -122,6 +129,8 @@ export async function exportArticle({ doc, url, settings: rawSettings, fetchJats
 
   const notices = [];
   const dom = DOM_ADAPTERS[det.site.id](doc, url, det.ids);
+  // 单页应用换了文章、DOM 还没更新时，URL 里的 ID 和页面上的对不上：不导出旧文章（审查 N-D）
+  if (staleDom(det.ids, dom.meta)) return fail(ERR.PAGE_CHANGED);
   const pmcid = dom.meta.pmcid || det.ids.pmcid || '';
   const verify = (jatsMeta) => jatsMatchesPage(jatsMeta, dom.meta, det.ids);
 

@@ -217,5 +217,8 @@
   },
   "btnClose": {
     "message": "关闭"
+  },
+  "err_page_changed": {
+    "message": "页面还在切换到另一篇文章。请等它加载完成后再试。"
   }
 }

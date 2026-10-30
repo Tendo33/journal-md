@@ -71,3 +71,40 @@ describe('frontmatter helpers', () => {
     expect(formatExported(d, -300)).toBe('2026-10-28T08:40-05:00');
   });
 });
+
+describe('asset links (review N-C)', () => {
+  test('unpaired parentheses in file names are percent-encoded', async () => {
+    const { pmcAssetUrl } = await import('@core/assets');
+    expect(pmcAssetUrl('PMC1', 'fig 1).jpg')).toBe('https://pmc.ncbi.nlm.nih.gov/articles/instance/1/bin/fig%201%29.jpg');
+  });
+
+  test('rendered image targets never break on ) and drop non-http sources', async () => {
+    const { renderMarkdown } = await import('@core/render/markdown');
+    const { createArticle } = await import('@core/article-ir');
+    const ir = createArticle({ meta: { title: 'T' } });
+    ir.sections = [{ title: null, blocks: [{ type: 'figure', id: 'f1' }, { type: 'figure', id: 'f2' }], children: [] }];
+    ir.figures = [
+      { id: 'f1', label: 'Fig. 1', caption: [], src: 'https://example.org/a(b.jpg', alt: '' },
+      { id: 'f2', label: 'Fig. 2', caption: [], src: 'javascript:alert(1)', alt: '' },
+    ];
+    const md = renderMarkdown(ir, { now: new Date(0) });
+    expect(md).toContain('](https://example.org/a%28b.jpg)');
+    expect(md).not.toContain('javascript:');
+  });
+});
+
+describe('background sender guard (review N-4)', () => {
+  test('extension pages and supported-site content scripts only', async () => {
+    const { isTrustedSender, isExtensionPageSender } = await import('@/background/message-guards');
+    const base = 'moz-extension://uuid-1/';
+    expect(isTrustedSender({ id: 'me', url: 'chrome-extension://me/popup.html' }, 'me', base)).toBe(true);
+    expect(isTrustedSender({ id: 'me', url: 'moz-extension://uuid-1/options.html' }, 'me', base)).toBe(true);
+    expect(isTrustedSender({ id: 'me', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC1/', tab: { id: 1 } }, 'me', base)).toBe(true);
+    expect(isTrustedSender({ id: 'me', url: 'http://pmc.ncbi.nlm.nih.gov/articles/PMC1/', tab: { id: 1 } }, 'me', base)).toBe(false);
+    expect(isTrustedSender({ id: 'me', url: 'https://evil.example/', tab: { id: 1 } }, 'me', base)).toBe(false);
+    expect(isTrustedSender({ id: 'other', url: 'chrome-extension://other/popup.html' }, 'me', base)).toBe(false);
+    expect(isTrustedSender({ id: 'me', tab: { id: 1 } }, 'me', base)).toBe(false);
+    expect(isExtensionPageSender({ id: 'me', url: 'chrome-extension://me/popup.html' }, 'me', base)).toBe(true);
+    expect(isExtensionPageSender({ id: 'me', url: 'chrome-extension://me/popup.html', tab: { id: 1 } }, 'me', base)).toBe(false);
+  });
+});

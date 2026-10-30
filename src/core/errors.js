@@ -5,6 +5,7 @@ export const ERR = Object.freeze({
   SITE_DISABLED: 'site_disabled',
   NOT_ARTICLE: 'not_article',
   NO_CONTENT: 'no_content',
+  PAGE_CHANGED: 'page_changed',
   CONTENT_UNREACHABLE: 'content_unreachable',
   DOWNLOAD_FAILED: 'download_failed',
   CLIPBOARD_FAILED: 'clipboard_failed',

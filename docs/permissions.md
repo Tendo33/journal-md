@@ -12,6 +12,8 @@
 | `https://europepmc.org/*` | Europe PMC 文章页：注入 content script |
 | `https://www.ebi.ac.uk/europepmc/*` | Europe PMC REST `fullTextXML`：只在用户导出或复制时请求，只带 PMCID，不带 Cookie |
 
+前三个 host 主要服务于 `content_scripts`（在文章页注入脚本、读取当前页 DOM，审查 N-E）；只有 `www.ebi.ac.uk/europepmc` 是扩展主动请求的接口。
+
 打开弹窗、加载页面时不发任何请求。其余 P0 站点在 M1 只是「计划中」提示：弹窗靠点击工具栏图标时的 `activeTab` 读到当前标签页地址来识别站点，不需要这些站点的 host 权限。
 
 图片链接（`https://pmc.ncbi.nlm.nih.gov/articles/instance/{id}/bin/{file}`）只写进 Markdown，扩展本身不去下载。

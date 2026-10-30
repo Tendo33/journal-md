@@ -7,6 +7,7 @@ import { MSG } from '../utils/messages';
 import { downloadMarkdown } from './download';
 import { createMenuBuilder, menuAction } from './context-menu';
 import { createActionRunner } from './run-action';
+import { isTrustedSender } from './message-guards';
 
 const log = (...args) => console.warn('[journal-md]', ...args);
 
@@ -16,8 +17,8 @@ const menus = createMenuBuilder({ menus: chrome.contextMenus, runtime: chrome.ru
 const runner = createActionRunner({ tabs: chrome.tabs, scripting: chrome.scripting, action: chrome.action, log });
 
 export function handleMessage(message, sender) {
-  // 只接受本扩展自己的页面和 content script
-  if (!message || !sender || sender.id !== chrome.runtime.id) return null;
+  // 只接受本扩展自己的页面和支持站点上的 content script（审查 N-4）
+  if (!message || !isTrustedSender(sender, chrome.runtime.id)) return null;
   switch (message.type) {
   case MSG.FETCH_JATS:
     return jats.get(message.pmcid);

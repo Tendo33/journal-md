@@ -475,7 +475,7 @@ class JatsParser {
       else if (type === 'pmid') meta.pmid = normalizePmid(v);
       else if ((type === 'pmcid' || type === 'pmc') && !meta.pmcid) meta.pmcid = normalizePmcid(v);
     }
-    if (!meta.pmcid && this.pmcidHint) meta.pmcid = normalizePmcid(this.pmcidHint);
+    // 不再用请求时的 PMCID 回填：身份校验只能看 XML 自己带的 ID（审查 N-B），回填由导出流程在校验通过后做
 
     const titleGroup = child(am, 'title-group');
     const title = titleGroup && child(titleGroup, 'article-title');

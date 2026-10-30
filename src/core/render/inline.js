@@ -36,10 +36,17 @@ function wrap(marker, inner) {
   return `${m[1]}${marker}${m[2]}${marker}${m[3]}`;
 }
 
-function safeUrl(href) {
+/** Markdown 链接目标里的括号和空白必须编码，否则不配对的「)」会截断链接（审查 N-C） */
+export function encodeLinkTarget(u) {
+  // encodeURIComponent 不编码括号，所以手写百分号编码
+  return String(u || '').trim().replace(/[()\s<>]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')}`);
+}
+
+/** 外部链接：只放行 http(s) / mailto / ftp；ZIP 里的相对路径（images/…）也放行 */
+export function safeUrl(href) {
   const u = String(href || '').trim();
-  if (!/^(https?:|mailto:|ftp:)/i.test(u)) return '';
-  return u.replace(/[()\s]/g, (c) => encodeURIComponent(c));
+  if (!/^(https?:|mailto:|ftp:)/i.test(u) && !/^images\/[^:]+$/.test(u)) return '';
+  return encodeLinkTarget(u);
 }
 
 /**
@@ -81,7 +88,7 @@ function renderInline(n, ctx) {
     return tex ? `$${tex}$` : '';
   }
   case 'mathImage':
-    return n.src ? `![equation (image)](${safeUrl(n.src)})` : '';
+    return n.src ? `![equation (image)](${ctx.asset ? ctx.asset(n.src) : safeUrl(n.src)})` : '';
   case 'link': {
     const label = renderInlines(n.c, ctx).trim();
     const url = safeUrl(n.href);
@@ -122,7 +129,7 @@ export function renderInlinesHtml(inlines, ctx) {
     case 'code': return `<code>${escapeHtml(n.v)}</code>`;
     case 'br': return '<br>';
     case 'math': return escapeHtml(`$${texForMarkdown(n.tex)}$`);
-    case 'mathImage': return n.src ? `<img src="${escapeHtml(safeUrl(n.src))}" alt="equation (image)">` : '';
+    case 'mathImage': return n.src ? `<img src="${escapeHtml(ctx.asset ? ctx.asset(n.src) : safeUrl(n.src))}" alt="equation (image)">` : '';
     case 'link': {
       const url = safeUrl(n.href);
       const label = renderInlinesHtml(n.c, ctx);

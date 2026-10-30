@@ -123,9 +123,11 @@ export function extractDomArticle(doc, url, cfg, ids = {}) {
   const metaArea = first(doc, cfg.metaArea);
   const doiEl = metaArea ? first(metaArea, cfg.doi) : null;
   meta.doi = normalizeDoi(citationMeta(doc, 'citation_doi')[0] || (doiEl && (doiEl.getAttribute('href') || textOf(doiEl))) || '');
-  meta.pmid = normalizePmid(ids.pmid || citationMeta(doc, 'citation_pmid')[0] || '');
+  // 页面上的 ID 优先，URL 里的只作兜底：两者不一致说明单页应用的 DOM 还是上一篇（审查 N-D）
+  const pmidText = metaArea ? (textOf(metaArea).match(/PMID:?\s*(\d{1,9})/i) || [])[1] : '';
+  meta.pmid = normalizePmid(citationMeta(doc, 'citation_pmid')[0] || pmidText || ids.pmid || '');
   const pmcText = metaArea ? (textOf(metaArea).match(/PMCID:?\s*(PMC\d+)/i) || [])[1] : '';
-  meta.pmcid = normalizePmcid(ids.pmcid || citationMeta(doc, 'citation_pmcid')[0] || pmcText || '');
+  meta.pmcid = normalizePmcid(citationMeta(doc, 'citation_pmcid')[0] || pmcText || ids.pmcid || '');
   const lic = first(root, cfg.license) || first(doc, cfg.license);
   meta.license = lic ? normalizeLicense(lic.getAttribute('href') || textOf(lic)) : '';
   meta.keywords = citationMeta(doc, 'citation_keywords').flatMap(splitKeywords);

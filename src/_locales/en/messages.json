@@ -217,5 +217,8 @@
   },
   "btnClose": {
     "message": "Close"
+  },
+  "err_page_changed": {
+    "message": "The page is still switching to another article. Wait until it finishes loading, then try again."
   }
 }

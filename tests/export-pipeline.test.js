@@ -174,3 +174,24 @@ describe('inspectPage', () => {
     expect(inspectPage(html('pmc-article.html'), 'https://www.mdpi.com/2076-2615/11/5/1300')).toMatchObject({ ok: false, error: 'site_planned', siteName: 'MDPI' });
   });
 });
+
+describe('review nits N-A / N-B / N-D', () => {
+  test('N-A: PMID and DOI comparable and different → mismatch even when the URL PMCID equals the JATS PMCID', () => {
+    expect(jatsMatchesPage({ pmid: '1', doi: '10.1/a', pmcid: 'PMC9' }, { pmid: '2', doi: '10.1/b' }, { pmcid: 'PMC9' })).toBe(false);
+  });
+
+  test('N-B: XML without its own PMCID cannot vouch for the URL PMCID', async () => {
+    const xml = '<article><front><article-meta><title-group><article-title>T</article-title></title-group><abstract><p>A</p></abstract></article-meta></front><body><sec><title>S</title><p>x</p></sec></body></article>';
+    const { parseJats } = await import('@core/parsers/jats');
+    const ir = parseJats(xml, { pmcid: 'PMC11000001' });
+    expect(ir.meta.pmcid).toBe('');
+    expect(jatsMatchesPage(ir.meta, {}, { pmcid: 'PMC11000001' })).toBe(false);
+  });
+
+  test('N-D: stale single-page DOM (URL PMID ≠ page PMID) is not exported', async () => {
+    const doc = html('pubmed-with-pmcid.html');
+    const r = await exportArticle({ doc, url: 'https://pubmed.ncbi.nlm.nih.gov/12345/', fetchJats: ok, now: NOW });
+    expect(r).toEqual({ ok: false, error: 'page_changed' });
+    expect(ok).not.toHaveBeenCalled();
+  });
+});

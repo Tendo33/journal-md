@@ -12,7 +12,7 @@ export function pmcAssetUrl(pmcid, href, kind = 'image') {
   const id = normalizePmcid(pmcid);
   if (!id) return '';
   const file = kind === 'image' && !/\.[a-z0-9]{2,4}$/i.test(href) ? `${href}.jpg` : href;
-  return `https://pmc.ncbi.nlm.nih.gov/articles/instance/${id.slice(3)}/bin/${encodeURI(file)}`;
+  return `https://pmc.ncbi.nlm.nih.gov/articles/instance/${id.slice(3)}/bin/${encodeURI(file).replace(/\(/g, '%28').replace(/\)/g, '%29')}`;
 }
 
 /** 把已知打不开的 Europe PMC bin 地址改写成 PMC instance 地址；其他地址原样返回 */

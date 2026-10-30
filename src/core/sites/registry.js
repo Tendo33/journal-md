@@ -58,6 +58,12 @@ function hostMatches(host, pattern) {
   return host === pattern;
 }
 
+/** 主机名属于某个已支持站点（后台校验消息来源用） */
+export function isSupportedHost(hostname) {
+  const host = String(hostname || '').toLowerCase();
+  return SITES.some((s) => s.status === SITE_STATUS.SUPPORTED && s.hosts.some((h) => hostMatches(host, h)));
+}
+
 export function getSite(id) {
   return SITES.find((s) => s.id === id) || null;
 }

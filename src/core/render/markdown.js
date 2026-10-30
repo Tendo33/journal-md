@@ -1,7 +1,7 @@
 // ArticleIR → Markdown（PRD §2.3）。JATS 和 DOM 两条路共用这一个渲染器。
 import { inlinesToPlain, blocksToPlain } from '../article-ir';
 import { renderFrontMatter, formatExported } from './frontmatter';
-import { renderInlines, escapeLineStart, texForMarkdown, unwrapFootnoteGroups } from './inline';
+import { renderInlines, escapeLineStart, texForMarkdown, unwrapFootnoteGroups, encodeLinkTarget, safeUrl } from './inline';
 import { renderTableBody } from './table';
 
 export const ABSTRACT_ONLY_MARKER = 'Abstract only / 仅摘要';
@@ -51,7 +51,14 @@ class Renderer {
     this.ctx = {
       citeNumber: (rid) => this.refIndex.get(rid) || null,
       cited: this.cited,
+      asset: (src) => this.asset(src),
     };
+  }
+
+  /** 图片地址：打包 ZIP 时换成包内路径（opts.rewriteAsset），再编码括号和空白（审查 N-C） */
+  asset(src) {
+    const u = this.opts.rewriteAsset ? this.opts.rewriteAsset(src) || src : src;
+    return safeUrl(u);
   }
 
   inl(inlines) {
@@ -80,7 +87,7 @@ class Renderer {
       return tex ? `$$\n${tex}\n$$` : '';
     }
     case 'mathImage':
-      return b.src ? `![equation](${b.src})\n\n*Equation shown as image (no TeX source available).*` : '';
+      return this.asset(b.src) ? `![equation](${this.asset(b.src)})\n\n*Equation shown as image (no TeX source available).*` : '';
     case 'figure':
       return this.figure(this.figures.get(b.id));
     case 'table':
@@ -98,7 +105,7 @@ class Renderer {
     if (!f || this.placed.has(`f:${f.id}`)) return '';
     this.placed.add(`f:${f.id}`);
     const parts = [];
-    if (this.opts.includeImages && f.src) parts.push(`![${shortCaption(f.label, f.caption) || 'Figure'}](${f.src})`);
+    if (this.opts.includeImages && this.asset(f.src)) parts.push(`![${shortCaption(f.label, f.caption) || 'Figure'}](${this.asset(f.src)})`);
     const caption = this.blocks(f.caption);
     const label = f.label ? `**${this.inl([{ t: 'text', v: f.label }])}**` : '';
     const quote = [label, caption].filter(Boolean).join(' ');
@@ -117,7 +124,7 @@ class Renderer {
     if (head) parts.push(head);
     const body = renderTableBody(t, this.ctx);
     if (body) parts.push(body);
-    else if (t.src) parts.push(`![${shortCaption(t.label, t.caption) || 'Table'}](${t.src})`);
+    else if (this.asset(t.src)) parts.push(`![${shortCaption(t.label, t.caption) || 'Table'}](${this.asset(t.src)})`);
     const foot = this.blocks(t.foot);
     if (foot) parts.push(prefixLines(foot, '> '));
     return parts.join('\n\n');
@@ -187,7 +194,7 @@ class Renderer {
     if (!items.length) return '';
     const lines = items.map((s) => {
       const label = s.label || 'Supplementary file';
-      const name = s.href ? `[${this.inl([{ t: 'text', v: label }])}](${s.href})` : `**${this.inl([{ t: 'text', v: label }])}**`;
+      const name = s.href ? `[${this.inl([{ t: 'text', v: label }])}](${encodeLinkTarget(s.href)})` : `**${this.inl([{ t: 'text', v: label }])}**`;
       const caption = oneLine(this.blocks(s.caption));
       return `- ${name}${caption ? ` — ${caption}` : ''}`;
     });
@@ -264,6 +271,7 @@ export function renderMarkdown(ir, options = {}) {
     includeImages: options.includeImages !== false,
     exported: options.exported || formatExported(options.now || new Date()),
     tags: options.tags || ['paper'],
+    rewriteAsset: options.rewriteAsset || null,
   };
   return new Renderer(ir, opts).render();
 }
