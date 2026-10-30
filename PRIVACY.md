@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Last updated: 2026-10-30** · applies to Journal to Markdown（期刊全文转 Markdown）1.0.0
+**Last updated: 2026-10-30 (fix round 1)** · applies to Journal to Markdown（期刊全文转 Markdown）1.0.0
 
 ## Overview
 
@@ -38,7 +38,7 @@ Requests to Europe PMC carry no cookies and no page address. When Europe PMC can
 
 PDF parsing is used only after you turn it on in Settings, choose a service and enter your own token, and then click "Parse PDF" in the popup. The extension contacts **only the service you chose** and never switches to another one on failure.
 
-**Open access.** Only open-access PDFs are sent without asking: a PDF on the same site as the article when that whole site is open access (BMC, SpringerOpen, Frontiers, MDPI, PLOS, eLife), or an article whose page declares a Creative Commons licence. For every other article, or when this cannot be determined, the popup asks "This article is not open access. Uploading it to {service} may violate the publisher's terms. Continue?" before anything is sent. Your answer applies to that one request; there is no "always allow". Only the popup can start PDF parsing; web pages cannot.
+**Open access.** A PDF is sent without asking only when it is on the same site as the article and either (a) the article's licence is **CC BY** (any version) or **CC0**, or (b) the whole site is open access (BMC, SpringerOpen, Frontiers, MDPI, PLOS, eLife) and the page does not state a more restrictive licence. The licence is read only from the article's own licence or copyright box, a `rel="license"` link, or `citation_license` / `dc.rights` metadata — never from links elsewhere on the page such as the reference list. Articles under **CC BY-NC, CC BY-ND, CC BY-SA, CC BY-NC-SA, CC BY-NC-ND** or any other licence, and articles whose status cannot be determined, are treated as not open access: the popup asks "This article is not open access. Uploading it to {service} may violate the publisher's terms. Continue?" before anything is sent. Your answer applies to that one request; there is no "always allow". Only the popup can start PDF parsing; web pages cannot.
 
 What is sent:
 

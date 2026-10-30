@@ -32,6 +32,17 @@ describe('OA gate (PRD §2.11)', () => {
     [{ pageUrl: PLOS, pdfUrl: 'http://journals.plos.org/x.pdf' }, false],
     [{ pageUrl: 'not a url', pdfUrl: 'https://journals.plos.org/x.pdf' }, false],
     [null, false],
+    // 审查 N7：只有 CC BY / CC0 免确认
+    [{ pageUrl: NATURE, pdfUrl: `${NATURE}.pdf`, license: 'CC-BY-4.0' }, true],
+    [{ pageUrl: NATURE, pdfUrl: `${NATURE}.pdf`, license: 'CC0-1.0' }, true],
+    [{ pageUrl: NATURE, pdfUrl: `${NATURE}.pdf`, license: 'CC-BY-NC-4.0' }, false],
+    [{ pageUrl: NATURE, pdfUrl: `${NATURE}.pdf`, license: 'CC-BY-ND-4.0' }, false],
+    [{ pageUrl: NATURE, pdfUrl: `${NATURE}.pdf`, license: 'CC-BY-NC-SA-4.0' }, false],
+    [{ pageUrl: NATURE, pdfUrl: `${NATURE}.pdf`, license: 'CC-BY-SA-4.0' }, false],
+    // 整站 OA 的出版商，但页面写了更严的许可
+    [{ pageUrl: PLOS, pdfUrl: 'https://journals.plos.org/x.pdf', license: 'CC-BY-NC-ND-4.0' }, false],
+    // 审查 N2：CC BY 但 PDF 在别的站点
+    [{ pageUrl: NATURE, pdfUrl: 'https://files.example.org/x.pdf?sig=1', license: 'CC-BY-4.0' }, false],
   ])('%j → %s', (info, oa) => {
     expect(isOpenAccessPdf(info)).toBe(oa);
   });

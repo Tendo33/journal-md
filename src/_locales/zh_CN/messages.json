@@ -354,7 +354,7 @@
     "message": "PDF 解析（可选）"
   },
   "optPdfHelp": {
-    "message": "页面上没有可用全文时，可以用你自己的 Token 让第三方服务解析文章 PDF。默认关闭。只有开放获取的 PDF 会直接发送；其他文章每次都会在弹窗里先问你。"
+    "message": "页面上没有可用全文时，可以用你自己的 Token 让第三方服务解析文章 PDF。默认关闭。只有许可为 CC BY 或 CC0（或整站开放获取、页面没写更严许可）的 PDF 会直接发送；CC BY-NC / ND / SA 和其他文章每次都会在弹窗里先问你。"
   },
   "optPdfEnabled": {
     "message": "启用 PDF 解析"

@@ -354,7 +354,7 @@
     "message": "PDF parsing (optional)"
   },
   "optPdfHelp": {
-    "message": "When a page has no usable full text, the article PDF can be parsed by a third-party service with your own token. Off by default. Only open-access PDFs are sent without asking; for other articles the popup asks you every time."
+    "message": "When a page has no usable full text, the article PDF can be parsed by a third-party service with your own token. Off by default. Only PDFs licensed CC BY or CC0 (or on a fully open-access site that states no stricter licence) are sent without asking; for CC BY-NC / ND / SA and any other article the popup asks you every time."
   },
   "optPdfEnabled": {
     "message": "Enable PDF parsing"
