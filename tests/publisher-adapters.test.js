@@ -183,6 +183,8 @@ describe('eLife (Homo naledi)', () => {
 
   test('metadata from Dublin Core tags only', () => {
     expect(r).toMatchObject({ ok: true, route: 'dom-elife', meta: { doi: '10.7554/eLife.09560', license: 'CC-BY-4.0' } });
+    // 没有 citation_pdf_url：PDF 地址来自页面上的「Article PDF」下载链接（L3 PDF 解析用）
+    expect(r.meta.pdfUrl).toMatch(/^https:\/\/elifesciences\.org\/download\/.+\/elife-09560-v1\.pdf\?/);
     expect(r.markdown).toContain('journal: eLife');
     expect(r.markdown).toMatch(/^authors: \[Lee R Berger, John Hawks, /m);
   });

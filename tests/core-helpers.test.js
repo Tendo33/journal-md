@@ -105,6 +105,8 @@ describe('background sender guard (review N-4)', () => {
     expect(isTrustedSender({ id: 'other', url: 'chrome-extension://other/popup.html' }, 'me', base)).toBe(false);
     expect(isTrustedSender({ id: 'me', tab: { id: 1 } }, 'me', base)).toBe(false);
     expect(isExtensionPageSender({ id: 'me', url: 'chrome-extension://me/popup.html' }, 'me', base)).toBe(true);
-    expect(isExtensionPageSender({ id: 'me', url: 'chrome-extension://me/popup.html', tab: { id: 1 } }, 'me', base)).toBe(false);
+    expect(isExtensionPageSender({ id: 'me', url: 'chrome-extension://me/options.html', tab: { id: 1 } }, 'me', base)).toBe(true);
+    expect(isExtensionPageSender({ id: 'me', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC1/', tab: { id: 1 } }, 'me', base)).toBe(false);
+    expect(isExtensionPageSender({ id: 'me', tab: { id: 1, url: 'chrome-extension://me/popup.html' } }, 'me', base)).toBe(false);
   });
 });

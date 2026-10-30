@@ -40,8 +40,12 @@ export function isTrustedSender(sender, runtimeId, baseUrl) {
   }
 }
 
-/** 只有扩展自己的页面（popup / 设置页）能发：content script 带 sender.tab，一律拒绝，网页脚本没法替用户点确认 */
+/**
+ * 只有扩展自己的页面（popup、以标签页打开的设置页）能发：看发消息的 frame 地址（sender.url）必须是本扩展页面。
+ * content script 的 sender.url 是网页地址，一律拒绝，网页脚本没法替用户点确认。
+ * 和 arxiv-md 不同，这里不因为带 sender.tab 就拒绝：设置页 open_in_tab，也要能测试 Token。
+ */
 export function isExtensionPageSender(sender, runtimeId, baseUrl) {
-  if (!sender || !runtimeId || sender.id !== runtimeId || sender.tab) return false;
+  if (!sender || !runtimeId || sender.id !== runtimeId) return false;
   return isExtensionPageUrl(sender.url, runtimeId, baseUrl);
 }

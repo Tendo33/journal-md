@@ -153,10 +153,12 @@ async function startPdf(consent) {
     r = { ok: false, code: 'NETWORK' };
   }
   $('pdf').removeAttribute('aria-disabled');
-  // 任务开始后的状态由 storage 变化推送；没开始就失败（如另一个任务在跑）时在这里显示
-  if (r && !r.ok && ['BUSY', 'CONSENT_REQUIRED', 'PDF_DISABLED', 'FILE_UNSUPPORTED'].includes(r.code)) {
-    setPdfStatus({ state: 'failed', errorCode: r.code, provider: pdfSettings.provider });
-  }
+  if (r && r.ok) return;
+  // 任务过程中的状态由 storage 变化推送；最后再读一次，没开始就失败（另一个任务在跑、没确认……）时用返回的错误码
+  const got = await chrome.storage.local.get(PDF_TASK_KEY);
+  const task = got && got[PDF_TASK_KEY];
+  if (task && task.pageUrl === tab.url && task.state === 'failed') setPdfStatus(task);
+  else setPdfStatus({ state: 'failed', errorCode: (r && r.code) || 'PROVIDER_FAILED', provider: pdfSettings.provider });
 }
 
 /** PRD §2.11：非 OA 或拿不准的先确认，每次都问，没有「总是允许」 */
