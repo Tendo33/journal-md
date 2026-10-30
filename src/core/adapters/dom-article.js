@@ -3,6 +3,7 @@
 import { createArticle, inlinesToPlain, trimInlines } from '../article-ir';
 import { HtmlConverter, refIdsFromElement, citationMeta } from '../parsers/html-blocks';
 import { classifyBackSection } from '../parsers/back-matter';
+import { completeDanglingSections } from '../parsers/dangling';
 import { normalizeDoi, normalizePmcid, normalizePmid, extractYear } from '../ids';
 import { normalizeLicense } from '../license';
 import { textOf, resolveUrl } from '../parsers/dom-utils';
@@ -118,9 +119,15 @@ function refText(conv, li, cfg) {
 
 function suppItems(conv, root, cfg, baseUrl) {
   const out = [];
+  const seen = new Set();
   all(root, cfg.supp).forEach((el, i) => {
     const link = el.querySelector('a[href]');
     const href = link ? resolveUrl(link.getAttribute('href'), baseUrl) : '';
+    // 同一个文件列了两次（PMC 页面上的 MOESM1，QA JM-09）只留一条
+    if (href) {
+      if (seen.has(href)) return;
+      seen.add(href);
+    }
     const captionEls = all(el, cfg.suppCaption).filter((c) => !c.contains(link));
     let text = captionEls.map(textOf).filter(Boolean).join(' ');
     let label = '';
@@ -238,6 +245,7 @@ export function extractDomArticle(doc, url, cfg, ids = {}) {
   if (cfg.abstractByHeading) { const a = abstractByHeading(body); if (a) a.remove(); }
   if (cfg.hooks && cfg.hooks.prepareBody) cfg.hooks.prepareBody(body);
   const sections = conv.sections(body);
+  completeDanglingSections(sections);
 
   const plainTitle = (x) => inlinesToPlain(x.title || []).replace(/\s+/g, ' ').trim();
   // 子节里的致谢 / 利益冲突 / 数据可用性也移到文末（Springer「Additional information > Competing interests」、

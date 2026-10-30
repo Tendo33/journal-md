@@ -126,3 +126,14 @@ describe('PubMed adapter (dom-pubmed)', () => {
     expect(renderMarkdown(ir, { exported: EXPORTED })).toContain('— Full text: <https://example-publisher.cn/article/123>');
   });
 });
+
+describe('QA JM-09 on the PMC page route (real PMC7095418 page)', () => {
+  test('dangling "is available for this paper" sentence is completed; MOESM1 listed once', async () => {
+    const { exportArticle } = await import('@core/export/pipeline');
+    const r = await exportArticle({ doc: loadHtml('pmc-7095418.html'), url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC7095418/', fetchJats: async () => ({ ok: false, reason: 'timeout' }), now: new Date(0) });
+    expect(r.route).toBe('dom-pmc');
+    expect(r.markdown).not.toMatch(/^is available for this paper/m);
+    expect(r.markdown).toContain('Extended data is available for this paper at <https://doi.org/10.1038/s41586-020-2012-7>.');
+    expect(r.markdown.match(/^- .*MOESM1_ESM\.pdf/gm)).toHaveLength(1);
+  });
+});
