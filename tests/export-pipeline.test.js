@@ -227,3 +227,12 @@ test('N-D does not compare DOIs guessed from publisher URLs', async () => {
   const r = await exportArticle({ doc, url: 'https://www.nature.com/articles/s99999-000-00000-0', fetchJats: ok, settings: { preferJats: false }, now: NOW });
   expect(r).toMatchObject({ ok: true, route: 'dom-nature' });
 });
+
+test('QA JM-M2-06: a placeholder "undefined" author name from the page is dropped', async () => {
+  const doc = html('europepmc-med-31862249.html');
+  const names = doc.querySelectorAll('.metadata--author-name');
+  names[names.length - 1].textContent = 'undefined';
+  const r = await exportArticle({ doc, url: 'https://europepmc.org/article/MED/31862249', fetchJats: ok, now: NOW });
+  expect(r.markdown).toMatch(/^authors: \[Lagae L, .*Ceulemans B\]$/m);
+  expect(r.markdown).not.toContain('undefined');
+});

@@ -24,7 +24,7 @@ function authors(doc) {
   const out = [];
   for (const item of items) {
     const name = textOf(q(item, '.full-name')) || textOf(item).replace(/\s*\d+(,\s*\d+)*\s*$/, '');
-    if (!name || seen.has(name)) continue;
+    if (!name || seen.has(name) || /^\s*(undefined|null)\s*$/i.test(name)) continue;
     seen.add(name);
     const affiliations = qa(item, '.affiliation-link').map((a) => (a.getAttribute('title') || '').trim()).filter(Boolean);
     out.push({ name, affiliations });

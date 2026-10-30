@@ -11,6 +11,8 @@ const REF_LINK_NOISE = /^(DOI|PubMed|PMC free article|Google Scholar|CrossRef|Cr
 const DROP_SECTION = /^(references?|literature cited|bibliography|associated data|supplementary (information|materials?|data)|additional files?|electronic supplementary material|citations?( (&|and) impact)?|cited by|similar articles|related articles|articles citing this|author information|authors? and affiliations|ethics declarations|additional information|rights and permissions|about this article|cite this article|share this article|comments|statements|authors[’'] original submitted files for images|peer review( information)?|publisher[’']s note|reprints and permissions|metrics|article and author information|download links|copyright)$/i;
 const NOTES_SECTION = /^(footnotes?|notes|article notes)$/i;
 
+const PLACEHOLDER_NAME = /^\s*(undefined|null|nan|\[object object\])\s*$/i;
+
 function first(root, selectors) {
   for (const s of [].concat(selectors || [])) {
     try {
@@ -158,7 +160,8 @@ export function extractDomArticle(doc, url, cfg, ids = {}) {
   meta.title = (metaValues(doc, 'citation_title', 'dc.title')[0] || textOf(h1)).replace(/\s+/g, ' ').trim();
   const authors = metaValues(doc, 'citation_author', 'dc.creator', 'dc.contributor').map(personName);
   const authorEls = authors.length ? [] : all(root, cfg.authors);
-  meta.authors = (authors.length ? authors : authorEls.map(textOf)).filter(Boolean)
+  // 前端页面没渲染完时姓名位置可能是字面的「undefined」（Europe PMC 的团体作者，QA JM-M2-06）
+  meta.authors = (authors.length ? authors : authorEls.map(textOf)).filter((n) => n && !PLACEHOLDER_NAME.test(n))
     .filter((n, i, arr) => arr.indexOf(n) === i).map((name) => ({ name, affiliations: [] }));
   meta.journal = metaValues(doc, 'citation_journal_title')[0] || textOf(first(root, cfg.journal)) || (cfg.journalName || '');
   meta.year = extractYear(metaValues(doc, 'citation_publication_date', 'citation_date', 'citation_online_date', 'dc.date')[0] || textOf(first(root, cfg.date)));
