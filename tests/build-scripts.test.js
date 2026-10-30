@@ -82,7 +82,7 @@ describe('verifyDist on a temp directory', () => {
   test('source maps and keys fail', () => {
     const dir = makeDist((d) => {
       fs.writeFileSync(path.join(d, 'content.js.map'), '{}');
-      fs.writeFileSync(path.join(d, 'popup.js'), 'x\n//# sourceMappingURL=popup.js.map\nconst k="sk-abcdefghijklmnopqrstu";');
+      fs.writeFileSync(path.join(d, 'popup.js'), `x\n//# sourceMappingURL=popup.js.map\nconst k="${'sk'}-abcdefghijklmnopqrstu";`);
     });
     const errors = verifyDist(dir, 'chrome');
     expect(errors).toEqual(expect.arrayContaining([
@@ -94,7 +94,7 @@ describe('verifyDist on a temp directory', () => {
 });
 
 test('check-no-keys detects common key formats', () => {
-  expect(scanText('const a = "AKIAABCDEFGHIJKLMNOP";').map((h) => h.name)).toEqual(['AWS access key']);
+  expect(scanText(`const a = "${'AKIA'}ABCDEFGHIJKLMNOP";`).map((h) => h.name)).toEqual(['AWS access key']);
   expect(scanText('Bearer ${token}')).toEqual([]);
 });
 
