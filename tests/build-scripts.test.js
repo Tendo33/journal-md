@@ -16,6 +16,10 @@ describe('source manifest', () => {
     expect(manifest.optional_host_permissions).toBeUndefined();
     expect(verifyPermissions(manifest)).toEqual([]);
   });
+  test('shortcuts: export Alt+Shift+J (no clash with arxiv-md Alt+Shift+M / zhihu-md Alt+Shift+K), copy unassigned', () => {
+    expect(manifest.commands['export-markdown'].suggested_key).toEqual({ default: 'Alt+Shift+J' });
+    expect(manifest.commands['copy-markdown'].suggested_key).toBeUndefined();
+  });
   test('name, description and commands are localized', () => {
     expect(manifest.name).toBe('__MSG_extName__');
     expect(manifest.description).toBe('__MSG_extDescription__');

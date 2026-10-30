@@ -66,7 +66,7 @@
     "message": "设置"
   },
   "popupShortcuts": {
-    "message": "快捷键：{export} 导出 · {copy} 复制"
+    "message": "快捷键：导出 {export} · 复制 {copy}"
   },
   "popupNoShortcut": {
     "message": "未设置"
@@ -156,7 +156,7 @@
     "message": "感谢安装"
   },
   "optWelcomeBody": {
-    "message": "打开 PMC、Europe PMC 或 PubMed 上的文章，然后点击工具栏图标、按 Alt+Shift+M，或在页面上点右键。"
+    "message": "打开 PMC、Europe PMC 或 PubMed 上的文章，然后点击工具栏图标、按 Alt+Shift+J，或在页面上点右键。"
   },
   "optSectionOutput": {
     "message": "输出"

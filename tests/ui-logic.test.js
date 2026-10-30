@@ -63,7 +63,8 @@ describe('popup view logic', () => {
     expect(routeItems('zh', { jats: false, dom: false, abstract: true }).map((i) => i.text)).toEqual(['页面 ✗', '摘要 ✓']);
   });
   test('shortcut hint', () => {
-    expect(shortcutText('en', [{ name: 'export-markdown', shortcut: 'Alt+Shift+M' }])).toBe('Shortcuts: Alt+Shift+M export · not set copy');
+    expect(shortcutText('en', [{ name: 'export-markdown', shortcut: 'Alt+Shift+J' }, { name: 'copy-markdown', shortcut: '' }])).toBe('Shortcuts: export Alt+Shift+J · copy not set');
+    expect(shortcutText('zh', [{ name: 'export-markdown', shortcut: 'Alt+Shift+J' }])).toBe('快捷键：导出 Alt+Shift+J · 复制 未设置');
   });
 });
 

@@ -67,14 +67,11 @@
   "commands": {
     "export-markdown": {
       "suggested_key": {
-        "default": "Alt+Shift+M"
+        "default": "Alt+Shift+J"
       },
       "description": "__MSG_cmdExport__"
     },
     "copy-markdown": {
-      "suggested_key": {
-        "default": "Alt+Shift+C"
-      },
       "description": "__MSG_cmdCopy__"
     }
   },
@@ -87,7 +84,9 @@
       "id": "journal-md@tendo33",
       "strict_min_version": "140.0",
       "data_collection_permissions": {
-        "required": ["websiteContent"]
+        "required": [
+          "websiteContent"
+        ]
       }
     }
   }

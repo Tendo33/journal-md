@@ -66,7 +66,7 @@
     "message": "Settings"
   },
   "popupShortcuts": {
-    "message": "Shortcuts: {export} export · {copy} copy"
+    "message": "Shortcuts: export {export} · copy {copy}"
   },
   "popupNoShortcut": {
     "message": "not set"
@@ -156,7 +156,7 @@
     "message": "Thanks for installing"
   },
   "optWelcomeBody": {
-    "message": "Open an article on PMC, Europe PMC or PubMed, then click the toolbar icon, press Alt+Shift+M, or right-click the page."
+    "message": "Open an article on PMC, Europe PMC or PubMed, then click the toolbar icon, press Alt+Shift+J, or right-click the page."
   },
   "optSectionOutput": {
     "message": "Output"
