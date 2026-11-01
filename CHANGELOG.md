@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
-## [1.0.0] - 2026-10-30
+## [1.0.0] - 2026-11-01
 
 First public release.
 
@@ -22,7 +22,7 @@ First public release.
 - Nature JATS: "is available for this paper at 10.1038/…" sentences now keep their subject and link the DOI; a supplementary file listed twice appears once (QA JM-09).
 - Europe PMC pages without full text no longer include site chrome (author information, full-text links, share panel, affiliation numbers, a second abstract) and are marked `abstract_only` (QA JM-10).
 - Review nits N-A..N-E: identity check tests, no PMCID back-fill from the request, parentheses in image links, stale single-page DOM detection, permission notes; background messages are accepted only from extension pages and supported-site content scripts.
-- Options title stays on one line at 320px; the "JATS: checked on export" hint is shown in the muted colour.
+- Options title stays on one line at 320px; the "Structured full text: checked on export" hint is shown in the muted colour.
 - ZIP: images on publisher pages come from the publisher's own image URLs (PMC as fallback); the message names the site that refused images (QA JM-M2-01).
 - MDPI: reliable export after the page re-renders (formulas read from the page's server HTML), figure images kept; every failed export shows a message (QA JM-M2-02, M2-03).
 - PLOS JATS: figures no longer point at formula images from their captions (QA JM-M2-04); placeholder "undefined" author names dropped (M2-06); JM-09 also fixed on the PMC page route.
