@@ -23,20 +23,14 @@
   "popupHeading": {
     "message": "期刊全文转 Markdown"
   },
-  "popupPlatform": {
-    "message": "平台"
-  },
   "popupRoutes": {
-    "message": "取数通道"
-  },
-  "routeJats": {
-    "message": "JATS"
+    "message": "全文来源"
   },
   "routeJatsDeferred": {
-    "message": "JATS：导出时检查"
+    "message": "结构化全文：导出时检查"
   },
   "routeDom": {
-    "message": "页面"
+    "message": "当前页面"
   },
   "routeAbstract": {
     "message": "摘要"
@@ -59,9 +53,6 @@
   "btnCopyTitle": {
     "message": "把全文 Markdown 复制到剪贴板"
   },
-  "btnRetry": {
-    "message": "重试"
-  },
   "linkSettings": {
     "message": "设置"
   },
@@ -81,10 +72,10 @@
     "message": "已保存 {filename}"
   },
   "statusCopied": {
-    "message": "已复制 {count} 个字符到剪贴板。"
+    "message": "已复制 {count} 个字符。"
   },
   "routeUsedJats": {
-    "message": "来源：Europe PMC JATS（结构化全文）。"
+    "message": "来源：Europe PMC（结构化全文）。"
   },
   "routeUsedDom": {
     "message": "来源：当前页面。"
@@ -159,7 +150,7 @@
     "message": "感谢安装"
   },
   "optWelcomeBody": {
-    "message": "打开 PMC、Europe PMC、PubMed、Springer/BMC、Nature、Frontiers、MDPI、PLOS 或 eLife 上的文章，然后点页面右下角的 Markdown 按钮、点击工具栏图标、按 Alt+Shift+J，或在页面上点右键。"
+    "message": "打开下方「站点」里任一网站上的文章，然后点页面右下角的 M↓ 按钮、点工具栏图标、按 Alt+Shift+J，或在页面上点右键。"
   },
   "optSectionOutput": {
     "message": "输出"
@@ -183,7 +174,7 @@
     "message": "优先使用结构化全文"
   },
   "optPreferJatsHelp": {
-    "message": "先获取结构化全文（JATS XML）：开放获取文章从 Europe PMC 获取（出版商页面按 DOI 查找），Frontiers 用出版商自己的 XML。失败或超时则改用当前页面。"
+    "message": "先尝试结构化全文（JATS XML）：开放获取文章从 Europe PMC 获取，Frontiers 用出版商自己的 XML。失败或超时则改用当前页面。"
   },
   "optSectionLanguage": {
     "message": "语言"
@@ -213,7 +204,7 @@
     "message": "版本 {version}"
   },
   "optPrivacy": {
-    "message": "文章在浏览器内完成转换。只有在你导出或复制文章时，扩展才会向 Europe PMC（EMBL-EBI）请求开放获取全文，只发送 PMCID 或 DOI，不发送 Cookie 和页面地址。打开弹窗不会发出任何请求。PDF 解析只在你点「解析 PDF」时发送 PDF 链接和你的 Token，见上方「PDF 解析」一节。"
+    "message": "文章在浏览器内转换。只有在你导出或复制时，扩展才可能向 Europe PMC（EMBL-EBI）请求开放获取全文，只发送 PMCID 或 DOI，不发送 Cookie 和页面地址。打开弹窗不会发出请求。PDF 解析只在你点「解析 PDF」时发送 PDF 链接和你的 Token，见上方「PDF 解析」。"
   },
   "btnClose": {
     "message": "关闭"
@@ -321,7 +312,7 @@
     "message": "这台设备上没有 {provider} 的 Token。请在「设置 › PDF 解析」里填写。"
   },
   "pdfErr_reason_forbidden_empty": {
-    "message": "{provider} 拒绝了请求（空的 403）。请重启浏览器后重试。"
+    "message": "{provider} 拒绝了请求。请重启浏览器后重试。"
   },
   "pdfErr_reason_dnr_not_ready": {
     "message": "{provider} 需要的网络规则还没生效。请关闭本扩展的所有页面，稍后再试，或重启浏览器。"
@@ -336,7 +327,7 @@
     "message": "PDF 解析（可选）"
   },
   "optPdfHelp": {
-    "message": "页面上没有可用全文时，可以用你自己的 Token 让第三方服务解析文章 PDF。给所选服务填上 Token 后，工具栏弹窗会在带 PDF 链接的文章页上显示「解析 PDF」。点击后会直接把这篇的 PDF 链接和你的 Token 发给所选服务，不再另外确认，所以只用于你有权分享给该服务的 PDF。"
+    "message": "页面没有可用全文时，可以用你自己的 Token 让第三方服务解析文章 PDF。填好 Token 后，弹窗会在带 PDF 链接的文章页显示「解析 PDF」。点击后会直接把 PDF 链接和 Token 发给所选服务，不再确认，所以只用于你有权分享给该服务的 PDF。"
   },
   "optPdfProvider": {
     "message": "PDF 解析服务"
