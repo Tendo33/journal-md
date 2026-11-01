@@ -204,7 +204,7 @@
     "message": "Version {version}"
   },
   "optPrivacy": {
-    "message": "Articles are converted in your browser. When you export or copy, the extension may ask Europe PMC (EMBL-EBI) for the open-access full text, sending only the PMCID or DOI, never cookies or the page address. Opening the popup sends nothing. PDF parsing sends data only when you click Parse PDF; see PDF parsing above."
+    "message": "Articles are converted in your browser. Only when you export or copy can the extension ask Europe PMC (EMBL-EBI) for the open-access full text, sending only the PMCID or DOI, never cookies or the page address. Opening the popup sends nothing. PDF parsing sends the PDF link and your token only when you click Parse PDF; see PDF parsing above."
   },
   "btnClose": {
     "message": "Close"

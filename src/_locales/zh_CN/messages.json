@@ -204,7 +204,7 @@
     "message": "版本 {version}"
   },
   "optPrivacy": {
-    "message": "文章在浏览器内转换。导出或复制时，扩展可能向 Europe PMC（EMBL-EBI）请求开放获取全文，只发送 PMCID 或 DOI，不发送 Cookie 和页面地址。打开弹窗不会发出请求。PDF 解析只在你点「解析 PDF」时发送数据，见上方「PDF 解析」。"
+    "message": "文章在浏览器内转换。只有在你导出或复制时，扩展才可能向 Europe PMC（EMBL-EBI）请求开放获取全文，只发送 PMCID 或 DOI，不发送 Cookie 和页面地址。打开弹窗不会发出请求。PDF 解析只在你点「解析 PDF」时发送 PDF 链接和你的 Token，见上方「PDF 解析」。"
   },
   "btnClose": {
     "message": "关闭"
