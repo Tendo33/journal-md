@@ -1,12 +1,12 @@
 {
   "extName": {
-    "message": "期刊全文转 Markdown"
+    "message": "Journal to Markdown"
   },
   "extDescription": {
-    "message": "把期刊论文全文导出为干净的 Markdown，保留公式、表格和参考文献。支持 PMC、Europe PMC、PubMed、Springer/BMC、Nature、Frontiers、MDPI、PLOS、eLife。"
+    "message": "一键把期刊论文全文存为 Markdown：公式、表格、参考文献原样保留。支持 PMC、PubMed、Springer、Nature、Frontiers、MDPI、PLOS、eLife。"
   },
   "actionTitle": {
-    "message": "期刊全文转 Markdown：导出本文"
+    "message": "Journal to Markdown：导出本文"
   },
   "cmdExport": {
     "message": "导出本页为 Markdown"
@@ -21,16 +21,16 @@
     "message": "复制本页为 Markdown"
   },
   "popupHeading": {
-    "message": "期刊全文转 Markdown"
+    "message": "Journal to Markdown"
   },
   "popupRoutes": {
-    "message": "全文来源"
+    "message": "全文"
   },
   "routeJatsDeferred": {
-    "message": "结构化全文：导出时检查"
+    "message": "先试开放获取全文"
   },
   "routeDom": {
-    "message": "当前页面"
+    "message": "本页"
   },
   "routeAbstract": {
     "message": "摘要"
@@ -117,7 +117,7 @@
     "message": "部分公式只有图片，已保留为图片链接。"
   },
   "err_unsupported_page": {
-    "message": "暂不支持此页面。请打开 PMC、Europe PMC、PubMed、Springer/BMC、Nature、Frontiers、MDPI、PLOS 或 eLife 上的文章页。"
+    "message": "请打开 PMC、Europe PMC、PubMed、Springer/BMC、Nature、Frontiers、MDPI、PLOS 或 eLife 上的文章页。"
   },
   "err_site_planned": {
     "message": "暂不支持 {site}，计划在后续版本加入。"
@@ -144,7 +144,7 @@
     "message": "出了点问题。请刷新页面后重试。"
   },
   "optTitle": {
-    "message": "期刊全文转 Markdown 设置"
+    "message": "Journal to Markdown 设置"
   },
   "optWelcomeTitle": {
     "message": "感谢安装"
@@ -177,7 +177,7 @@
     "message": "先尝试结构化全文（JATS XML）：开放获取文章从 Europe PMC 获取，Frontiers 用出版商自己的 XML。失败或超时则改用当前页面。"
   },
   "optSectionLanguage": {
-    "message": "语言"
+    "message": "通用"
   },
   "optLangAuto": {
     "message": "跟随浏览器"
@@ -194,9 +194,6 @@
   "optSitesHelp": {
     "message": "关闭某个站点后，将不再从该站点导出。"
   },
-  "optSitePlanned": {
-    "message": "后续版本支持"
-  },
   "optSaved": {
     "message": "已保存"
   },
@@ -204,7 +201,7 @@
     "message": "版本 {version}"
   },
   "optPrivacy": {
-    "message": "文章在浏览器内转换。只有在你导出或复制时，扩展才可能向 Europe PMC（EMBL-EBI）请求开放获取全文，只发送 PMCID 或 DOI，不发送 Cookie 和页面地址。打开弹窗不会发出请求。PDF 解析只在你点「解析 PDF」时发送 PDF 链接和你的 Token，见上方「PDF 解析」。"
+    "message": "文章在浏览器内转换。只有在你导出或复制时，扩展才可能向 Europe PMC（EMBL-EBI）请求开放获取全文，只发送 PMCID 或 DOI，不发送 Cookie 和页面地址。打开弹窗不会发出请求。PDF 解析只在你点「解析 PDF」时发送 PDF 链接和你的 Key，见上方「PDF 解析」。"
   },
   "btnClose": {
     "message": "关闭"
@@ -234,7 +231,7 @@
     "message": "导出为 Markdown（菜单）"
   },
   "fabMenu": {
-    "message": "期刊全文转 Markdown"
+    "message": "Journal to Markdown"
   },
   "fabDownload": {
     "message": "下载 .md"
@@ -279,7 +276,7 @@
     "message": "{provider} 已解析 PDF：已保存 {filename}"
   },
   "pdfErr_AUTH_INVALID": {
-    "message": "{provider} 不接受这个 Token。请到「设置 › PDF 解析」检查。"
+    "message": "{provider} 不接受这个 Key。请到「设置 › PDF 解析」检查。"
   },
   "pdfErr_QUOTA_EXCEEDED": {
     "message": "{provider} 的额度已用完。请稍后再试，或在设置里换一个服务。"
@@ -309,7 +306,7 @@
     "message": "还有一个 PDF 正在解析，请等它完成。"
   },
   "pdfErr_reason_key_not_on_device": {
-    "message": "这台设备上没有 {provider} 的 Token。请在「设置 › PDF 解析」里填写。"
+    "message": "这台设备上没有 {provider} 的 Key。请在「设置 › PDF 解析」里填写。"
   },
   "pdfErr_reason_forbidden_empty": {
     "message": "{provider} 拒绝了请求。请重启浏览器后重试。"
@@ -324,10 +321,10 @@
     "message": "{provider} 没有从这个 PDF 里识别出正文，没有保存文件。"
   },
   "optSectionPdf": {
-    "message": "PDF 解析（可选）"
+    "message": "PDF 解析"
   },
   "optPdfHelp": {
-    "message": "页面没有可用全文时，可以用你自己的 Token 让第三方服务解析文章 PDF。填好 Token 后，弹窗会在带 PDF 链接的文章页显示「解析 PDF」。点击后会直接把 PDF 链接和 Token 发给所选服务，不再确认，所以只用于你有权分享给该服务的 PDF。"
+    "message": "页面没有可用全文时，可以用你自己的 Key 让第三方服务解析文章 PDF。填好 Key 后，弹窗会在带 PDF 链接的文章页显示「解析 PDF」。点击后会直接把 PDF 链接和 Key 发给所选服务，不再确认，所以只用于你有权分享给该服务的 PDF。"
   },
   "optPdfProvider": {
     "message": "PDF 解析服务"
@@ -339,33 +336,69 @@
     "message": "MinerU"
   },
   "optPdfNote_paddleocr": {
-    "message": "PaddleOCR（百度飞桨星河社区）会收到 PDF 链接和你的 Token，由它自己下载 PDF，结果文字和图片来自 *.bj.bcebos.com。有每日免费额度。"
+    "message": "PaddleOCR（百度飞桨星河社区）会收到 PDF 链接和你的 Key，由它自己下载 PDF，结果文字和图片来自 *.bj.bcebos.com。有每日免费额度。"
   },
   "optPdfNote_mineru": {
-    "message": "MinerU（OpenDataLab）会收到 PDF 链接和你的 Token，由它自己下载 PDF，结果 ZIP 来自 cdn-mineru.openxlab.org.cn。"
+    "message": "MinerU（OpenDataLab）会收到 PDF 链接和你的 Key，由它自己下载 PDF，结果 ZIP 来自 cdn-mineru.openxlab.org.cn。"
   },
   "optPdfToken": {
-    "message": "{provider} Token"
+    "message": "{provider} API Key"
   },
   "optPdfTokenHelp": {
     "message": "只保存在本浏览器（不同步），只发给所选服务。"
   },
   "optPdfGetToken": {
-    "message": "获取 Token"
+    "message": "获取 Key"
   },
   "optPdfTest": {
     "message": "测试"
   },
   "optPdfTesting": {
-    "message": "正在测试 Token…"
+    "message": "正在测试 Key…"
   },
   "optPdfTestOk": {
-    "message": "Token 可用。"
+    "message": "Key 可用。"
   },
   "optPdfNeedToken": {
-    "message": "请先填写 Token。"
+    "message": "请先填写 Key。"
   },
   "noticeZipNone": {
     "message": "没能打包任何图片：从 {hosts} 下载失败。ZIP 里只有 article.md，{total} 张图片都保留网络链接。"
+  },
+  "optSubtitle": {
+    "message": "设置"
+  },
+  "optLinks": {
+    "message": "相关链接"
+  },
+  "optLinkIssues": {
+    "message": "反馈问题"
+  },
+  "optLinkPrivacy": {
+    "message": "隐私说明"
+  },
+  "optLinkChangelog": {
+    "message": "更新日志"
+  },
+  "optSeries": {
+    "message": "同系列"
+  },
+  "popupShortcutLabel": {
+    "message": "快捷键"
+  },
+  "popupFooterMenu": {
+    "message": "右键菜单也能导出"
+  },
+  "popupUnsupportedTitle": {
+    "message": "这个页面不支持导出"
+  },
+  "popupReadFailTitle": {
+    "message": "没能读取这篇文章"
+  },
+  "optLanguage": {
+    "message": "界面语言"
+  },
+  "optSitesPlanned": {
+    "message": "后续版本支持：{sites}。"
   }
 }

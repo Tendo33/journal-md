@@ -140,7 +140,7 @@ describe('fix2b-1: floating button language follows the settings language', () =
   const { mountFab: mount, fabLabels } = require('@/content/fab');
 
   test('labels come from the chosen language, not the page or browser', () => {
-    expect(fabLabels('zh')).toMatchObject({ button: '导出为 Markdown（菜单）', download: '下载 .md', zip: '下载 ZIP（含图片）', copy: '复制 Markdown', hide: '隐藏此按钮', menu: '期刊全文转 Markdown' });
+    expect(fabLabels('zh')).toMatchObject({ button: '导出为 Markdown（菜单）', download: '下载 .md', zip: '下载 ZIP（含图片）', copy: '复制 Markdown', hide: '隐藏此按钮', menu: 'Journal to Markdown' });
     expect(fabLabels('en')).toMatchObject({ button: 'Export as Markdown (menu)', download: 'Download .md', hide: 'Hide this button' });
   });
 
@@ -150,7 +150,7 @@ describe('fix2b-1: floating button language follows the settings language', () =
     f.button.click();
     f.setLabels(fabLabels('zh'));
     expect(f.menu.hidden).toBe(false);
-    expect(f.menu.getAttribute('aria-label')).toBe('期刊全文转 Markdown');
+    expect(f.menu.getAttribute('aria-label')).toBe('Journal to Markdown');
     expect(Array.from(f.menu.querySelectorAll('[role=menuitem]')).map((i) => i.textContent)).toEqual(['下载 .md', '下载 ZIP（含图片）', '复制 Markdown', '隐藏此按钮']);
     expect(f.button.getAttribute('aria-label')).toBe('导出为 Markdown（菜单）');
     f.setState('err', 'x');

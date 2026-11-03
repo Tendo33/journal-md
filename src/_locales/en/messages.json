@@ -3,7 +3,7 @@
     "message": "Journal to Markdown"
   },
   "extDescription": {
-    "message": "Journal articles to clean Markdown with math, tables and references: PMC, PubMed, Springer, Nature, Frontiers, MDPI, PLOS, eLife."
+    "message": "Save journal articles as Markdown: math, tables and references intact. PMC, PubMed, Springer, Nature, Frontiers, MDPI, PLOS, eLife."
   },
   "actionTitle": {
     "message": "Journal to Markdown — export this article"
@@ -24,10 +24,10 @@
     "message": "Journal to Markdown"
   },
   "popupRoutes": {
-    "message": "Full text from"
+    "message": "Full text"
   },
   "routeJatsDeferred": {
-    "message": "Structured full text: checked on export"
+    "message": "Open-access version first"
   },
   "routeDom": {
     "message": "This page"
@@ -117,7 +117,7 @@
     "message": "Some equations only exist as images and were kept as image links."
   },
   "err_unsupported_page": {
-    "message": "This page is not supported. Open an article on PMC, Europe PMC, PubMed, Springer/BMC, Nature, Frontiers, MDPI, PLOS or eLife."
+    "message": "Open an article on PMC, Europe PMC, PubMed, Springer/BMC, Nature, Frontiers, MDPI, PLOS or eLife."
   },
   "err_site_planned": {
     "message": "{site} is not supported yet; it is planned for a later version."
@@ -177,7 +177,7 @@
     "message": "Try structured full text (JATS XML) first: from Europe PMC for open-access articles, or the publisher's own XML on Frontiers. If that fails or times out, the page itself is used."
   },
   "optSectionLanguage": {
-    "message": "Language"
+    "message": "General"
   },
   "optLangAuto": {
     "message": "Follow browser"
@@ -194,9 +194,6 @@
   "optSitesHelp": {
     "message": "Turn a site off to stop exporting from it."
   },
-  "optSitePlanned": {
-    "message": "Coming in a later version"
-  },
   "optSaved": {
     "message": "Saved"
   },
@@ -204,7 +201,7 @@
     "message": "Version {version}"
   },
   "optPrivacy": {
-    "message": "Articles are converted in your browser. Only when you export or copy can the extension ask Europe PMC (EMBL-EBI) for the open-access full text, sending only the PMCID or DOI, never cookies or the page address. Opening the popup sends nothing. PDF parsing sends the PDF link and your token only when you click Parse PDF; see PDF parsing above."
+    "message": "Articles are converted in your browser. Only when you export or copy can the extension ask Europe PMC (EMBL-EBI) for the open-access full text, sending only the PMCID or DOI, never cookies or the page address. Opening the popup sends nothing. PDF parsing sends the PDF link and your key only when you click Parse PDF; see PDF parsing above."
   },
   "btnClose": {
     "message": "Close"
@@ -279,7 +276,7 @@
     "message": "PDF parsed by {provider}: saved {filename}"
   },
   "pdfErr_AUTH_INVALID": {
-    "message": "{provider} rejected the token. Check it in Settings › PDF parsing."
+    "message": "{provider} rejected the key. Check it in Settings › PDF parsing."
   },
   "pdfErr_QUOTA_EXCEEDED": {
     "message": "The {provider} quota is used up. Try again later or choose another service in Settings."
@@ -309,7 +306,7 @@
     "message": "Another PDF is still being parsed. Wait for it to finish."
   },
   "pdfErr_reason_key_not_on_device": {
-    "message": "No {provider} token on this device. Add it in Settings › PDF parsing."
+    "message": "No {provider} API key on this device. Add it in Settings › PDF parsing."
   },
   "pdfErr_reason_forbidden_empty": {
     "message": "{provider} refused the request. Restart the browser and try again."
@@ -324,10 +321,10 @@
     "message": "{provider} returned no text for this PDF. Nothing was saved."
   },
   "optSectionPdf": {
-    "message": "PDF parsing (optional)"
+    "message": "PDF parsing"
   },
   "optPdfHelp": {
-    "message": "For pages without usable full text, a third-party service can parse the article PDF with your own token. Once a token is set, the popup shows \"Parse PDF\" on articles that link a PDF. Clicking it sends the PDF link and your token to that service right away, without asking again, so only use it for PDFs you may share with that service."
+    "message": "For pages without usable full text, a third-party service can parse the article PDF with your own key. Once a key is set, the popup shows \"Parse PDF\" on articles that link a PDF. Clicking it sends the PDF link and your key to that service right away, without asking again, so only use it for PDFs you may share with that service."
   },
   "optPdfProvider": {
     "message": "PDF parsing service"
@@ -339,33 +336,69 @@
     "message": "MinerU"
   },
   "optPdfNote_paddleocr": {
-    "message": "PaddleOCR (Baidu AI Studio) receives the PDF link and your token, downloads the PDF itself, and returns text and images from *.bj.bcebos.com. Free daily quota."
+    "message": "PaddleOCR (Baidu AI Studio) receives the PDF link and your key, downloads the PDF itself, and returns text and images from *.bj.bcebos.com. Free daily quota."
   },
   "optPdfNote_mineru": {
-    "message": "MinerU (OpenDataLab) receives the PDF link and your token, downloads the PDF itself, and returns a ZIP from cdn-mineru.openxlab.org.cn."
+    "message": "MinerU (OpenDataLab) receives the PDF link and your key, downloads the PDF itself, and returns a ZIP from cdn-mineru.openxlab.org.cn."
   },
   "optPdfToken": {
-    "message": "{provider} token"
+    "message": "{provider} API key"
   },
   "optPdfTokenHelp": {
     "message": "Stored only in this browser (not synced). Sent only to the selected service."
   },
   "optPdfGetToken": {
-    "message": "Get a token"
+    "message": "Get a key"
   },
   "optPdfTest": {
     "message": "Test"
   },
   "optPdfTesting": {
-    "message": "Testing the token…"
+    "message": "Testing the key…"
   },
   "optPdfTestOk": {
-    "message": "The token works."
+    "message": "The key works."
   },
   "optPdfNeedToken": {
-    "message": "Enter a token first."
+    "message": "Enter a key first."
   },
   "noticeZipNone": {
     "message": "No images could be packed: downloading from {hosts} failed. The ZIP has article.md only, with web links to all {total} images."
+  },
+  "optSubtitle": {
+    "message": "Settings"
+  },
+  "optLinks": {
+    "message": "Links"
+  },
+  "optLinkIssues": {
+    "message": "Report an issue"
+  },
+  "optLinkPrivacy": {
+    "message": "Privacy"
+  },
+  "optLinkChangelog": {
+    "message": "Changelog"
+  },
+  "optSeries": {
+    "message": "Also in the series"
+  },
+  "popupShortcutLabel": {
+    "message": "Shortcut"
+  },
+  "popupFooterMenu": {
+    "message": "Also in the right-click menu"
+  },
+  "popupUnsupportedTitle": {
+    "message": "Can’t export this page"
+  },
+  "popupReadFailTitle": {
+    "message": "Couldn’t read this article"
+  },
+  "optLanguage": {
+    "message": "Language"
+  },
+  "optSitesPlanned": {
+    "message": "Coming in a later version: {sites}."
   }
 }

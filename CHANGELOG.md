@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+- "Token" is now "Key" / "API key" everywhere, the same word arXiv to Markdown uses.
+- Options: the language picker sits in a "General" card as a row like arXiv to Markdown's; the six planned sites are one line under the site list instead of six rows; the PDF section is titled "PDF parsing".
+- Popup: the full-text row reads "Open-access version first · This page ✓" instead of the internal route names.
+- Visual: solid primary button, lighter off-state switches, segmented controls with a raised selected item, 13px help text.
+- Chinese extension name unified with the series: 「Journal to Markdown」 in every language (was 「期刊全文转 Markdown」), like arXiv to Markdown and Zhihu to Markdown.
+- Options page uses the shared "to Markdown" series shell (same as the other two): icon, product name, "Settings" and a version chip in the header; footer with GitHub, issue, privacy and changelog links and the other extensions in the series. New `series.css`, byte-identical across the three repositories.
+- Popup: unsupported pages show the series empty state (icon, title, where to go) and keep the buttons in place, disabled; the footer shows the export shortcut as a key and the version, like the other two. The export button has the download icon.
+- Store short description rewritten; new `docs/store-listing.md`.
+- README restructured to the series layout (install, usage, settings, permissions, privacy, series), with a settings screenshot.
+
 ## [1.0.0] - 2026-11-01
 
 First public release.

@@ -2,9 +2,17 @@
   "name": "journal-md",
   "version": "1.0.0",
   "private": true,
-  "description": "Browser extension that exports journal articles (PMC, Europe PMC, PubMed, Springer/BMC, Nature, Frontiers, MDPI, PLOS, eLife) as clean Markdown",
+  "description": "Journal to Markdown — browser extension that saves open-access journal articles (PMC, PubMed, Springer, Nature, Frontiers, MDPI, PLOS, eLife) as clean Markdown.",
   "author": "SimonSun",
   "license": "MIT",
+  "homepage": "https://github.com/Tendo33/journal-md#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tendo33/journal-md.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Tendo33/journal-md/issues"
+  },
   "scripts": {
     "build": "webpack --mode production",
     "build:firefox": "webpack --mode production --env target=firefox",

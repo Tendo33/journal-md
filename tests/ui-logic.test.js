@@ -1,4 +1,4 @@
-import { quickCheck, emptyText, routeItems, shortcutText } from '@/ui/popup/popup-view';
+import { quickCheck, emptyText, routeItems, shortcutText, exportShortcut } from '@/ui/popup/popup-view';
 import { describeResult, errorText } from '@/ui/shared/result-text';
 import { t, resolveLanguage, MESSAGES } from '@config/i18n';
 import { normalizeSettings, saveSettings, loadSettings, DEFAULT_SETTINGS } from '@config/settings';
@@ -59,13 +59,16 @@ describe('popup view logic', () => {
     expect(errorText('en', 'nonsense')).toBe(t('en', 'err_unknown'));
   });
   test('routes: JATS is only checked on export (no request when the popup opens)', () => {
-    expect(routeItems('en', { jats: true, dom: true, abstract: true }).map((i) => i.text)).toEqual(['Structured full text: checked on export', 'This page ✓']);
-    expect(routeItems('zh', { jats: true, dom: true }).map((i) => i.text)).toEqual(['结构化全文：导出时检查', '当前页面 ✓']);
-    expect(routeItems('zh', { jats: false, dom: false, abstract: true }).map((i) => i.text)).toEqual(['当前页面 ✗', '摘要 ✓']);
+    expect(routeItems('en', { jats: true, dom: true, abstract: true }).map((i) => i.text)).toEqual(['Open-access version first', 'This page ✓']);
+    expect(routeItems('zh', { jats: true, dom: true }).map((i) => i.text)).toEqual(['先试开放获取全文', '本页 ✓']);
+    expect(routeItems('zh', { jats: false, dom: false, abstract: true }).map((i) => i.text)).toEqual(['本页 ✗', '摘要 ✓']);
   });
   test('shortcut hint', () => {
     expect(shortcutText('en', [{ name: 'export-markdown', shortcut: 'Alt+Shift+J' }, { name: 'copy-markdown', shortcut: '' }])).toBe('Shortcuts: export Alt+Shift+J · copy not set');
     expect(shortcutText('zh', [{ name: 'export-markdown', shortcut: 'Alt+Shift+J' }])).toBe('快捷键：导出 Alt+Shift+J · 复制 未设置');
+    // 系列页脚：<kbd> 只放导出快捷键，没设置时写「未设置」
+    expect(exportShortcut('zh', [{ name: 'export-markdown', shortcut: 'Alt+Shift+J' }])).toBe('Alt+Shift+J');
+    expect(exportShortcut('zh', [])).toBe('未设置');
   });
 });
 
