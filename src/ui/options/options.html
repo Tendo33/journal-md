@@ -6,16 +6,18 @@
   <title>Journal to Markdown</title>
   <link rel="stylesheet" href="ui-v2.css">
   <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="series.css">
   <link rel="stylesheet" href="options.css">
 </head>
-<body>
-  <main class="page">
-    <header class="head">
-      <img src="assets/icon.svg" alt="" width="32" height="32">
-      <div class="brand-text">
-        <h1 data-i18n="optTitle">Journal to Markdown settings</h1>
-        <p id="version" class="sub"></p>
+<body class="sp-body">
+  <main class="sp">
+    <header class="sp-hd head">
+      <img src="assets/icon.svg" alt="" width="40" height="40">
+      <div class="sp-ttl">
+        <h1 data-i18n="extName">Journal to Markdown</h1>
+        <p data-i18n="optSubtitle">Settings</p>
       </div>
+      <div class="sp-acts"><span id="version" class="chip"></span></div>
     </header>
 
     <section id="welcome" class="welcome" aria-labelledby="welcome-title" hidden>
@@ -57,10 +59,11 @@
     <section class="grp" aria-labelledby="sec-language">
       <h2 id="sec-language" data-i18n="optSectionLanguage"></h2>
       <div class="it">
-        <fieldset class="segmented" aria-labelledby="sec-language">
+        <div class="tx"><span id="lang-label" class="lbl" data-i18n="optLanguage"></span></div>
+        <fieldset class="segmented" aria-labelledby="lang-label">
           <label><input type="radio" name="language" value="auto"><span data-i18n="optLangAuto"></span></label>
-          <label><input type="radio" name="language" value="en"><span data-i18n="optLangEn"></span></label>
           <label><input type="radio" name="language" value="zh"><span data-i18n="optLangZh"></span></label>
+          <label><input type="radio" name="language" value="en"><span data-i18n="optLangEn"></span></label>
         </fieldset>
       </div>
     </section>
@@ -91,11 +94,24 @@
       <h2 id="sec-sites" data-i18n="optSectionSites"></h2>
       <p class="grp-desc" data-i18n="optSitesHelp"></p>
       <ul id="sites" class="sites"></ul>
+      <p id="sites-planned" class="grp-desc sites-planned"></p>
     </section>
 
-    <footer class="foot">
-      <p data-i18n="optPrivacy"></p>
+    <footer class="sp-ft">
       <p id="saved" class="saved" role="status" aria-live="polite"></p>
+      <p data-i18n="optPrivacy"></p>
+      <nav class="sp-links" data-i18n-aria-label="optLinks">
+        <a href="https://github.com/Tendo33/journal-md" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://github.com/Tendo33/journal-md/issues" target="_blank" rel="noopener noreferrer" data-i18n="optLinkIssues"></a>
+        <a href="https://github.com/Tendo33/journal-md/blob/main/PRIVACY.md" target="_blank" rel="noopener noreferrer" data-i18n="optLinkPrivacy"></a>
+        <a href="https://github.com/Tendo33/journal-md/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer" data-i18n="optLinkChangelog"></a>
+      </nav>
+      <div class="series">
+        <span data-i18n="optSeries"></span>
+        <a data-p="arxiv" href="https://chromewebstore.google.com/detail/arxiv-to-markdown/pphdggfbjddgdljndgdablkhbdpbfnbd" target="_blank" rel="noopener noreferrer">arXiv to Markdown</a>
+        <a data-p="zhihu" href="https://chromewebstore.google.com/detail/zhihu-md/heeilejdelmogpbnbbhdokgfabmhkenh" target="_blank" rel="noopener noreferrer">Zhihu to Markdown</a>
+      </div>
+      <p>© 2026 SimonSun</p>
     </footer>
   </main>
   <script src="options.js"></script>

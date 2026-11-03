@@ -45,50 +45,32 @@ function renderPreview() {
 function renderSites() {
   const ul = $('sites');
   ul.textContent = '';
+  // 还不支持的站点不占开关行，在列表下面合成一行说明（设置页只放能改的东西）
+  const planned = [];
   for (const site of SITES) {
+    if (site.status !== SITE_STATUS.SUPPORTED) { planned.push(site.name); continue; }
     const li = document.createElement('li');
     const id = `site-${site.id}`;
     const label = document.createElement('label');
     label.htmlFor = id;
     label.textContent = site.name;
     li.append(label);
-    if (site.status === SITE_STATUS.SUPPORTED) {
-      const sw = document.createElement('input');
-      sw.type = 'checkbox';
-      sw.id = id;
-
-      sw.setAttribute('role', 'switch');
-      sw.checked = settings.sites[site.id] !== false;
-      sw.addEventListener('change', () => update({ sites: { [site.id]: sw.checked } }));
-      // ui-v2 开关结构：<span class="switch"><input><span></span></span>
-      const wrap = document.createElement('span');
-      wrap.className = 'switch';
-      const track = document.createElement('span');
-      track.setAttribute('aria-hidden', 'true');
-      wrap.append(sw, track);
-      li.append(wrap);
-    } else {
-      const span = document.createElement('span');
-      span.className = 'planned';
-      span.id = id;
-      span.textContent = t(lang, 'optSitePlanned');
-      li.append(span);
-    }
+    const sw = document.createElement('input');
+    sw.type = 'checkbox';
+    sw.id = id;
+    sw.setAttribute('role', 'switch');
+    sw.checked = settings.sites[site.id] !== false;
+    sw.addEventListener('change', () => update({ sites: { [site.id]: sw.checked } }));
+    // ui-v2 开关结构：<span class="switch"><input><span></span></span>
+    const wrap = document.createElement('span');
+    wrap.className = 'switch';
+    const track = document.createElement('span');
+    track.setAttribute('aria-hidden', 'true');
+    wrap.append(sw, track);
+    li.append(wrap);
     ul.append(li);
   }
-}
-
-/** 标题最后两个词（「Markdown 设置」/「Markdown settings」）不拆行（设计 backlog 1，R09） */
-function renderTitle() {
-  const h1 = document.querySelector('h1');
-  const text = t(lang, 'optTitle');
-  const m = text.match(/^(.*\s)?(\S+\s\S+)$/);
-  h1.textContent = '';
-  if (!m) { h1.textContent = text; return; }
-  const nw = document.createElement('span');
-  nw.className = 'nw';
-  nw.textContent = m[2];
-  h1.append(m[1] || '', nw);
+  $('sites-planned').textContent = planned.length ? t(lang, 'optSitesPlanned', { sites: planned.join(lang === 'zh' ? '、' : ', ') }) : '';
 }
 
 // ---- PDF 解析 ----
@@ -136,9 +118,8 @@ async function onPdfTest() {
 function render() {
   lang = resolveLanguage(settings.language);
   applyI18n(document, lang);
-  renderTitle();
   renderPdf();
-  $('version').textContent = t(lang, 'optVersion', { version: chrome.runtime.getManifest().version });
+  $('version').textContent = `v${chrome.runtime.getManifest().version}`;
   renderPreview();
   renderSites();
 }

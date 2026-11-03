@@ -11,7 +11,6 @@ body{min-width:360px}
 .kv dt{color:var(--text-2)}
 .kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
 #loading{white-space:normal}
-.ctx .empty{padding:12px 4px}
 .route{display:inline-block;margin-right:var(--sp-2);white-space:nowrap}
 .route[data-state="yes"]{color:var(--success)}
 .route[data-state="no"],.route[data-state="deferred"]{color:var(--text-2)}

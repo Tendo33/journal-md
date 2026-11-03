@@ -128,7 +128,7 @@ async function main() {
   check('popup shows platform', (await popup.textContent('#platform')) === 'PubMed Central');
   check('icon: popup header logo (assets/icon.svg) loads', await popup.$eval('.hd .logo img', (img) => img.complete && img.naturalWidth > 0 && img.getAttribute('src') === 'assets/icon.svg'));
   check('popup shows PMCID', (await popup.textContent('#pmcid')) === 'PMC11000001');
-  check('popup routes: structured full text checked on export / This page ✓', /(Structured full text|结构化全文).*(export|导出时检查).*✓/.test(await popup.textContent('#routes')), await popup.textContent('#routes'));
+  check('popup routes: open-access full text first / This page ✓', /(Open-access version first|先试开放获取全文).*(This page|本页) ✓/.test(await popup.textContent('#routes')), await popup.textContent('#routes'));
   check('shortcut hint shows Alt+Shift+J', /Alt\+Shift\+J|⌥⇧J/.test(await popup.textContent('#shortcuts')), await popup.textContent('#shortcuts'));
   check('M-1: opening the popup sends no request', jatsHits.length === 0 && external.length === 0, jatsHits.concat(external).join(', '));
   const rowBefore = await popup.locator('#actions').boundingBox();
@@ -156,19 +156,19 @@ async function main() {
   check('export via JATS route', res && res.ok && res.route === 'jats-europepmc', JSON.stringify(res && { ok: res.ok, route: res.route, error: res.error }));
   check('markdown has front matter and footnotes', res && /^---\ntitle:/.test(res.markdown) && res.markdown.includes('[^1]:'));
 
-  // 不支持的页面：popup 直接给出原因，按钮不显示、不能被 Tab 聚焦（MF1 / JM-04）
+  // 不支持的页面：popup 直接给出原因；按钮同 arxiv-md / zhihu-md 留在原位置灰（系列统一），不能被 Tab 聚焦（MF1 / JM-04）
   const p2 = await ctx.newPage();
   await p2.addInitScript(() => { chrome.tabs.query = async () => [{ id: -1, url: 'https://www.sciencedirect.com/science/article/pii/S0032579120300001' }]; });
   await p2.goto(`chrome-extension://${extId}/popup.html`);
   await p2.waitForSelector('#empty:not([hidden])');
   check('popup explains planned site', (await p2.textContent('#empty')).includes('ScienceDirect'), await p2.textContent('#empty'));
-  check('MF1: export/copy hidden on unsupported page', !(await p2.isVisible('#export')) && !(await p2.isVisible('#copy')));
+  check('MF1: export/copy disabled on unsupported page', await p2.isDisabled('#export') && await p2.isDisabled('#copy') && await p2.isDisabled('#zip'));
   const focusIds = [];
   for (let i = 0; i < 6; i += 1) {
     await p2.keyboard.press('Tab');
     focusIds.push(await p2.evaluate(() => document.activeElement && document.activeElement.id));
   }
-  check('MF1: hidden buttons take no Tab focus', !focusIds.includes('export') && !focusIds.includes('copy'), focusIds.join(','));
+  check('MF1: disabled buttons take no Tab focus', !focusIds.includes('export') && !focusIds.includes('copy'), focusIds.join(','));
 
   // PubMed 无 PMCID：仅摘要
   const pub = await ctx.newPage();
@@ -185,7 +185,7 @@ async function main() {
   check('MF2: welcome card hidden without ?welcome=1', !(await opt.isVisible('#welcome')));
   check('icon: options header logo (assets/icon.svg) loads', await opt.$eval('.head img', (img) => img.complete && img.naturalWidth > 0 && img.getAttribute('src') === 'assets/icon.svg'));
   await opt.click('input[name="language"][value="zh"]', { force: true });
-  await opt.waitForFunction(() => document.querySelector('h1').textContent.includes('设置'));
+  await opt.waitForFunction(() => document.querySelector('.sp-ttl').textContent.includes('设置'));
   check('options switches to Chinese immediately', true);
   // 不用 force：点开关本身（ui-v2 结构里轨道 span 不能挡住 input）
   await opt.locator('#includeImages').locator('xpath=..').click();
@@ -365,7 +365,7 @@ async function main() {
   const swPdfHits = await sw.evaluate(() => { globalThis.fetch = globalThis.__jmdOrigFetch; return globalThis.__jmdPdfHits; });
   const allPdfHits = [...swPdfHits, ...pdfBackendHits];
   check('PDF: non-OA article is sent straight away to the (mocked) backend', allPdfHits.length >= 1 && /paddleocr\.aistudio-app\.com/.test(allPdfHits[0]), JSON.stringify(allPdfHits.slice(0, 2)));
-  check('PDF: backend refusal is shown clearly', /PaddleOCR rejected the token/.test(await np.textContent('#pdf-status')), await np.textContent('#pdf-status'));
+  check('PDF: backend refusal is shown clearly', /PaddleOCR rejected the key/.test(await np.textContent('#pdf-status')), await np.textContent('#pdf-status'));
   check('fix2c: nothing called permissions.request in the popup', (await np.evaluate(() => window.__permCalls.length)) === 0);
   const npNoToken = await (async () => {
     await sw.evaluate(() => chrome.storage.local.set({ pdfSettings: { provider: 'paddleocr', tokens: {} } }));

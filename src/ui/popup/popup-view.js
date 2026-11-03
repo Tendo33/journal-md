@@ -32,6 +32,11 @@ export function routeItems(lang, routes) {
   return items;
 }
 
+/** 页脚 <kbd> 只放导出快捷键（同 arxiv-md / zhihu-md）；完整说明放 title */
+export function exportShortcut(lang, commands) {
+  return ((commands || []).find((c) => c.name === 'export-markdown') || {}).shortcut || t(lang, 'popupNoShortcut');
+}
+
 export function shortcutText(lang, commands) {
   const find = (name) => ((commands || []).find((c) => c.name === name) || {}).shortcut || t(lang, 'popupNoShortcut');
   return t(lang, 'popupShortcuts', { export: find('export-markdown'), copy: find('copy-markdown') });

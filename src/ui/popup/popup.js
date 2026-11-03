@@ -2,7 +2,7 @@ import { loadSettings } from '../../config/settings';
 import { applyI18n, resolveLanguage, t } from '../../config/i18n';
 import { MSG, ACTIONS } from '../../utils/messages';
 import { describeResult, errorText } from '../shared/result-text';
-import { quickCheck, emptyText, routeItems, shortcutText } from './popup-view';
+import { quickCheck, emptyText, routeItems, shortcutText, exportShortcut } from './popup-view';
 import { loadPdfSettings, pdfReady, PDF_TASK_KEY } from '../../pdf/settings';
 import { pdfStatusText, providerLabel } from '../shared/pdf-text';
 
@@ -17,13 +17,15 @@ function show(id, visible) {
   $(id).hidden = !visible;
 }
 
-function setEmpty(text) {
-  show('loading', false);
-  show('info', false);
-  show('actions', false);
-  const el = $('empty');
-  el.textContent = text;
-  el.hidden = false;
+/** 空状态和另外两款插件同一写法：图标 + 标题 + 去哪里 / 为什么 */
+function setEmpty(text, titleKey = 'popupReadFailTitle') {
+  show('ctx', false);
+  // 同另外两款：按钮留在原位置灰，让人知道到了文章页能做什么
+  show('actions', true);
+  $('actions').querySelectorAll('button').forEach((b) => { b.disabled = true; });
+  $('empty-title').textContent = t(lang, titleKey);
+  $('empty-desc').textContent = text;
+  show('empty', true);
 }
 
 /**
@@ -90,7 +92,7 @@ async function sendToTab(message) {
 
 async function inspect(settings) {
   const quick = quickCheck(tab && tab.url, settings);
-  if (!quick.ok) return setEmpty(emptyText(lang, quick));
+  if (!quick.ok) return setEmpty(emptyText(lang, quick), 'popupUnsupportedTitle');
   let info;
   try {
     info = await sendToTab({ type: MSG.INSPECT });
@@ -207,7 +209,11 @@ async function main() {
   $('copy').addEventListener('click', () => run(ACTIONS.COPY));
   $('zip').addEventListener('click', () => run(ACTIONS.ZIP));
   $('pdf').addEventListener('click', onPdfClick);
-  chrome.commands.getAll().then((cmds) => { $('shortcuts').textContent = shortcutText(lang, cmds); }, () => {});
+  $('footer-version').textContent = `v${chrome.runtime.getManifest().version}`;
+  chrome.commands.getAll().then((cmds) => {
+    $('shortcut-kbd').textContent = exportShortcut(lang, cmds);
+    $('shortcuts').title = shortcutText(lang, cmds);
+  }, () => {});
   [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   await inspect(settings);
 }
