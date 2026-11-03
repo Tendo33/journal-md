@@ -12,6 +12,11 @@
 
 [Install](#install) · [中文说明](./README.md) · [Permissions](./docs/permissions.md) · [Privacy](./PRIVACY.md) · [Changelog](./CHANGELOG.md)
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/hero-dark.png">
+  <img src="docs/screenshots/hero-light.png" width="860" alt="The extension popup and the M↓ button on a PMC article page">
+</picture>
+
 </div>
 
 > **The "to Markdown" series**: [arXiv to Markdown](https://github.com/Tendo33/arxiv-md) · [Zhihu to Markdown](https://github.com/Tendo33/zhihu-md) · **Journal to Markdown**. Three extensions with the same interface and export habits, for arXiv preprints, Zhihu and journal full text.
@@ -25,6 +30,10 @@ Export a full-text article page from PubMed Central, Nature, Frontiers and other
 - **Download ZIP**: `article.md` + `images/`, with image links rewritten to the local files. Springer / BMC / Nature and PLOS images sit on servers that block cross-site downloads (`media.springernature.com`, PLOS's image storage), so they are downloaded in the background. If an image still fails, the ZIP is created anyway, that image keeps its web link, and a message says so.
 - **PDF parsing (optional)**: when a page has no usable full text, the article PDF can be parsed by **PaddleOCR** (default) or **MinerU** with your own key; the result downloads as a ZIP. Once the selected service has a key in Settings, the popup shows "Parse PDF with …"; clicking it sends the PDF link straight away, without asking again. Only parse PDFs you are allowed to share with a third party. Tokens stay in this browser (`chrome.storage.local`).
 - **English and Chinese interface**, following the browser language or set in Settings.
+
+| Page button | Exported Markdown |
+| --- | --- |
+| <img src="docs/screenshots/page-entry.png" alt="The M↓ button and its menu at the bottom right of an article page"> | <img src="docs/screenshots/markdown-output.png" alt="The exported Markdown file"> |
 
 ## Supported sites
 
@@ -60,6 +69,8 @@ It converts only pages you can already read: no paywall bypassing, no bulk crawl
 | Toolbar popup | Platform, title, DOI / PMCID / PMID and full-text source of the current article; Export, Copy, Download ZIP; Parse PDF once a key is set |
 | Shortcut | Export `Alt+Shift+J` (`Option+Shift+J` on macOS); copy has no default, set one at `chrome://extensions/shortcuts` |
 | Right-click menu | "Export this page as Markdown", "Copy this page as Markdown" |
+
+<img src="docs/screenshots/popup.png" width="300" alt="Toolbar popup">
 
 ## Settings
 

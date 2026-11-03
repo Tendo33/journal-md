@@ -60,6 +60,8 @@ PubMed Central、Europe PMC、PubMed、Springer Link / BMC / SpringerOpen、Natu
 • arXiv to Markdown：arXiv 论文存为 Markdown，PDF 按标题命名。
 • Zhihu to Markdown：知乎文章、回答、问题和热榜存为 Markdown。
 
+需要 Chrome 121 或更高版本。
+
 开源（MIT）：github.com/Tendo33/journal-md
 ```
 
@@ -96,8 +98,25 @@ Also in the series
 • arXiv to Markdown — save arXiv papers as Markdown, PDFs named by title.
 • Zhihu to Markdown — save Zhihu articles, answers, questions and the hot list as Markdown.
 
+Requires Chrome 121 or later.
+
 Open source (MIT): github.com/Tendo33/journal-md
 ```
+
+## 图片素材（中文，可直接上传）
+
+全部由真实扩展界面截取后合成，三款插件同一版式。生成方式：无界面 Chromium 加载 `dist/`，截取弹窗、设置页和页面内元素，导出的 Markdown 来自真实导出结果。
+
+| 文件 | 尺寸 | 内容 |
+| --- | --- | --- |
+| `docs/store/screenshot-1.png` | 1280×800 | 一键把期刊论文全文存为 Markdown（PMC 文章页 + 弹窗） |
+| `docs/store/screenshot-2.png` | 1280×800 | 公式、表格、参考文献原样保留（导出的 Markdown） |
+| `docs/store/screenshot-3.png` | 1280×800 | 文章页右下角的 M↓ 按钮（菜单） |
+| `docs/store/screenshot-4.png` | 1280×800 | 文件名、站点、PDF 解析都能设置（设置页） |
+| `docs/store/screenshot-5.png` | 1280×800 | 浅色、深色都顺眼（深色模式） |
+| `docs/store/promo-small-440x280.png` | 440×280 | 小型宣传图块（必填） |
+| `docs/store/promo-marquee-1400x560.png` | 1400×560 | 顶部宣传图块（可选） |
+| `docs/store/description.zh.txt` | — | 中文详细说明，粘贴到「说明」 |
 
 ## 单一用途说明
 

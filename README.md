@@ -12,6 +12,11 @@
 
 [安装](#安装) · [English](./README.en.md) · [权限说明](./docs/permissions.md) · [隐私说明](./PRIVACY.md) · [更新日志](./CHANGELOG.md)
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/hero-dark.png">
+  <img src="docs/screenshots/hero-light.png" width="860" alt="PMC 文章页上的扩展弹窗和右下角 M↓ 按钮">
+</picture>
+
 </div>
 
 > **「to Markdown」系列**：[arXiv to Markdown](https://github.com/Tendo33/arxiv-md) · [Zhihu to Markdown](https://github.com/Tendo33/zhihu-md) · **Journal to Markdown**。三款插件同一套界面和导出习惯，分别覆盖 arXiv 预印本、知乎和期刊全文。
@@ -25,6 +30,10 @@
 - **下载 ZIP**：`article.md` + `images/`，正文里的图片链接改成包内路径。Springer / BMC / Nature 和 PLOS 的图片服务器（`media.springernature.com`、PLOS 的图片存储）不允许跨站下载，由后台下载。个别图片下载失败时照样生成 ZIP，这些图片保留网络链接并给出提示。
 - **PDF 解析（可选）**：页面上没有可用全文时，可以用你自己的 Key 让 **PaddleOCR**（默认）或 **MinerU** 解析文章 PDF，结果下载为 ZIP。在设置里给所选服务填好 Key，弹窗里就会出现「用 … 解析 PDF」按钮；点击后直接发送 PDF 链接，不再确认。请只解析你有权分享给第三方的 PDF。Key 只存在本浏览器（`chrome.storage.local`）。
 - **中英文界面**，跟随浏览器语言，也可在设置里切换。
+
+| 页面内按钮 | 导出的 Markdown |
+| --- | --- |
+| <img src="docs/screenshots/page-entry.png" alt="文章页右下角的 M↓ 按钮和菜单"> | <img src="docs/screenshots/markdown-output.png" alt="导出的 Markdown 文件"> |
 
 ## 支持的网站
 
@@ -60,6 +69,8 @@
 | 工具栏弹窗 | 当前文章的平台、标题、DOI / PMCID / PMID 和全文来源；导出、复制、下载 ZIP；填好 Key 后有「解析 PDF」 |
 | 快捷键 | 导出 `Alt+Shift+J`（macOS 为 `Option+Shift+J`）；复制默认不设，可在 `chrome://extensions/shortcuts` 指定 |
 | 右键菜单 | 「导出本页为 Markdown」「复制本页为 Markdown」 |
+
+<img src="docs/screenshots/popup.png" width="300" alt="工具栏弹窗">
 
 ## 设置
 

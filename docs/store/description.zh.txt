@@ -1,0 +1,33 @@
+把正在阅读的期刊论文全文一键存为干净的 Markdown，直接放进 Obsidian、Zotero，或交给 AI 阅读。
+
+支持的网站
+PubMed Central、Europe PMC、PubMed、Springer Link / BMC / SpringerOpen、Nature / Scientific Reports、Frontiers、MDPI、PLOS、eLife。
+
+能做什么
+• 结构化全文优先：开放获取文章先从 Europe PMC 取 JATS 全文（Frontiers 用出版商自己的 XML），取不到时转换当前页面。
+• 内容完整：标题、作者、摘要、章节、公式（$…$ / $$…$$）、表格、图注、参考文献脚注，数据可用性、基金、利益冲突各自成节。
+• 元数据：YAML 头信息包含 title、authors、journal、year、doi、pmid、pmcid、license。
+• 下载 ZIP：article.md + images/，正文图片链接改成包内路径。
+• 文件名模板：按 {title} {year} {journal} {doi} 等变量命名。
+• PDF 解析（可选）：页面没有可用全文时，用你自己的 PaddleOCR 或 MinerU Key 解析文章 PDF。
+• 四个入口：文章页右下角 M↓ 按钮、工具栏弹窗、右键菜单、快捷键 Alt+Shift+J。
+• 中英文界面，跟随系统浅色 / 深色。
+
+怎么用
+1. 打开支持网站上的一篇文章。
+2. 点右下角的 M↓ 按钮，或点工具栏图标后选「导出 Markdown」。
+3. 需要图片一起保存时选「下载 ZIP」。
+
+隐私
+• 没有自己的服务器，不收集数据，没有统计或埋点。
+• 打开弹窗、加载页面时不发任何请求；只有在你导出时才会向 Europe PMC 请求开放获取全文，只发 PMCID 或 DOI，不带 Cookie 和页面地址。
+• PDF 解析只在你填了 Key 并点击解析时发生，只发给你选的那一个服务。Key 只保存在本浏览器。
+• 只转换你本来就能看到的页面：不绕过付费墙，不批量抓取。
+
+同系列
+• arXiv to Markdown：arXiv 论文存为 Markdown，PDF 按标题命名。
+• Zhihu to Markdown：知乎文章、回答、问题和热榜存为 Markdown。
+
+需要 Chrome 121 或更高版本。
+
+开源（MIT）：github.com/Tendo33/journal-md
