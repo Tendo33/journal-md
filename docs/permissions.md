@@ -1,4 +1,4 @@
-# 权限说明（1.0.0）
+# 权限说明（1.1.0）
 
 白名单以 `scripts/permission-allowlist.js` 为准，`npm run verify:dist` 和测试都按它校验构建产物。
 

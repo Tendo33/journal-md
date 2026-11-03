@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-03
+
 ### Changed
 - "Token" is now "Key" / "API key" everywhere, the same word arXiv to Markdown uses.
 - Options: the language picker sits in a "General" card as a row like arXiv to Markdown's; the six planned sites are one line under the site list instead of six rows; the PDF section is titled "PDF parsing".

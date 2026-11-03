@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Last updated: 2026-10-30 (fix round 2: all permissions granted at install, no confirmations)** · applies to Journal to Markdown 1.0.0
+**Last updated: 2026-11-03 (wording: "token" is now "key"; no change to what is collected or sent)** · applies to Journal to Markdown 1.1.0
 
 ## Overview
 
