@@ -1,0 +1,33 @@
+Save the journal article you're reading as clean Markdown in one click, ready for your notes app, reference manager or AI assistant.
+
+Where it works
+Article pages on PubMed Central, PubMed and several major open-access publishers. The full list of sites is on the project homepage.
+
+What it does
+• Structured full text first: for open-access articles it uses the structured full text (JATS XML) made available by the publisher or archive, and converts the current page when that isn't available.
+• Complete content: title, authors, abstract, sections, math ($…$ / $$…$$), tables, figure captions and reference footnotes; data availability, funding and competing interests each get their own section.
+• Metadata: YAML front matter with title, authors, journal, year, DOI, PMID, PMCID and license.
+• Download as ZIP: article.md + images/, with image links rewritten to the bundled files.
+• Filename template: name files with {title}, {year}, {journal}, {doi} and more.
+• PDF parsing (optional): when the page has no usable full text, parse the article PDF with your own OCR service key.
+• Four ways in: the M↓ button on article pages, the toolbar popup, the right-click menu, and Alt+Shift+J.
+• English and Chinese interface; follows your light or dark theme.
+
+How to use
+1. Open an article on a supported site.
+2. Click the M↓ button in the corner, or click the toolbar icon and choose Export Markdown.
+3. Choose Download ZIP to keep the images too.
+
+Privacy
+• No servers of our own, no data collection, no analytics.
+• Opening the popup or loading a page sends nothing. Only when you export does the extension ask a public open-access archive (Europe PMC) for the full text, sending just the PMCID or DOI — never cookies or the page address.
+• PDF parsing happens only after you add a key and click Parse, and goes only to the provider you chose. Keys stay in this browser.
+• Only pages you can already read are converted: no paywall bypassing, no bulk scraping.
+
+Also in the series
+• arXiv to Markdown — save arXiv papers as Markdown.
+• Zhihu to Markdown — save Zhihu content as Markdown.
+
+Requires Chrome 121 or later.
+
+Open source (MIT): github.com/Tendo33/journal-md

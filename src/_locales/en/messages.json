@@ -3,7 +3,7 @@
     "message": "Journal to Markdown"
   },
   "extDescription": {
-    "message": "Save journal articles as Markdown: math, tables and references intact. PMC, PubMed, Springer, Nature, Frontiers, MDPI, PLOS, eLife."
+    "message": "Save the journal article you're reading as clean Markdown: math, tables, figure captions and references intact, images in a ZIP."
   },
   "actionTitle": {
     "message": "Journal to Markdown — export this article"

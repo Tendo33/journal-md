@@ -1,8 +1,8 @@
 {
   "name": "journal-md",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
-  "description": "Journal to Markdown — browser extension that saves open-access journal articles (PMC, PubMed, Springer, Nature, Frontiers, MDPI, PLOS, eLife) as clean Markdown.",
+  "description": "Journal to Markdown — browser extension that saves open-access journal articles as clean Markdown.",
   "author": "SimonSun",
   "license": "MIT",
   "homepage": "https://github.com/Tendo33/journal-md#readme",

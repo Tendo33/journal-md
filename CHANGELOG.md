@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-11-04
+
+### Changed
+- Store short description (`extDescription`) no longer lists site names; the first Chrome Web Store submission was rejected for keyword spam. The detailed store description drops the site list and third-party product names as well; the full list of supported sites stays in the README.
+
 ## [1.1.0] - 2026-11-03
 
 ### Changed

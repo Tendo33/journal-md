@@ -3,7 +3,7 @@
     "message": "Journal to Markdown"
   },
   "extDescription": {
-    "message": "一键把期刊论文全文存为 Markdown：公式、表格、参考文献原样保留。支持 PMC、PubMed、Springer、Nature、Frontiers、MDPI、PLOS、eLife。"
+    "message": "一键把正在阅读的期刊论文全文存为干净的 Markdown：公式、表格、图注和参考文献原样保留，可连同图片打包下载。"
   },
   "actionTitle": {
     "message": "Journal to Markdown：导出本文"
