@@ -174,10 +174,7 @@
     "message": "Read the full text on the publisher's site:"
   },
   "abstractOnlyPdfReady": {
-    "message": "If you have access, try the PDF parsing button above."
-  },
-  "abstractOnlyPdfSetup": {
-    "message": "If you have access, you can also add a PDF parsing key in Settings and parse the article PDF."
+    "message": "If you have access, use \"Quick PDF parse\" above to get the full text from the PDF."
   },
   "btnExportAbstract": {
     "message": "Export abstract anyway"
@@ -325,6 +322,48 @@
   },
   "pdfButtonTitle": {
     "message": "Send this article's PDF link to {provider} and download the result as a ZIP"
+  },
+  "btnPdfFast": {
+    "message": "Quick PDF parse"
+  },
+  "btnPdfFastTitle": {
+    "message": "Download the PDF on this page and convert its text layer to Markdown: takes seconds and sends nothing to any service; formulas, tables and figures may be incomplete"
+  },
+  "pdfFastWorking": {
+    "message": "Reading the PDF's text layer on this page…"
+  },
+  "pdfFastDone": {
+    "message": "Saved {filename} ({pages} pages, from the PDF text layer)."
+  },
+  "pdfFastErr_pdf_http": {
+    "message": "Could not download the PDF: you may not have access to this article."
+  },
+  "pdfFastErr_pdf_not_pdf": {
+    "message": "The download was not a PDF (probably a sign-in or bot-check page). Open the PDF once in the browser, make sure you can see it, then try again."
+  },
+  "pdfFastErr_pdf_too_large": {
+    "message": "The PDF is larger than 80 MB and was not parsed."
+  },
+  "pdfFastErr_pdf_timeout": {
+    "message": "Downloading the PDF timed out."
+  },
+  "pdfFastErr_pdf_network": {
+    "message": "Could not download the PDF (network error, or the PDF is on another site that does not allow it)."
+  },
+  "pdfFastErr_pdf_not_https": {
+    "message": "The PDF address is not https; nothing was downloaded."
+  },
+  "pdfFastErr_pdf_no_text": {
+    "message": "This PDF has no text layer (probably a scan). Quick parse cannot read it; use PaddleOCR instead."
+  },
+  "pdfFastErr_pdf_parse": {
+    "message": "Could not parse the PDF."
+  },
+  "pdfFastErr_download_failed": {
+    "message": "Could not save the file."
+  },
+  "pdfFastErr_content_unreachable": {
+    "message": "Cannot run on this page. Reload it and try again."
   },
   "pdfStateDownloading": {
     "message": "Downloading the PDF in your browser…"

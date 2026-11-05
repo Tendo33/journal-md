@@ -54,5 +54,8 @@
     "mdpi",
     "plos",
     "elife"
-  ]
+  ],
+  "dependencies": {
+    "pdfjs-dist": "^6.5.438"
+  }
 }

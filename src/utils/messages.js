@@ -9,6 +9,7 @@ export const MSG = Object.freeze({
   DOWNLOAD: 'JMD_DOWNLOAD', // content → background：下载 .md
   DOWNLOAD_ZIP: 'JMD_DOWNLOAD_ZIP', // content → background：下载 ZIP（base64）
   PDF_START: 'JMD_PDF_START', // popup → background：开始 PDF 解析（带本次的 OA 确认）
+  PDF_FAST: 'JMD_PDF_FAST', // popup → 注入的 pdf-fast.js：在文章页里用 pdf.js 读 PDF 文字层（不经过第三方）
   PDF_TEST: 'JMD_PDF_TEST', // options → background：测试后端 Token（不提交任务）
   FETCH_ASSET: 'JMD_FETCH_ASSET', // content → background：页面里被 CORS 拦下的图片，只限已授权的支持站点
 });

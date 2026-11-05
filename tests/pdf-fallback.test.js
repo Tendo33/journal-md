@@ -200,6 +200,13 @@ describe('PDF task runner', () => {
 });
 
 describe('PDF texts', () => {
+  test('quick parse (text layer) states', () => {
+    expect(pdfStatusText('zh', { state: 'fast' })).toBe('正在本页读取 PDF 文字层…');
+    expect(pdfStatusText('en', { state: 'fast_done', filename: 'a (PDF).md', pages: 12 })).toBe('Saved a (PDF).md (12 pages, from the PDF text layer).');
+    expect(pdfStatusText('zh', { state: 'fast_failed', error: 'pdf_no_text' })).toContain('没有文字层');
+    expect(pdfStatusText('en', { state: 'fast_failed', error: 'something_new' })).toBe('Could not parse the PDF.');
+  });
+
   test('download / upload states', () => {
     expect(pdfStatusText('zh', { state: 'downloading', provider: 'paddleocr' })).toBe('正在用你的浏览器下载 PDF…');
     expect(pdfStatusText('en', { state: 'submitting', provider: 'paddleocr', uploaded: true })).toBe('Uploading the PDF to PaddleOCR…');

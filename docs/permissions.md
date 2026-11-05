@@ -35,6 +35,8 @@
 | `https://media.springernature.com/*` | ZIP 打包 Springer Link / BMC / Nature 的图片（这个 CDN 不发 CORS 头，页面里取不到，由后台代取） |
 | `https://corpus-prod.f505aadad1e46610c8f8563037eb3c4b.r2.cloudflarestorage.com/*` | ZIP 打包 PLOS 的图片：`/article/figure/image` 和 `/article/file?type=thumbnail` 一律 302 到这个 R2 存储桶，它不发 CORS 头。只用这个确切主机，不用 `*.r2.cloudflarestorage.com` |
 
+`scripting` 另一个用途：点「快速解析 PDF」时把 `pdf-fast.js`（pdf.js，扩展包内文件）注入当前文章页，在页面里读 PDF 文字层，不发任何第三方请求。
+
 前三个和出版商域名主要服务于 `content_scripts`（在文章页注入脚本、读取当前页 DOM，审查 N-E）。content script 的 matches 尽量收窄到文章路径（`/articles/*`、`/article/*` 等），MDPI、PLOS 的文章地址没有固定前缀，只能整站匹配；脚本加载时只读扩展自己的设置，不发请求，也不读页面内容。
 
 ZIP 打包时，页面里按 CORS 取不到的图片，如果图片在上表的站点上（含两个图片 CDN），后台会代取（只取 https 的 `image/*`，不带 Cookie）。其他图片域名没有权限；取不到的图片（任何原因）照样生成 ZIP，在 article.md 里保留原网址，结果里有提示。

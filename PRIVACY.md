@@ -38,6 +38,10 @@ Nothing is requested when a page loads or when you open the popup. The in-page b
 
 Requests to Europe PMC carry no cookies and no page address. When Europe PMC cannot be reached, is slow, or has no open-access copy, the extension uses the page you are viewing instead. Turning off "Prefer structured full text" stops all Europe PMC requests except the PubMed full-text lookup for articles that show a PMCID. Requests to Unpaywall and bioRxiv / medRxiv carry no cookies and no page address; turn off "Look for a free version" to stop them. Links to free versions found this way are shown in the popup; the extension opens or parses them only when you click.
 
+### Quick PDF parse (on this page, no service)
+
+"Quick PDF parse" downloads the article's PDF from the page you are on, like opening the PDF yourself (same site, with your sign-in), and reads its text layer with pdf.js inside that page. Nothing is sent to any other service and no key is needed. The extension injects its PDF reader (`pdf-fast.js`, part of the extension package) into the article tab only when you click the button.
+
 ### PDF parsing (optional, used only when you set it up)
 
 PDF parsing is used only after you choose a service in Settings and enter your own key for it, and then click "Parse PDF" in the popup. Without a key the button is not shown and nothing is sent. The extension contacts **only the service you chose** and never switches to another one on failure. Access to the services' hosts is granted when you install the extension; nothing is asked when you parse.

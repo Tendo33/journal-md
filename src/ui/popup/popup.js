@@ -136,7 +136,12 @@ function setPdfStatus(task) {
 async function setupPdf() {
   pdfSettings = await loadPdfSettings();
   const pdf = pageInfo && pageInfo.pdf;
-  if (!pdfReady(pdfSettings)) return;
+  // 快速解析（文字层）不需要 Key：本页有 PDF 就显示
+  if (pdf && pdf.url) {
+    $('pdf-fast').hidden = false;
+    show('pdf-row', true);
+  }
+  if (!pdfReady(pdfSettings)) { $('pdf').hidden = true; return; }
   const name = providerLabel(pdfSettings.provider);
   $('pdf').textContent = t(lang, 'pdfButton', { provider: name });
   $('pdf').title = t(lang, 'pdfButtonTitle', { provider: name });
@@ -145,11 +150,27 @@ async function setupPdf() {
   // 弹窗重新打开时显示这一页上次任务的状态
   const got = await chrome.storage.local.get(PDF_TASK_KEY);
   const task = got && got[PDF_TASK_KEY];
-  show('pdf-row', !$('pdf').hidden || !!(task && task.pageUrl === tab.url));
+  show('pdf-row', !$('pdf').hidden || !$('pdf-fast').hidden || !!(task && task.pageUrl === tab.url));
   if (task && task.pageUrl === tab.url) setPdfStatus(task);
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local' && changes[PDF_TASK_KEY] && changes[PDF_TASK_KEY].newValue && changes[PDF_TASK_KEY].newValue.pageUrl === tab.url) setPdfStatus(changes[PDF_TASK_KEY].newValue);
   });
+}
+
+/** 快速解析：把 pdf-fast.js 注入文章页，在页面里下载 PDF、读文字层、保存 Markdown（不经过第三方） */
+async function startFastPdf() {
+  if ($('pdf-fast').getAttribute('aria-disabled') === 'true') return;
+  $('pdf-fast').setAttribute('aria-disabled', 'true');
+  setPdfStatus({ state: 'fast' });
+  let r;
+  try {
+    await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['pdf-fast.js'] });
+    r = await chrome.tabs.sendMessage(tab.id, { type: MSG.PDF_FAST, pdfUrl: pageInfo.pdf.url, meta: pageInfo.meta });
+  } catch (_) {
+    r = { ok: false, error: 'content_unreachable' };
+  }
+  $('pdf-fast').removeAttribute('aria-disabled');
+  setPdfStatus(r && r.ok ? { state: 'fast_done', ...r } : { state: 'fast_failed', error: (r && r.error) || 'pdf_parse' });
 }
 
 /** pdfUrl：别处免费版本的 PDF（默认解析本页的 PDF） */
@@ -193,7 +214,7 @@ function abstractOnlyLines(result, action) {
     lines.push({ text: openLinkText(lang, l), cls: 'note', href: l.url, linkText: t(lang, 'openLinkOpen'), button: canParse ? { label: t(lang, 'btnParseThisPdf'), onClick: () => startPdf(l.pdfUrl) } : null });
   }
   if (pageInfo && pageInfo.pdf && pageInfo.pdf.url) {
-    lines.push({ text: t(lang, pdfSettings && pdfReady(pdfSettings) ? 'abstractOnlyPdfReady' : 'abstractOnlyPdfSetup'), cls: 'note' });
+    lines.push({ text: t(lang, 'abstractOnlyPdfReady'), cls: 'note' });
   }
   lines.push({ cls: 'note', button: { label: t(lang, 'btnExportAbstract'), onClick: () => run(action, true) } });
   return lines;
@@ -241,6 +262,7 @@ async function main() {
   $('copy').addEventListener('click', () => run(ACTIONS.COPY));
   $('zip').addEventListener('click', () => run(ACTIONS.ZIP));
   $('pdf').addEventListener('click', onPdfClick);
+  $('pdf-fast').addEventListener('click', startFastPdf);
   $('footer-version').textContent = `v${chrome.runtime.getManifest().version}`;
   chrome.commands.getAll().then((cmds) => {
     $('shortcut-kbd').textContent = exportShortcut(lang, cmds);
