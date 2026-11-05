@@ -47,6 +47,10 @@ export const SOURCE_ROUTES = Object.freeze({
   DOM_MDPI: 'dom-mdpi',
   DOM_PLOS: 'dom-plos',
   DOM_ELIFE: 'dom-elife',
+  DOM_WILEY: 'dom-wiley',
+  DOM_CELL: 'dom-cell',
+  DOM_OUP: 'dom-oup',
+  DOM_TANDF: 'dom-tandf',
 });
 
 export function createMeta(overrides = {}) {

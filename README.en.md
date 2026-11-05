@@ -48,6 +48,10 @@ Export a full-text article page from PubMed Central, Nature, Frontiers and other
 | MDPI | Europe PMC JATS (by DOI) | the page |
 | PLOS | Europe PMC JATS (by DOI) | the page |
 | eLife | Europe PMC JATS (by DOI) | the page |
+| Wiley Online Library (including society journals on `*.onlinelibrary.wiley.com`) | Europe PMC JATS (by DOI, when open access) | the page (full text when you have access) |
+| Cell Press (cell.com) | Europe PMC JATS (by DOI, when open access) | the page |
+| Oxford Academic (academic.oup.com) | Europe PMC JATS (by DOI, when open access) | the page |
+| Taylor & Francis Online | Europe PMC JATS (by DOI, when open access) | the page (table contents live in a pop-up; only table titles are exported) |
 
 It converts only pages you can already read: no paywall bypassing, no bulk crawling. Subscription articles you have access to can be exported from the page.
 

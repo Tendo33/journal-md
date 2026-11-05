@@ -64,15 +64,14 @@ function flatten(sections) {
   return out;
 }
 
-/** 名字可能是 citation_*，也可能只有 Dublin Core（eLife 只有 dc.*；有的站点写 DC.title） */
+/** 名字可能是 citation_*，也可能只有 Dublin Core（eLife 只有 dc.*；有的站点写 DC.title，T&F 写 dc.Title） */
 function metaValues(doc, ...names) {
   for (const n of names) {
-    const v = citationMeta(doc, n);
-    if (v.length) return v;
-    const upper = n.replace(/^dc\./, 'DC.');
-    if (upper !== n) {
-      const u = citationMeta(doc, upper);
-      if (u.length) return u;
+    const variants = [n];
+    if (/^dc\./.test(n)) variants.push(n.replace(/^dc\./, 'DC.'), n.replace(/^dc\.(\w)/, (_m, c) => `dc.${c.toUpperCase()}`));
+    for (const name of variants) {
+      const v = citationMeta(doc, name);
+      if (v.length) return v;
     }
   }
   return [];
@@ -200,7 +199,9 @@ export function extractDomArticle(doc, url, cfg, ids = {}) {
   // DOI / PMCID 只从文章自己的元数据区取，不能扫整页：参考文献和「相关文章」里也有 DOI、PMCID（QA JM-01）
   const metaArea = first(doc, cfg.metaArea);
   const doiEl = metaArea ? first(metaArea, cfg.doi) : null;
-  meta.doi = normalizeDoi(metaValues(doc, 'citation_doi', 'dc.identifier')[0] || (doiEl && (doiEl.getAttribute('href') || textOf(doiEl))) || '');
+  // dc.identifier 可能有好几个（T&F：出版商编号、DOI、CODEN），取第一个像 DOI 的；都没有时用地址里的 DOI
+  const doiMeta = metaValues(doc, 'citation_doi').concat(metaValues(doc, 'dc.identifier')).map(normalizeDoi).find(Boolean);
+  meta.doi = doiMeta || normalizeDoi((doiEl && (doiEl.getAttribute('href') || textOf(doiEl))) || '') || normalizeDoi(ids.doi || '');
   // 页面上的 ID 优先，URL 里的只作兜底：两者不一致说明单页应用的 DOM 还是上一篇（审查 N-D）
   const pmidText = metaArea ? (textOf(metaArea).match(/PMID:?\s*(\d{1,9})/i) || [])[1] : '';
   meta.pmid = normalizePmid(citationMeta(doc, 'citation_pmid')[0] || pmidText || ids.pmid || '');
@@ -229,13 +230,18 @@ export function extractDomArticle(doc, url, cfg, ids = {}) {
   }).filter((r) => r.id);
   const refIds = new Set(refItems.map((r) => r.id));
   const conv = new HtmlConverter(ir, { baseUrl: url, refIds, refAlias, selectors: cfg.selectors, hooks: cfg.hooks || {} });
-  ir.refs = refItems.map(({ li, id }, i) => ({
-    id,
-    label: textOf(first(li, cfg.refLabel)).replace(/[.\s]+$/, '') || String(i + 1),
-    text: refText(conv, li, cfg),
-    ...refIdsFromElement(li),
-    url: '',
-  }));
+  ir.refs = refItems.map(({ li, id }, i) => {
+    const found = refIdsFromElement(li);
+    // 站点把 DOI 放在链接和「doi:」文字以外的地方时（Wiley 的隐藏 span），由站点钩子给出
+    if (!found.doi && cfg.hooks && cfg.hooks.refDoi) found.doi = normalizeDoi(cfg.hooks.refDoi(li) || '');
+    return {
+      id,
+      label: textOf(first(li, cfg.refLabel)).replace(/[.\s]+$/, '') || String(i + 1),
+      text: refText(conv, li, cfg),
+      ...found,
+      url: '',
+    };
+  });
 
   // ---- 摘要 ----
   let absEls = all(root, cfg.abstract).filter((el, _i, arr) => !arr.some((o) => o !== el && o.contains(el)));
@@ -246,6 +252,7 @@ export function extractDomArticle(doc, url, cfg, ids = {}) {
   for (const absEl of absEls) {
     const clone = absEl.cloneNode(true);
     removeAll(clone, cfg.keywords);
+    if (cfg.hooks && cfg.hooks.prepareAbstract) cfg.hooks.prepareAbstract(clone);
     ir.abstract.push(...abstractSections(conv, clone));
   }
 

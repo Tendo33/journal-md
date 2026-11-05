@@ -35,6 +35,11 @@
     "https://www.mdpi.com/*",
     "https://journals.plos.org/*",
     "https://elifesciences.org/*",
+    "https://onlinelibrary.wiley.com/*",
+    "https://*.onlinelibrary.wiley.com/*",
+    "https://www.cell.com/*",
+    "https://academic.oup.com/*",
+    "https://www.tandfonline.com/*",
     "https://api.unpaywall.org/*",
     "https://api.biorxiv.org/*",
     "https://www.biorxiv.org/*",
@@ -66,7 +71,13 @@
         "https://www.frontiersin.org/articles/*",
         "https://www.mdpi.com/*",
         "https://journals.plos.org/*",
-        "https://elifesciences.org/articles/*"
+        "https://elifesciences.org/articles/*",
+        "https://onlinelibrary.wiley.com/doi/*",
+        "https://*.onlinelibrary.wiley.com/doi/*",
+        "https://www.cell.com/*/fulltext/*",
+        "https://www.cell.com/*/abstract/*",
+        "https://academic.oup.com/*",
+        "https://www.tandfonline.com/doi/*"
       ],
       "js": [
         "content.js"

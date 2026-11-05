@@ -48,6 +48,10 @@
 | MDPI | Europe PMC JATS（按 DOI） | 当前页面 |
 | PLOS | Europe PMC JATS（按 DOI） | 当前页面 |
 | eLife | Europe PMC JATS（按 DOI） | 当前页面 |
+| Wiley Online Library（含 `*.onlinelibrary.wiley.com` 学会期刊） | Europe PMC JATS（按 DOI，开放获取时） | 当前页面（有订阅权限时就是全文） |
+| Cell Press（cell.com） | Europe PMC JATS（按 DOI，开放获取时） | 当前页面 |
+| Oxford Academic（academic.oup.com） | Europe PMC JATS（按 DOI，开放获取时） | 当前页面 |
+| Taylor & Francis Online | Europe PMC JATS（按 DOI，开放获取时） | 当前页面（表格内容在弹窗里，只导出表题） |
 
 只转换你本来就能看到的页面：不绕过付费墙，不批量抓取。订阅文章在你有权限时也能从当前页面导出。
 

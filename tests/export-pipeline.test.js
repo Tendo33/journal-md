@@ -182,7 +182,7 @@ describe('inspectPage', () => {
       .toMatchObject({ ok: true, routes: { jats: false, dom: false, abstract: true } });
   });
   test('planned site', () => {
-    expect(inspectPage(html('pmc-article.html'), 'https://academic.oup.com/jas/article/1/1/1')).toMatchObject({ ok: false, error: 'site_planned', siteName: 'Oxford Academic' });
+    expect(inspectPage(html('pmc-article.html'), 'https://www.sciencedirect.com/science/article/pii/S1')).toMatchObject({ ok: false, error: 'site_planned', siteName: 'ScienceDirect' });
   });
 });
 

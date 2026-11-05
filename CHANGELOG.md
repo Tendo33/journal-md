@@ -5,6 +5,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ## [Unreleased]
 
 ### Added
+- New sites: Wiley Online Library (and society journals on `*.onlinelibrary.wiley.com`), Cell Press, Oxford Academic and Taylor & Francis Online. Like the other publishers they try Europe PMC first and otherwise export the page, so a subscription article you have access to exports in full. Adapters written against the live pages (2026-11-05); fixtures keep only the page structure with placeholder text. ScienceDirect stays planned: its pages sit behind a bot check.
 - When a page only shows the abstract, look up a legal free version by DOI: Unpaywall (PMC copies, repositories, arXiv) and bioRxiv / medRxiv (preprint of the published article). PMC copies and bioRxiv / medRxiv preprints are exported as structured full text, with the journal page's citation and a note naming the version (`fulltext_source`, `fulltext_version` in the front matter, `source_route: jats-preprint` for preprints). Other free versions are listed in the popup; repository PDFs can be parsed with one click, arXiv preprints link to arXiv to Markdown. New setting "Look for a free version when only the abstract is shown" (on by default). New host permissions: `api.unpaywall.org`, `api.biorxiv.org`, `www.biorxiv.org`, `www.medrxiv.org`.
 
 ### Changed

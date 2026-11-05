@@ -74,7 +74,7 @@ describe('detectSite', () => {
   });
 
   test('content scripts only run on supported sites', () => {
-    expect(SUPPORTED_SITE_IDS).toEqual(['pmc', 'europepmc', 'pubmed', 'springer', 'nature', 'frontiers', 'mdpi', 'plos', 'elife']);
+    expect(SUPPORTED_SITE_IDS).toEqual(['pmc', 'europepmc', 'pubmed', 'springer', 'nature', 'frontiers', 'mdpi', 'plos', 'elife', 'wiley', 'cell', 'oup', 'tandf']);
     expect(manifest.content_scripts[0].matches).toEqual(SUPPORTED_PAGE_PATTERNS);
   });
 });
