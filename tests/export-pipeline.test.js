@@ -67,14 +67,14 @@ describe('PubMed page (PRD §1.3)', () => {
   });
 
   test('PMCID but not OA → abstract only, marked at the top', async () => {
-    const r = await exportArticle({ doc: html('pubmed-with-pmcid.html'), url: PUBMED_URL, fetchJats: notOa, now: NOW });
+    const r = await exportArticle({ doc: html('pubmed-with-pmcid.html'), url: PUBMED_URL, fetchJats: notOa, now: NOW, allowAbstract: true });
     expect(r).toMatchObject({ ok: true, route: 'dom-pubmed', abstractOnly: true });
     expect(r.notices).toEqual([{ code: 'jats_fallback', reason: 'not_available' }, { code: 'abstract_only', fullTextUrl: 'https://doi.org/10.1186/s12711-025-00001-2' }]);
     expect(r.markdown.split('---\n')[2].trim().startsWith('> **Abstract only / 仅摘要**')).toBe(true);
   });
 
   test('no PMCID → abstract only without any network request', async () => {
-    const r = await exportArticle({ doc: html('pubmed-abstract-only.html'), url: 'https://pubmed.ncbi.nlm.nih.gov/31768545/', fetchJats: ok, now: NOW });
+    const r = await exportArticle({ doc: html('pubmed-abstract-only.html'), url: 'https://pubmed.ncbi.nlm.nih.gov/31768545/', fetchJats: ok, now: NOW, allowAbstract: true });
     expect(ok).not.toHaveBeenCalled();
     expect(r).toMatchObject({ ok: true, route: 'dom-pubmed', abstractOnly: true });
   });
@@ -92,10 +92,21 @@ describe('Europe PMC page', () => {
     expect(r).toMatchObject({ ok: true, route: 'dom-europepmc' });
   });
 
-  test('page without a body becomes abstract only', async () => {
+  test('without allowAbstract an abstract-only page creates no file and says where the full text is', async () => {
     const doc = html('europepmc-article.html');
     doc.getElementById('fulltextcontent').remove();
     const r = await exportArticle({ doc, url: 'https://europepmc.org/article/MED/33900001', fetchJats: notOa, now: NOW });
+    expect(r).toMatchObject({ ok: false, error: 'abstract_only' });
+    expect(r.markdown).toBeUndefined();
+    expect(r.notices).toEqual([{ code: 'jats_fallback', reason: 'not_available' }]);
+    const pm = await exportArticle({ doc: html('pubmed-with-pmcid.html'), url: PUBMED_URL, fetchJats: notOa, now: NOW });
+    expect(pm).toMatchObject({ ok: false, error: 'abstract_only', fullTextUrl: 'https://doi.org/10.1186/s12711-025-00001-2' });
+  });
+
+  test('page without a body becomes abstract only', async () => {
+    const doc = html('europepmc-article.html');
+    doc.getElementById('fulltextcontent').remove();
+    const r = await exportArticle({ doc, url: 'https://europepmc.org/article/MED/33900001', fetchJats: notOa, now: NOW, allowAbstract: true });
     expect(r).toMatchObject({ ok: true, route: 'dom-europepmc', abstractOnly: true });
   });
 });
@@ -108,7 +119,7 @@ describe('JATS must belong to the page article (QA JM-01)', () => {
     const info = inspectPage(doc, MED_URL);
     expect(info.ids).toEqual({ doi: '10.1016/S0140-6736(19)32500-0', pmid: '31862249', pmcid: '' });
     expect(info.routes.jats).toBe(false);
-    const r = await exportArticle({ doc, url: MED_URL, fetchJats: ok, now: NOW });
+    const r = await exportArticle({ doc, url: MED_URL, fetchJats: ok, now: NOW, allowAbstract: true });
     expect(ok).not.toHaveBeenCalled();
     expect(r).toMatchObject({ ok: true, route: 'dom-europepmc', abstractOnly: true, meta: { pmid: '31862249', pmcid: '' } });
     expect(r.markdown).not.toContain('PMC7756901');
@@ -119,7 +130,7 @@ describe('JATS must belong to the page article (QA JM-01)', () => {
     // 页面上的 PMCID 指错了（JATS fixture 是 PMID 40000001 / 另一个 DOI）
     const ids = doc.querySelector('#full-view-identifiers');
     ids.insertAdjacentHTML('beforeend', '<li><span class="identifier pmc"><a class="id-link">PMC11000001</a></span></li>');
-    const r = await exportArticle({ doc, url: 'https://pubmed.ncbi.nlm.nih.gov/31768545/', fetchJats: ok, now: NOW });
+    const r = await exportArticle({ doc, url: 'https://pubmed.ncbi.nlm.nih.gov/31768545/', fetchJats: ok, now: NOW, allowAbstract: true });
     expect(ok).toHaveBeenCalledWith('PMC11000001');
     expect(r).toMatchObject({ ok: true, route: 'dom-pubmed', abstractOnly: true, meta: { pmid: '31768545' } });
     expect(r.notices).toContainEqual({ code: 'jats_fallback', reason: 'mismatch' });
@@ -198,7 +209,7 @@ describe('review nits N-A / N-B / N-D', () => {
 
 describe('QA JM-10: real Europe PMC pages (2026-10 layout)', () => {
   test('MED page without full text: abstract only, no site chrome, no affiliation numbers', async () => {
-    const r = await exportArticle({ doc: html('europepmc-med-31862249.html'), url: 'https://europepmc.org/article/MED/31862249', fetchJats: ok, now: NOW });
+    const r = await exportArticle({ doc: html('europepmc-med-31862249.html'), url: 'https://europepmc.org/article/MED/31862249', fetchJats: ok, now: NOW, allowAbstract: true });
     expect(ok).not.toHaveBeenCalled();
     expect(r).toMatchObject({ ok: true, route: 'dom-europepmc', abstractOnly: true, meta: { pmid: '31862249', pmcid: '', doi: '10.1016/s0140-6736(19)32500-0' } });
     const md = r.markdown;
@@ -232,7 +243,7 @@ test('QA JM-M2-06: a placeholder "undefined" author name from the page is droppe
   const doc = html('europepmc-med-31862249.html');
   const names = doc.querySelectorAll('.metadata--author-name');
   names[names.length - 1].textContent = 'undefined';
-  const r = await exportArticle({ doc, url: 'https://europepmc.org/article/MED/31862249', fetchJats: ok, now: NOW });
+  const r = await exportArticle({ doc, url: 'https://europepmc.org/article/MED/31862249', fetchJats: ok, now: NOW, allowAbstract: true });
   expect(r.markdown).toMatch(/^authors: \[Lagae L, .*Ceulemans B\]$/m);
   expect(r.markdown).not.toContain('undefined');
 });

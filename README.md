@@ -28,7 +28,7 @@
 - **四个入口**：页面右下角的 **M↓ 悬浮按钮**（菜单：下载 .md、下载 ZIP、复制）、工具栏弹窗、右键菜单、快捷键 `Alt+Shift+J`（导出）。悬浮按钮可以用键盘操作、读屏可读，跟随系统深色模式，可在设置里或按钮菜单里隐藏。
 - **输出**：YAML front matter（title、authors、journal、year、doi、pmid、pmcid、license、url、`source_route`、exported）；公式写成 `$…$` / `$$…$$`；没有合并单元格的表格写成 GFM 表格，有合并单元格的保留 HTML；正文引用变成 `[^n]` 脚注，参考文献带 DOI 链接；数据可用性、基金、利益冲突、致谢各自成节；补充材料列出文件名和链接。
 - **下载 ZIP**：`article.md` + `images/`，正文里的图片链接改成包内路径。Springer / BMC / Nature 和 PLOS 的图片服务器（`media.springernature.com`、PLOS 的图片存储）不允许跨站下载，由后台下载。个别图片下载失败时照样生成 ZIP，这些图片保留网络链接并给出提示。
-- **PDF 解析（可选）**：页面上没有可用全文时，可以用你自己的 Key 让 **PaddleOCR**（默认）或 **MinerU** 解析文章 PDF，结果下载为 ZIP。在设置里给所选服务填好 Key，弹窗里就会出现「用 … 解析 PDF」按钮；点击后直接发送 PDF 链接，不再确认。请只解析你有权分享给第三方的 PDF。Key 只存在本浏览器（`chrome.storage.local`）。
+- **PDF 解析（可选）**：页面上没有可用全文时，可以用你自己的 Key 让 **PaddleOCR**（默认）或 **MinerU** 解析文章 PDF，结果下载为 ZIP。在设置里给所选服务填好 Key，弹窗里就会出现「用 … 解析 PDF」按钮；点击后直接发送，不再确认。用 PaddleOCR 时，插件先在你的浏览器里（用你的网络和登录状态）下载 PDF 再上传，所以有订阅权限的文章也能解析；下载失败时退回只发链接。MinerU 仍只发链接。请只解析你有权分享给第三方的 PDF。Key 只存在本浏览器（`chrome.storage.local`）。
 - **中英文界面**，跟随浏览器语言，也可在设置里切换。
 
 | 页面内按钮 | 导出的 Markdown |
@@ -40,7 +40,7 @@
 | 网站 | 优先使用的结构化全文 | 兜底 |
 | --- | --- | --- |
 | PubMed Central（pmc.ncbi.nlm.nih.gov） | Europe PMC JATS（按 PMCID） | 当前页面 |
-| Europe PMC（europepmc.org） | Europe PMC JATS（按 PMCID） | 当前页面（没有全文时只导出摘要，并标记 `abstract_only`） |
+| Europe PMC（europepmc.org） | Europe PMC JATS（按 PMCID） | 当前页面 |
 | PubMed（pubmed.ncbi.nlm.nih.gov） | 有 PMCID 且开放获取时取全文 | 题录 + 摘要 + MeSH，标记「仅摘要」 |
 | Springer Link / BMC / SpringerOpen | Europe PMC JATS（按 DOI 查找，开放获取时） | 当前页面 |
 | Nature / Scientific Reports | Europe PMC JATS（按 DOI） | 当前页面 |
@@ -50,6 +50,8 @@
 | eLife | Europe PMC JATS（按 DOI） | 当前页面 |
 
 只转换你本来就能看到的页面：不绕过付费墙，不批量抓取。订阅文章在你有权限时也能从当前页面导出。
+
+页面上只有摘要时（通常是没有访问权限）默认不生成文件，弹窗会给出全文链接和 PDF 解析入口；只需要题录和摘要时，点「仍导出摘要」（导出的文件标记 `abstract_only`）。
 
 ## 安装
 
@@ -101,7 +103,7 @@
 - Springer Link / Nature 页面上的表格只有表题和「完整表格」链接（表格内容在单独页面）；能从 Europe PMC 取到 JATS 时表格是完整的。
 - PLOS 的 JATS 下载链接会跳转到没有跨域许可的存储域名，所以 PLOS 走 Europe PMC 或页面；MDPI 的 XML 下载有人机验证，同样不用。
 - eLife 页面会把较长的图注折叠成「see more」，只从页面导出时图注可能不完整（走 Europe PMC 时完整）。
-- PDF 解析把 PDF 链接交给第三方服务自己下载；需要登录或订阅才能下载的 PDF 通常会失败。
+- 用 MinerU 解析时只把 PDF 链接交给它自己下载，需要登录或订阅才能下载的 PDF 通常会失败；PaddleOCR 由浏览器先下载再上传，没有这个问题（单个文件上限 50 MB）。
 
 ## 开发
 

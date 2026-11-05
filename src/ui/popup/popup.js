@@ -42,11 +42,11 @@ function setStatus(lines) {
   statusFrame = requestAnimationFrame(() => {
     if (seq !== statusSeq) return;
     el.textContent = '';
-    for (const { text, cls, href } of lines) {
-      if (!text) continue;
+    for (const { text, cls, href, button } of lines) {
+      if (!text && !button) continue;
       const p = document.createElement('p');
       p.className = cls;
-      p.textContent = text;
+      p.textContent = text || '';
       if (href) {
         p.append(' ');
         const a = document.createElement('a');
@@ -55,6 +55,15 @@ function setStatus(lines) {
         a.rel = 'noopener noreferrer';
         a.textContent = t(lang, 'noticeFullTextLink');
         p.append(a);
+      }
+      if (button) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'btn btn-secondary';
+        b.textContent = button.label;
+        b.addEventListener('click', button.onClick);
+        if (text) p.append(document.createElement('br'));
+        p.append(b);
       }
       el.append(p);
     }
@@ -168,7 +177,18 @@ function onPdfClick() {
   startPdf();
 }
 
-async function run(action) {
+/** 只有摘要：说明原因，给全文链接；有 PDF 时提示用 PDF 解析；最后是「仍导出摘要」按钮 */
+function abstractOnlyLines(result, action) {
+  const lines = [{ text: errorText(lang, 'abstract_only'), cls: 'alert err' }];
+  if (result.fullTextUrl) lines.push({ text: t(lang, 'abstractOnlyPublisher'), cls: 'note', href: result.fullTextUrl });
+  if (pageInfo && pageInfo.pdf && pageInfo.pdf.url) {
+    lines.push({ text: t(lang, pdfSettings && pdfReady(pdfSettings) ? 'abstractOnlyPdfReady' : 'abstractOnlyPdfSetup'), cls: 'note' });
+  }
+  lines.push({ cls: 'note', button: { label: t(lang, 'btnExportAbstract'), onClick: () => run(action, true) } });
+  return lines;
+}
+
+async function run(action, allowAbstract = false) {
   if (busy) return;
   busy = true;
   const buttons = [$('export'), $('copy'), $('zip')];
@@ -177,7 +197,7 @@ async function run(action) {
   setStatus([{ text: t(lang, 'statusWorking'), cls: 'alert info run' }]);
   let result;
   try {
-    result = await sendToTab({ type: MSG.EXPORT, action: action === ACTIONS.COPY ? ACTIONS.NONE : action });
+    result = await sendToTab({ type: MSG.EXPORT, action: action === ACTIONS.COPY ? ACTIONS.NONE : action, allowAbstract });
     if (result && result.ok && action === ACTIONS.COPY) {
       // popup 有焦点和用户手势，在这里写剪贴板最稳
       await navigator.clipboard.writeText(result.markdown);
@@ -187,7 +207,8 @@ async function run(action) {
     result = { ok: false, error: action === ACTIONS.COPY && result && result.ok ? 'clipboard_failed' : 'content_unreachable' };
   }
   const text = describeResult(result, lang, action);
-  const lines = [{ text: text.status, cls: result && result.ok ? 'alert ok' : 'alert err' }];
+  let lines = [{ text: text.status, cls: result && result.ok ? 'alert ok' : 'alert err' }];
+  if (result && !result.ok && result.error === 'abstract_only') lines = abstractOnlyLines(result, action);
   if (result && result.ok) {
     lines.push({ text: text.route, cls: 'note' });
     for (const n of text.notes) lines.push({ text: n, cls: 'note' });

@@ -131,6 +131,24 @@
   "err_no_content": {
     "message": "此页面上没有找到文章内容。如果是登录页或预览页，请确认访问权限后刷新。"
   },
+  "err_abstract_only": {
+    "message": "这个页面上只有摘要，没有生成文件。通常是没有这篇文章的访问权限：请在校园网或机构 VPN 里刷新后再试。"
+  },
+  "abstractOnlyPublisher": {
+    "message": "在出版商页面查看全文："
+  },
+  "abstractOnlyPdfReady": {
+    "message": "有访问权限时，可以试试上面的 PDF 解析按钮。"
+  },
+  "abstractOnlyPdfSetup": {
+    "message": "有访问权限时，也可以在设置里填 PDF 解析的 Key，然后解析文章 PDF。"
+  },
+  "btnExportAbstract": {
+    "message": "仍导出摘要"
+  },
+  "abstractOnlyToastHint": {
+    "message": "只需要摘要的话，点工具栏里的扩展图标，选「仍导出摘要」。"
+  },
   "err_content_unreachable": {
     "message": "无法读取此标签页。请刷新页面后重试。"
   },
@@ -266,8 +284,14 @@
   "pdfButtonTitle": {
     "message": "把这篇文章的 PDF 链接发给 {provider} 解析，结果下载为 ZIP"
   },
+  "pdfStateDownloading": {
+    "message": "正在用你的浏览器下载 PDF…"
+  },
   "pdfStateSubmitting": {
     "message": "正在把 PDF 链接发给 {provider}…"
+  },
+  "pdfStateUploading": {
+    "message": "正在把 PDF 上传给 {provider}…"
   },
   "pdfStateRunning": {
     "message": "{provider} 正在解析 PDF（{progress}%）。可以关闭弹窗，完成后会自动下载。"

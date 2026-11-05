@@ -5,6 +5,8 @@
 // - 不再弹确认、也不在使用时申请权限：后端域名和 DNR 都在安装时授予，点了「解析 PDF」就直接发送（开放获取判断只用于显示）；
 // - 只能由扩展自己的页面（弹窗）发起；用户没填所选后端的 Token 时不发任何请求（AUTH_INVALID / key_not_on_device）；
 // - 失败不自动换后端；Token 只从 chrome.storage.local 读，只发给该后端。
+// - 后端能收文件（provider.acceptsFile，目前只有 PaddleOCR）时，先由后台用用户自己的登录状态下载 PDF 再上传：
+//   订阅文章的 PDF 解析服务自己下载不到。下载失败（登录页、超时……）就退回只发链接，和以前一样。
 import { ParseError, isParseError, ERROR_REASONS } from '@pdf-core/errors.js';
 import { buildMineruLayout } from '@pdf-core/output/mineru-layout.js';
 import { assertSavableMarkdown } from '@pdf-core/output/pre-save.js';
@@ -33,9 +35,10 @@ function httpsUrl(u) {
  * @param {(result:object, baseName:string)=>Promise<{id:number, filename:string}>} deps.saveDeliverable PaddleOCR 整理后的 ZIP
  * @param {(providerId:string)=>Promise<void>} [deps.ensureRule] PaddleOCR 提交前确认 DNR 规则（去 Origin 头）
  * @param {(state:'run'|'ok'|'err')=>void} [deps.badge]
+ * @param {(url:string)=>Promise<{ok:boolean, blob?:Blob, reason?:string}>} [deps.downloadPdf] 用用户的网络和 Cookie 下载 PDF
  */
 export function createPdfRunner(deps) {
-  const { registry, storage, downloadUrl, saveDeliverable, ensureRule = async () => {}, badge = () => {}, now = () => Date.now(), sleep = sleepReal, keepAlive = withKeepAlive, log = () => {}, getFilenameTemplate = async () => undefined } = deps;
+  const { registry, storage, downloadUrl, saveDeliverable, ensureRule = async () => {}, downloadPdf = null, badge = () => {}, now = () => Date.now(), sleep = sleepReal, keepAlive = withKeepAlive, log = () => {}, getFilenameTemplate = async () => undefined } = deps;
   let running = null;
 
   async function write(patch) {
@@ -71,9 +74,16 @@ export function createPdfRunner(deps) {
 
   async function run(task, provider, token, settings) {
     const creds = { token };
+    let file = null;
+    if (provider.acceptsFile && downloadPdf) {
+      await write({ state: 'downloading', progress: 2 });
+      const d = await downloadPdf(task.pdfUrl);
+      if (d && d.ok && d.blob) file = d.blob;
+      else log(`PDF download in browser failed (${(d && d.reason) || 'unknown'}), sending the link instead`);
+    }
     const submitAt = now();
-    await write({ state: 'submitting', progress: 5, startedAt: submitAt });
-    const r = await provider.submit({ url: task.pdfUrl }, creds, {});
+    await write({ state: 'submitting', progress: 5, startedAt: submitAt, uploaded: !!file });
+    const r = await provider.submit(file ? { url: task.pdfUrl, file } : { url: task.pdfUrl }, creds, {});
     await write({ state: 'running', progress: 10, jobId: r.jobId || null });
     let fetched = r.result || null;
     if (!fetched) {
@@ -133,7 +143,7 @@ export function createPdfRunner(deps) {
     if (running) return;
     const got = await storage.get(PDF_TASK_KEY);
     const t = got && got[PDF_TASK_KEY];
-    if (t && ['checking', 'submitting', 'running'].includes(t.state)) {
+    if (t && ['checking', 'downloading', 'submitting', 'running'].includes(t.state)) {
       await write({ state: 'failed', errorCode: 'PROVIDER_FAILED', errorReason: ERROR_REASONS.INTERRUPTED_SUBMIT, progress: null });
     }
   }

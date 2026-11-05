@@ -6,6 +6,7 @@ import { createPdfRunner, PDF_SOURCE_ROUTE } from '@/background/pdf-task';
 import { createPdfRegistry, journalMineruProvider, journalPaddleProvider } from '@/pdf/providers';
 import { normalizePdfSettings, savePdfSettings, loadPdfSettings, pdfReady, PDF_SETTINGS_KEY, PDF_TASK_KEY } from '@/pdf/settings';
 import * as oa from '@/pdf/oa';
+import { downloadPagePdf, pagePdfAllowed } from '@/pdf/page-pdf';
 import { pdfErrorText, pdfStatusText } from '@/ui/shared/pdf-text';
 import { defineProvider } from '@pdf-core/provider.js';
 import { permissionsFor } from '@pdf-core/permissions.js';
@@ -97,14 +98,14 @@ function fakeProvider(id, overrides = {}) {
   });
 }
 
-function setup({ settings = { provider: 'paddleocr', tokens: { paddleocr: 'tok' } }, provider } = {}) {
+function setup({ settings = { provider: 'paddleocr', tokens: { paddleocr: 'tok' } }, provider, downloadPdf } = {}) {
   const p = provider || fakeProvider('paddleocr');
   const registry = { get: (id) => (id === p.id ? p : null) };
   const storage = memoryArea({ [PDF_SETTINGS_KEY]: settings });
   const saveDeliverable = jest.fn(async (result, base) => ({ id: 1, filename: `${base}.zip` }));
   const downloadUrl = jest.fn(async () => 2);
   const ensureRule = jest.fn(async () => {});
-  const runner = createPdfRunner({ registry, storage, saveDeliverable, downloadUrl, ensureRule, keepAlive: (fn) => fn(), sleep: async () => {}, now: () => 1000, getFilenameTemplate: async () => '{title} ({year})' });
+  const runner = createPdfRunner({ registry, storage, saveDeliverable, downloadUrl, ensureRule, keepAlive: (fn) => fn(), sleep: async () => {}, now: () => 1000, getFilenameTemplate: async () => '{title} ({year})', downloadPdf });
   return { runner, provider: p, storage, saveDeliverable, downloadUrl, ensureRule };
 }
 
@@ -162,6 +163,29 @@ describe('PDF task runner', () => {
     await expect(first).resolves.toEqual({ ok: true, state: 'done' });
   });
 
+  test('subscription PDF: downloaded in the browser first, then uploaded as a file', async () => {
+    const blob = new Blob(['%PDF-1.7'], { type: 'application/pdf' });
+    const downloadPdf = jest.fn(async () => ({ ok: true, blob }));
+    const s = setup({ provider: fakeProvider('paddleocr', { acceptsFile: true }), downloadPdf });
+    await expect(s.runner.start(REQ)).resolves.toEqual({ ok: true, state: 'done' });
+    expect(downloadPdf).toHaveBeenCalledWith(REQ.pdfUrl);
+    expect(s.provider.submit.mock.calls[0][0]).toEqual({ url: REQ.pdfUrl, file: blob });
+    expect(s.storage.data[PDF_TASK_KEY]).toMatchObject({ uploaded: true });
+  });
+
+  test('browser download fails (sign-in page) → falls back to sending the link; MinerU never downloads', async () => {
+    const downloadPdf = jest.fn(async () => ({ ok: false, reason: 'not_pdf' }));
+    const s = setup({ provider: fakeProvider('paddleocr', { acceptsFile: true }), downloadPdf });
+    await expect(s.runner.start(REQ)).resolves.toEqual({ ok: true, state: 'done' });
+    expect(s.provider.submit.mock.calls[0][0]).toEqual({ url: REQ.pdfUrl });
+    expect(s.storage.data[PDF_TASK_KEY]).toMatchObject({ uploaded: false });
+
+    const m = setup({ provider: fakeProvider('mineru', { fetchResult: jest.fn(async () => ({ zipUrl: 'https://cdn-mineru.openxlab.org.cn/r.zip' })) }), settings: { provider: 'mineru', tokens: { mineru: 'm' } }, downloadPdf });
+    downloadPdf.mockClear();
+    await m.runner.start(REQ);
+    expect(downloadPdf).not.toHaveBeenCalled();
+  });
+
   test('a task interrupted by a service-worker restart is marked failed, not resent', async () => {
     const s = setup();
     s.storage.data[PDF_TASK_KEY] = { state: 'running', provider: 'paddleocr' };
@@ -176,6 +200,12 @@ describe('PDF task runner', () => {
 });
 
 describe('PDF texts', () => {
+  test('download / upload states', () => {
+    expect(pdfStatusText('zh', { state: 'downloading', provider: 'paddleocr' })).toBe('正在用你的浏览器下载 PDF…');
+    expect(pdfStatusText('en', { state: 'submitting', provider: 'paddleocr', uploaded: true })).toBe('Uploading the PDF to PaddleOCR…');
+    expect(pdfStatusText('en', { state: 'submitting', provider: 'mineru' })).not.toContain('Uploading');
+  });
+
   test('no confirmation texts remain; error texts', () => {
     const { MESSAGES } = require('@/config/i18n');
     for (const k of ['pdfConfirmText', 'pdfConfirmContinue', 'pdfConfirmCancel', 'pdfCancelled', 'optPdfEnabled', 'optPdfDenied', 'optPdfGranted', 'pdfErr_CONSENT_REQUIRED', 'pdfErr_PDF_DISABLED']) {
@@ -186,5 +216,57 @@ describe('PDF texts', () => {
     expect(pdfErrorText('zh', { errorCode: 'PROVIDER_FAILED', errorReason: 'dnr_not_ready', provider: 'paddleocr' })).toContain('网络规则');
     expect(pdfErrorText('en', { errorCode: 'WHATEVER', provider: 'mineru' })).toBe('MinerU could not parse this PDF.');
     expect(pdfStatusText('en', { state: 'running', progress: 50, provider: 'mineru' })).toContain('(50%)');
+  });
+});
+
+describe('downloading the article PDF in the browser', () => {
+  const res = (bytes, { status = 200, headers = {} } = {}) => ({ ok: status < 400, status, headers: { get: (k) => headers[k.toLowerCase()] || null }, arrayBuffer: async () => new Uint8Array(bytes).buffer });
+  const PDF = [...Buffer.from('%PDF-1.7 body')];
+
+  test('only https URLs on supported sites', () => {
+    expect(pagePdfAllowed(`${NATURE}.pdf`)).toBe(true);
+    expect(pagePdfAllowed('https://link.springer.com/content/pdf/10.1007/s1.pdf')).toBe(true);
+    expect(pagePdfAllowed('http://www.nature.com/x.pdf')).toBe(false);
+    expect(pagePdfAllowed('https://evil.example/x.pdf')).toBe(false);
+    expect(pagePdfAllowed('https://u:p@www.nature.com/x.pdf')).toBe(false);
+  });
+
+  test('sends the user cookies and returns a PDF blob', async () => {
+    const fetchImpl = jest.fn(async () => res(PDF));
+    const r = await downloadPagePdf(`${NATURE}.pdf`, { fetchImpl });
+    expect(r.ok).toBe(true);
+    expect(r.blob.type).toBe('application/pdf');
+    expect(fetchImpl.mock.calls[0][1]).toMatchObject({ credentials: 'include' });
+  });
+
+  test('sign-in page, HTTP error, too large, other hosts', async () => {
+    await expect(downloadPagePdf(`${NATURE}.pdf`, { fetchImpl: async () => res([...Buffer.from('<html>Sign in')]) })).resolves.toEqual({ ok: false, reason: 'not_pdf' });
+    await expect(downloadPagePdf(`${NATURE}.pdf`, { fetchImpl: async () => res([], { status: 403 }) })).resolves.toEqual({ ok: false, reason: 'http', status: 403 });
+    await expect(downloadPagePdf(`${NATURE}.pdf`, { fetchImpl: async () => res(PDF, { headers: { 'content-length': '999' } }), maxBytes: 10 })).resolves.toEqual({ ok: false, reason: 'too_large' });
+    await expect(downloadPagePdf(`${NATURE}.pdf`, { fetchImpl: async () => res(PDF), maxBytes: 5 })).resolves.toEqual({ ok: false, reason: 'too_large' });
+    const fetchImpl = jest.fn();
+    await expect(downloadPagePdf('https://evil.example/x.pdf', { fetchImpl })).resolves.toEqual({ ok: false, reason: 'not_allowed' });
+    expect(fetchImpl).not.toHaveBeenCalled();
+    await expect(downloadPagePdf(`${NATURE}.pdf`, { fetchImpl: async () => { throw new TypeError('x'); } })).resolves.toEqual({ ok: false, reason: 'network' });
+  });
+
+  test('PaddleOCR uploads the file as multipart; without a file it still sends the link', async () => {
+    const calls = [];
+    const fetch = jest.fn(async (url, init) => { calls.push({ url, init }); return { ok: true, status: 200, json: async () => ({ code: 0, data: { jobId: 'J1' } }) }; });
+    const blob = new Blob(['%PDF-1.7'], { type: 'application/pdf' });
+    await expect(journalPaddleProvider.submit({ url: `${NATURE}.pdf`, file: blob }, { token: 't' }, { fetch, keepAlive: { ping: () => {} } })).resolves.toEqual({ jobId: 'J1' });
+    const body = calls[0].init.body;
+    expect(body).toBeInstanceOf(FormData);
+    expect(body.get('file').name).toBe('s41586-021-03819-2.pdf');
+    expect(calls[0].init.headers).toEqual({ Authorization: 'Bearer t' });
+
+    await journalPaddleProvider.submit({ url: `${NATURE}.pdf` }, { token: 't' }, { fetch });
+    expect(JSON.parse(calls[1].init.body)).toMatchObject({ fileUrl: `${NATURE}.pdf` });
+  });
+
+  test('PaddleOCR business errors on upload are mapped (auth)', async () => {
+    const fetch = async () => ({ ok: true, status: 200, json: async () => ({ code: 401, msg: 'invalid token' }) });
+    const blob = new Blob(['%PDF-1.7'], { type: 'application/pdf' });
+    await expect(journalPaddleProvider.submit({ url: `${NATURE}.pdf`, file: blob }, { token: 't' }, { fetch, keepAlive: { ping: () => {} } })).rejects.toMatchObject({ code: 'AUTH_INVALID' });
   });
 });

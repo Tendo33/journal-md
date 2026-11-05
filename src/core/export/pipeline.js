@@ -3,6 +3,7 @@
 //   PubMed 页：DOM 取题录和摘要；有 PMCID → Europe PMC 全文；否则「仅摘要」
 //   出版商页（Springer/BMC、Nature、Frontiers、MDPI、PLOS、eLife），开启「优先结构化来源」时：
 //     同站 XML（目前只有 Frontiers 的 citation_xml_url）→ 按 DOI 查 Europe PMC，开放获取就取 fullTextXML → 当前页 DOM
+// 最后只剩摘要时默认不导出（返回 ERR.ABSTRACT_ONLY，带全文 / PDF 链接），用户在弹窗里选「仍导出摘要」才传 allowAbstract
 // 纯函数 + 注入依赖（fetchJats、services），content script 和测试共用。
 import { hasBody, hasContent } from '../article-ir';
 import { parseJats } from '../parsers/jats';
@@ -249,12 +250,18 @@ async function publisherJats({ det, dom, doc, url, fetchJats, services, notices 
   return tryJats(look.pmcid, url, fetchJats, notices, (jatsMeta) => !!jatsMeta.doi && same(jatsMeta.doi, dom.meta.doi));
 }
 
+/** 只有摘要、用户没说要摘要：不生成文件，告诉调用方去哪里找全文 */
+function abstractOnlyFailure(ir, notices) {
+  const m = ir.meta;
+  return fail(ERR.ABSTRACT_ONLY, { notices, fullTextUrl: m.fullTextUrl || '', pdfUrl: m.pdfUrl || '', meta: { title: m.title, doi: m.doi, pmid: m.pmid, pmcid: m.pmcid } });
+}
+
 /**
  * @param {{ doc:Document, url:string, settings?:object, fetchJats:(pmcid:string)=>Promise<object>, now?:Date,
  *   services?:{ lookupDoi?:(doi:string)=>Promise<object>, fetchSiteXml?:(url:string)=>Promise<object>, fetchPageHtml?:(url:string)=>Promise<object> },
- *   format?:'md'|'zip' }} args
+ *   format?:'md'|'zip', allowAbstract?:boolean }} args
  */
-export async function exportArticle({ doc, url, settings: rawSettings, fetchJats, services = {}, now, format = 'md' }) {
+export async function exportArticle({ doc, url, settings: rawSettings, fetchJats, services = {}, now, format = 'md', allowAbstract = false }) {
   const settings = normalizeSettings(rawSettings);
   const det = detectSite(url);
   if (!det.site) return fail(ERR.UNSUPPORTED_PAGE);
@@ -285,6 +292,7 @@ export async function exportArticle({ doc, url, settings: rawSettings, fetchJats
       }
     }
     if (!dom.meta.title) return fail(ERR.NO_CONTENT);
+    if (!allowAbstract) return abstractOnlyFailure(dom, notices);
     return finish(dom, settings, notices, now, format);
   }
 
@@ -310,6 +318,7 @@ export async function exportArticle({ doc, url, settings: rawSettings, fetchJats
     if (!(dom.abstract || []).length) return fail(ERR.NO_CONTENT);
     dom.meta.abstractOnly = true;
     dom.meta.fullTextUrl = dom.meta.doi ? `https://doi.org/${dom.meta.doi}` : '';
+    if (!allowAbstract) return abstractOnlyFailure(dom, notices);
   }
   return finish(dom, settings, notices, now, format);
 }

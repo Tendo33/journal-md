@@ -25,6 +25,8 @@ body{min-width:360px}
 .status .alert{font-weight:600}
 .status .run::before{content:"";flex:none;width:14px;height:14px;margin-top:2px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite}
 .status .note{color:var(--text-2);font-size:var(--fs-xs);line-height:1.5;padding:0 2px}
+.status .note .btn{margin-top:var(--sp-1)}
+.status .note:has(> .btn:only-child) .btn{margin-top:0}
 
 /* L3 PDF 解析：所选后端填了 Token 才显示 */
 .pdf-row{display:flex;flex-direction:column;gap:var(--sp-2)}

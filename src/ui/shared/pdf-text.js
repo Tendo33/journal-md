@@ -22,8 +22,10 @@ export function pdfStatusText(lang, task) {
   if (!task || !task.state) return '';
   const p = { provider: providerLabel(task.provider) };
   switch (task.state) {
+  case 'downloading':
+    return t(lang, 'pdfStateDownloading', p);
   case 'checking': case 'submitting':
-    return t(lang, 'pdfStateSubmitting', p);
+    return t(lang, task.uploaded ? 'pdfStateUploading' : 'pdfStateSubmitting', p);
   case 'running':
     return t(lang, 'pdfStateRunning', { ...p, progress: Math.max(10, Math.min(99, Number(task.progress) || 10)) });
   case 'done':

@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+- A page that only shows the abstract (usually an article you don't have access to) no longer produces a file silently. The popup says why and links to the full text and to PDF parsing; "Export abstract anyway" still exports the abstract (marked `abstract_only`). The in-page button and shortcut show the same message.
+- PDF parsing with PaddleOCR downloads the article PDF in your browser first and uploads the file, so subscription PDFs you have access to (campus network, institutional sign-in) can be parsed; the service could not download them from the link. If the download fails, the link is sent as before. MinerU is unchanged (link only).
+
 ## [1.1.1] - 2026-11-04
 
 ### Changed

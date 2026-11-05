@@ -28,7 +28,7 @@ Export a full-text article page from PubMed Central, Nature, Frontiers and other
 - **Four ways in**: the **M↓ button** at the bottom right of article pages (menu: Download .md, Download ZIP, Copy), the toolbar popup, the right-click menu, and `Alt+Shift+J` (export). The button works with the keyboard and screen readers, follows dark mode, and can be hidden from its menu or in Settings.
 - **Output**: YAML front matter (title, authors, journal, year, doi, pmid, pmcid, license, url, `source_route`, exported); math as `$…$` / `$$…$$`; simple tables as GFM, tables with merged cells kept as HTML; in-text citations as `[^n]` footnotes with DOI links; data availability, funding, competing interests and acknowledgements as their own sections; supplementary files listed with links.
 - **Download ZIP**: `article.md` + `images/`, with image links rewritten to the local files. Springer / BMC / Nature and PLOS images sit on servers that block cross-site downloads (`media.springernature.com`, PLOS's image storage), so they are downloaded in the background. If an image still fails, the ZIP is created anyway, that image keeps its web link, and a message says so.
-- **PDF parsing (optional)**: when a page has no usable full text, the article PDF can be parsed by **PaddleOCR** (default) or **MinerU** with your own key; the result downloads as a ZIP. Once the selected service has a key in Settings, the popup shows "Parse PDF with …"; clicking it sends the PDF link straight away, without asking again. Only parse PDFs you are allowed to share with a third party. Tokens stay in this browser (`chrome.storage.local`).
+- **PDF parsing (optional)**: when a page has no usable full text, the article PDF can be parsed by **PaddleOCR** (default) or **MinerU** with your own key; the result downloads as a ZIP. Once the selected service has a key in Settings, the popup shows "Parse PDF with …"; clicking it sends the PDF straight away, without asking again. With PaddleOCR the extension first downloads the PDF in your browser (your network, your sign-in) and uploads the file, so subscription articles you can open can be parsed too; if that download fails it sends the link instead. MinerU still gets the link only. Only parse PDFs you are allowed to share with a third party. Tokens stay in this browser (`chrome.storage.local`).
 - **English and Chinese interface**, following the browser language or set in Settings.
 
 | Page button | Exported Markdown |
@@ -40,7 +40,7 @@ Export a full-text article page from PubMed Central, Nature, Frontiers and other
 | Site | Structured full text tried first | Fallback |
 | --- | --- | --- |
 | PubMed Central (pmc.ncbi.nlm.nih.gov) | Europe PMC JATS (by PMCID) | the page |
-| Europe PMC (europepmc.org) | Europe PMC JATS (by PMCID) | the page (abstract only, marked `abstract_only`, when there is no full text) |
+| Europe PMC (europepmc.org) | Europe PMC JATS (by PMCID) | the page |
 | PubMed (pubmed.ncbi.nlm.nih.gov) | full text when the article has an open-access PMCID | citation + abstract + MeSH, marked "Abstract only" |
 | Springer Link / BMC / SpringerOpen | Europe PMC JATS (looked up by DOI, open access only) | the page |
 | Nature / Scientific Reports | Europe PMC JATS (by DOI) | the page |
@@ -50,6 +50,8 @@ Export a full-text article page from PubMed Central, Nature, Frontiers and other
 | eLife | Europe PMC JATS (by DOI) | the page |
 
 It converts only pages you can already read: no paywall bypassing, no bulk crawling. Subscription articles you have access to can be exported from the page.
+
+When a page only shows the abstract (usually because you don't have access), no file is created by default: the popup links to the full text and to PDF parsing, and "Export abstract anyway" exports the abstract (marked `abstract_only`).
 
 ## Install
 
@@ -101,7 +103,7 @@ Nothing is requested when a page loads or the popup opens. On export the extensi
 - On Springer Link / Nature pages tables show only their caption and a "full table" link (the table lives on a separate page); with Europe PMC JATS the tables are complete.
 - PLOS's JATS download redirects to a storage host without CORS, and MDPI's XML download sits behind a bot check, so those sites use Europe PMC or the page.
 - eLife folds long figure captions behind "see more"; a page-only export may carry the shortened caption (Europe PMC JATS has the full one).
-- PDF parsing gives the PDF link to the third-party service, which downloads it itself; PDFs that need a login or subscription usually fail.
+- MinerU gets only the PDF link and downloads it itself, so PDFs that need a login or subscription usually fail there; PaddleOCR gets the file downloaded by your browser and does not have this problem (50 MB per file).
 
 ## Development
 

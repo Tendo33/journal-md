@@ -13,6 +13,7 @@ import { createActionRunner } from './run-action';
 import { isTrustedSender, isExtensionPageSender } from './message-guards';
 import { createPdfRunner } from './pdf-task';
 import { createPdfRegistry } from '../pdf/providers';
+import { downloadPagePdf } from '../pdf/page-pdf';
 import { saveDeliverable } from '@pdf-core/output/save.js';
 import { requirePaddleOriginRule, installPaddleOriginRuleListeners } from './paddle-origin-rule';
 import { scheduleReloadWhenIdle } from './dnr-reinit';
@@ -63,6 +64,8 @@ const pdf = createPdfRunner({
       throw e;
     }
   },
+  // 订阅文章：用用户自己的网络和登录状态先下载 PDF 再上传
+  downloadPdf: (url) => downloadPagePdf(url),
   badge: pdfBadge,
   log,
   getFilenameTemplate: async () => (await loadSettings()).filenameTemplate,

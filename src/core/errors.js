@@ -5,6 +5,7 @@ export const ERR = Object.freeze({
   SITE_DISABLED: 'site_disabled',
   NOT_ARTICLE: 'not_article',
   NO_CONTENT: 'no_content',
+  ABSTRACT_ONLY: 'abstract_only', // 页面上只有摘要（多半是没有订阅权限），默认不导出
   PAGE_CHANGED: 'page_changed',
   CONTENT_UNREACHABLE: 'content_unreachable',
   DOWNLOAD_FAILED: 'download_failed',

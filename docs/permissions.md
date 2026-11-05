@@ -40,7 +40,7 @@ ZIP 打包时，页面里按 CORS 取不到的图片，如果图片在上表的�
 
 ### Firefox
 
-`browser_specific_settings.gecko.data_collection_permissions.required` 为 `["websiteContent", "authenticationInfo"]`：`websiteContent` 同 arxiv-md（读文章内容生成 Markdown，解析 PDF 时把 PDF 链接发给所选后端）；`authenticationInfo` 是 arxiv-md 没有声明的——用户填的 PDF 服务 Token 随每次解析请求发给该服务。
+`browser_specific_settings.gecko.data_collection_permissions.required` 为 `["websiteContent", "authenticationInfo"]`：`websiteContent` 同 arxiv-md（读文章内容生成 Markdown，解析 PDF 时把 PDF（PaddleOCR 上传文件，MinerU 只给链接）发给所选后端）；`authenticationInfo` 是 arxiv-md 没有声明的——用户填的 PDF 服务 Token 随每次解析请求发给该服务。
 
 ## 与 M1（e59b310）相比的变化
 
