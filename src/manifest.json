@@ -40,6 +40,8 @@
     "https://www.cell.com/*",
     "https://academic.oup.com/*",
     "https://www.tandfonline.com/*",
+    "https://www.sciencedirect.com/*",
+    "https://api.elsevier.com/*",
     "https://api.unpaywall.org/*",
     "https://api.biorxiv.org/*",
     "https://www.biorxiv.org/*",
@@ -77,7 +79,8 @@
         "https://www.cell.com/*/fulltext/*",
         "https://www.cell.com/*/abstract/*",
         "https://academic.oup.com/*",
-        "https://www.tandfonline.com/doi/*"
+        "https://www.tandfonline.com/doi/*",
+        "https://www.sciencedirect.com/science/article/*"
       ],
       "js": [
         "content.js"

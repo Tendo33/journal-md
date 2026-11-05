@@ -37,7 +37,9 @@
 export const SOURCE_ROUTES = Object.freeze({
   JATS_EUROPEPMC: 'jats-europepmc',
   JATS_FRONTIERS: 'jats-frontiers', // 出版商同站 XML（citation_xml_url）
-  JATS_PREPRINT: 'jats-preprint', // bioRxiv / medRxiv 预印本 JATS（页面上只有摘要时找到的免费版本）
+  JATS_PREPRINT: 'jats-preprint',
+  XML_ELSEVIER: 'xml-elsevier', // Elsevier 全文接口（ScienceDirect / Cell 等，用户的 API Key）
+  DOM_SCIENCEDIRECT: 'dom-sciencedirect', // bioRxiv / medRxiv 预印本 JATS（页面上只有摘要时找到的免费版本）
   DOM_PMC: 'dom-pmc',
   DOM_EUROPEPMC: 'dom-europepmc',
   DOM_PUBMED: 'dom-pubmed',

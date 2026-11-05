@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 结构按 Elsevier 全文 API（full-text-retrieval-response、ja/ce/sb 格式）写的合成样例，文字全部是占位 -->
+<full-text-retrieval-response xmlns="http://www.elsevier.com/xml/svapi/article/dtd" xmlns:ce="http://www.elsevier.com/xml/common/dtd" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/" xmlns:xocs="http://www.elsevier.com/xml/xocs/dtd" xmlns:ja="http://www.elsevier.com/xml/ja/dtd" xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:sb="http://www.elsevier.com/xml/common/struct-bib/dtd" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <coredata>
+    <prism:doi>10.1016/j.widget.2021.100001</prism:doi>
+    <pii>S0000-0000(21)00001-X</pii>
+    <dc:title>Widgets fold along two hinges</dc:title>
+    <prism:publicationName>Journal of Widgets</prism:publicationName>
+    <prism:coverDate>2021-03-01</prism:coverDate>
+    <dc:creator>Example, Ada</dc:creator>
+    <dc:creator>Sample, Ben</dc:creator>
+    <dc:description>Abstract We fold widgets.</dc:description>
+    <openaccessUserLicense>http://creativecommons.org/licenses/by/4.0/</openaccessUserLicense>
+  </coredata>
+  <objects>
+    <object ref="gr1" category="thumbnail" type="IMAGE-THUMBNAIL" mimetype="image/gif">https://ars.els-cdn.com/content/image/1-s2.0-S000000002100001X-gr1.sml</object>
+    <object ref="gr1" category="standard" type="IMAGE-DOWNSAMPLED" mimetype="image/jpeg">https://ars.els-cdn.com/content/image/1-s2.0-S000000002100001X-gr1.jpg</object>
+    <object ref="gr1" category="high" type="IMAGE-HIGH-RES" mimetype="image/jpeg">https://ars.els-cdn.com/content/image/1-s2.0-S000000002100001X-gr1_lrg.jpg</object>
+  </objects>
+  <pubmed-id>33000001</pubmed-id>
+  <originalText><xocs:doc><xocs:serial-item>
+    <ja:article docsubtype="fla">
+      <ce:floats>
+        <ce:figure id="fig1"><ce:label>Figure 1</ce:label><ce:caption><ce:simple-para>Two hinges of a widget.</ce:simple-para></ce:caption><ce:link locator="gr1" xlink:href="pii:S000000002100001X/gr1"/></ce:figure>
+        <ce:table id="tbl1" frame="topbot"><ce:label>Table 1</ce:label><ce:caption><ce:simple-para>Creases per widget.</ce:simple-para></ce:caption>
+          <tgroup cols="3"><colspec colname="col1"/><colspec colname="col2"/><colspec colname="col3"/>
+            <thead><row><entry>Widget</entry><entry namest="col2" nameend="col3">Creases</entry></row></thead>
+            <tbody><row><entry>A</entry><entry>2</entry><entry>3</entry></row></tbody>
+          </tgroup>
+          <ce:table-footnote><ce:note-para>Counted by hand.</ce:note-para></ce:table-footnote>
+        </ce:table>
+      </ce:floats>
+      <ja:head>
+        <ce:title>Widgets fold along two hinges</ce:title>
+        <ce:abstract class="author-highlights"><ce:section-title>Highlights</ce:section-title><ce:abstract-sec><ce:simple-para><ce:list><ce:list-item><ce:label>•</ce:label><ce:para>Two hinges</ce:para></ce:list-item><ce:list-item><ce:label>•</ce:label><ce:para>One clip</ce:para></ce:list-item></ce:list></ce:simple-para></ce:abstract-sec></ce:abstract>
+        <ce:abstract class="author"><ce:section-title>Abstract</ce:section-title><ce:abstract-sec><ce:simple-para>We fold widgets and count the creases.</ce:simple-para></ce:abstract-sec></ce:abstract>
+        <ce:abstract class="graphical"><ce:section-title>Graphical abstract</ce:section-title><ce:abstract-sec><ce:simple-para><ce:display><ce:figure id="undfig1"><ce:link locator="fx1"/></ce:figure></ce:display></ce:simple-para></ce:abstract-sec></ce:abstract>
+        <ce:keywords><ce:section-title>Keywords</ce:section-title><ce:keyword><ce:text>widget</ce:text></ce:keyword><ce:keyword><ce:text>hinge</ce:text></ce:keyword></ce:keywords>
+      </ja:head>
+      <ja:body>
+        <ce:sections>
+          <ce:section id="sec1"><ce:label>1</ce:label><ce:section-title>Introduction</ce:section-title>
+            <ce:para id="p1">Widgets have hinges <ce:cross-refs refid="bib1 bib2">[1,2]</ce:cross-refs>, see <ce:cross-ref refid="fig1">Fig. 1</ce:cross-ref>.<ce:float-anchor refid="fig1"/></ce:para>
+          </ce:section>
+          <ce:section id="sec2"><ce:label>2</ce:label><ce:section-title>Results</ce:section-title>
+            <ce:section id="sec2.1"><ce:label>2.1</ce:label><ce:section-title>Counting</ce:section-title>
+              <ce:para>The count <mml:math altimg="si1.svg"><mml:mi>n</mml:mi><mml:mo>=</mml:mo><mml:mn>12</mml:mn></mml:math> is small <ce:italic>in vitro</ce:italic> and H<ce:inf>2</ce:inf>O<ce:float-anchor refid="tbl1"/>:
+                <ce:display><ce:formula id="eq1"><ce:label>(1)</ce:label><mml:math display="block"><mml:mi>c</mml:mi><mml:mo>=</mml:mo><mml:mn>2</mml:mn><mml:mi>n</mml:mi></mml:math></ce:formula></ce:display>
+                which we verified <ce:cross-ref refid="bib1">[1]</ce:cross-ref>.</ce:para>
+            </ce:section>
+          </ce:section>
+          <ce:section id="sec3" role="conflict"><ce:section-title>Declaration of competing interest</ce:section-title><ce:para>None.</ce:para></ce:section>
+        </ce:sections>
+        <ce:acknowledgment><ce:section-title>Acknowledgements</ce:section-title><ce:para>We thank the hinge lab.</ce:para></ce:acknowledgment>
+      </ja:body>
+      <ja:tail>
+        <ce:bibliography><ce:section-title>References</ce:section-title><ce:bibliography-sec>
+          <ce:bib-reference id="bib1"><ce:label>[1]</ce:label><sb:reference><sb:contribution><sb:authors><sb:author><ce:given-name>A.</ce:given-name><ce:surname>Example</ce:surname></sb:author><sb:author><ce:given-name>B.</ce:given-name><ce:surname>Sample</ce:surname></sb:author><sb:et-al/></sb:authors><sb:title><sb:maintitle>Hinges in widgets</sb:maintitle></sb:title></sb:contribution><sb:host><sb:issue><sb:series><sb:title><sb:maintitle>Widget J.</sb:maintitle></sb:title><sb:volume-nr>3</sb:volume-nr></sb:series><sb:date>2019</sb:date></sb:issue><sb:pages><sb:first-page>12</sb:first-page><sb:last-page>20</sb:last-page></sb:pages></sb:host><ce:doi>10.1000/widget.1</ce:doi></sb:reference></ce:bib-reference>
+          <ce:bib-reference id="bib2"><ce:label>[2]</ce:label><ce:other-ref><ce:textref>C. Placeholder, Crease notes, unpublished, 2020.</ce:textref></ce:other-ref></ce:bib-reference>
+        </ce:bibliography-sec></ce:bibliography>
+      </ja:tail>
+    </ja:article>
+  </xocs:serial-item></xocs:doc></originalText>
+</full-text-retrieval-response>

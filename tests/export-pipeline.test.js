@@ -150,7 +150,7 @@ describe('failure reasons', () => {
   const doc = html('pmc-article.html');
   test.each([
     ['https://example.com/paper', 'unsupported_page'],
-    ['https://www.sciencedirect.com/science/article/pii/S0032579120300001', 'site_planned'],
+    ['https://www.biorxiv.org/content/10.1101/2024.01.01.000001v1', 'site_planned'],
     ['https://pmc.ncbi.nlm.nih.gov/search/?term=x', 'not_article'],
   ])('%s → %s', async (url, error) => {
     const r = await exportArticle({ doc, url, fetchJats: ok });
@@ -182,7 +182,7 @@ describe('inspectPage', () => {
       .toMatchObject({ ok: true, routes: { jats: false, dom: false, abstract: true } });
   });
   test('planned site', () => {
-    expect(inspectPage(html('pmc-article.html'), 'https://www.sciencedirect.com/science/article/pii/S1')).toMatchObject({ ok: false, error: 'site_planned', siteName: 'ScienceDirect' });
+    expect(inspectPage(html('pmc-article.html'), 'https://www.biorxiv.org/content/10.1101/2024.01.01.000001v1')).toMatchObject({ ok: false, error: 'site_planned', siteName: 'bioRxiv / medRxiv' });
   });
 });
 

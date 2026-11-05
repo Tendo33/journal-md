@@ -14,6 +14,7 @@ Settings only: interface language, file name template, whether to include images
 
 ### `chrome.storage.local` (never synced)
 
+- **Elsevier API key** (if you enter one): stored only in this browser (`chrome.storage.local`), never synced, sent only to `api.elsevier.com`.
 - **PDF parsing settings**: which service you chose (PaddleOCR or MinerU) and **the keys you entered**. Keys are stored only in this browser profile and are sent only to the service they belong to.
 - **The last PDF parsing task**: service, article title and page address, state and progress, the job ID returned by the service, an error code if it failed, and the saved file name. It is overwritten by the next task.
 
@@ -33,6 +34,7 @@ Nothing is requested when a page loads or when you open the popup. The in-page b
 | `https://www.mdpi.com/` | On MDPI pages | One request for the article page you are viewing (same address), made from the page itself like a reload, because the site re-renders its formulas after loading; nothing else is sent |
 | `https://api.unpaywall.org/` (Unpaywall, OurResearch) | Only when the page shows just the abstract and "Look for a free version" is on (default) | The article's DOI and the extension's contact address (`Tendo33@users.noreply.github.com`, required by Unpaywall), to find legal free copies (PMC, preprints, institutional repositories) |
 | `https://api.biorxiv.org/`, `https://www.biorxiv.org/`, `https://www.medrxiv.org/` (Cold Spring Harbor Laboratory) | Same as above | The article's DOI, to find its bioRxiv / medRxiv preprint; then a request for that preprint's full-text XML |
+| `https://api.elsevier.com/` (Elsevier) | Only when you entered an Elsevier API key and an Elsevier article page (DOI `10.1016/…`, or a ScienceDirect PII) shows just the abstract | The DOI or PII and your key (in the `X-ELS-APIKey` header), without cookies. Elsevier decides from your network whether to return the full text |
 | The sites hosting the article's images | Only for "Download ZIP" with images included | Requests for the images shown on the page, without cookies. Images on hosts the extension has access to (the supported sites and the two image servers below) may be fetched by the extension's background page when the image server does not allow it otherwise |
 | `media.springernature.com`, PLOS's image storage (`corpus-prod.…r2.cloudflarestorage.com`) | Only for "Download ZIP" on Springer / BMC / Nature / PLOS articles | Requests for the article's images, without cookies. Access to these two hosts is granted when you install the extension; nothing is asked when you export. If an image still cannot be downloaded, the ZIP is saved anyway, that image keeps its web link in article.md, and a message names the host |
 
@@ -72,8 +74,9 @@ With MinerU, a PDF that needs a login or a subscription usually cannot be downlo
 | `downloads` | Save `.md`, `.zip` and PDF parsing results |
 | `contextMenus` | "Export this page as Markdown" / "Copy this page as Markdown" on supported pages |
 | `clipboardWrite` | Copy Markdown |
-| `https://pmc.ncbi.nlm.nih.gov/*`, `https://pubmed.ncbi.nlm.nih.gov/*`, `https://europepmc.org/*`, `https://link.springer.com/*`, `https://*.biomedcentral.com/*`, `https://*.springeropen.com/*`, `https://www.nature.com/*`, `https://www.frontiersin.org/*`, `https://www.mdpi.com/*`, `https://journals.plos.org/*`, `https://elifesciences.org/*`, `https://onlinelibrary.wiley.com/*`, `https://*.onlinelibrary.wiley.com/*`, `https://www.cell.com/*`, `https://academic.oup.com/*`, `https://www.tandfonline.com/*` | Run the converter on article pages of these sites (and fetch images from them for ZIP files) |
+| `https://pmc.ncbi.nlm.nih.gov/*`, `https://pubmed.ncbi.nlm.nih.gov/*`, `https://europepmc.org/*`, `https://link.springer.com/*`, `https://*.biomedcentral.com/*`, `https://*.springeropen.com/*`, `https://www.nature.com/*`, `https://www.frontiersin.org/*`, `https://www.mdpi.com/*`, `https://journals.plos.org/*`, `https://elifesciences.org/*`, `https://onlinelibrary.wiley.com/*`, `https://*.onlinelibrary.wiley.com/*`, `https://www.cell.com/*`, `https://academic.oup.com/*`, `https://www.tandfonline.com/*`, `https://www.sciencedirect.com/*` | Run the converter on article pages of these sites (and fetch images from them for ZIP files) |
 | `https://www.ebi.ac.uk/europepmc/*` | Europe PMC REST API (full text and DOI lookup), only on export |
+| `https://api.elsevier.com/*` | Elsevier full-text API, only with your own key and only for Elsevier articles whose page shows just the abstract |
 | `https://api.unpaywall.org/*`, `https://api.biorxiv.org/*`, `https://www.biorxiv.org/*`, `https://www.medrxiv.org/*` | Look for a legal free version (Unpaywall; bioRxiv / medRxiv preprint and its full-text XML), only when you export a page that shows just the abstract |
 | `https://paddleocr.aistudio-app.com/*`, `https://*.bj.bcebos.com/*` | PDF parsing with PaddleOCR. Contacted only when you click "Parse PDF" with PaddleOCR selected and a key entered |
 | `https://mineru.net/*`, `https://cdn-mineru.openxlab.org.cn/*` | PDF parsing with MinerU. Contacted only when you click "Parse PDF" with MinerU selected and a key entered |

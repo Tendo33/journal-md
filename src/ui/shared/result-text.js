@@ -47,6 +47,10 @@ export function describeResult(result, lang, action) {
       notes.push(t(lang, 'noticePubmedFulltext', { pmcid: (result.meta && result.meta.pmcid) || '' }));
     } else if (n.code === 'equation_image') {
       notes.push(t(lang, 'noticeEquationImage'));
+    } else if (n.code === 'elsevier_fulltext') {
+      notes.push(t(lang, 'noticeElsevierFulltext'));
+    } else if (n.code === 'elsevier_fallback') {
+      notes.push(t(lang, ['not_entitled', 'auth', 'quota', 'unavailable'].includes(n.reason) ? `noticeElsevier_${n.reason}` : 'noticeElsevier_other'));
     } else if (n.code === 'open_version') {
       notes.push(openVersionText(lang, n));
     } else if (n.code === 'abstract_only') {
@@ -55,6 +59,7 @@ export function describeResult(result, lang, action) {
   }
   let route = t(lang, 'routeUsedDom');
   if (result.route === 'jats-preprint') route = t(lang, 'routeUsedPreprint');
+  else if (result.route === 'xml-elsevier') route = t(lang, 'routeUsedElsevier');
   else if (result.route === 'jats-europepmc') route = t(lang, 'routeUsedJats');
   else if (/^jats-/.test(result.route || '')) route = t(lang, 'routeUsedSiteXml');
   return { status, notes, route };

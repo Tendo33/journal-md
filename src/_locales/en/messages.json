@@ -80,6 +80,27 @@
   "routeUsedDom": {
     "message": "Source: this page."
   },
+  "routeUsedElsevier": {
+    "message": "Source: Elsevier full-text API (structured full text)."
+  },
+  "noticeElsevierFulltext": {
+    "message": "This page only shows the abstract; the full text comes from the Elsevier full-text API (your key and institution's network)."
+  },
+  "noticeElsevier_not_entitled": {
+    "message": "The Elsevier API returned only the abstract: this network has no subscription to the article."
+  },
+  "noticeElsevier_auth": {
+    "message": "The Elsevier API key is invalid; check it in Settings."
+  },
+  "noticeElsevier_quota": {
+    "message": "Elsevier's rate limit was reached."
+  },
+  "noticeElsevier_unavailable": {
+    "message": "The Elsevier full-text API was unavailable (or the API key is wrong)."
+  },
+  "noticeElsevier_other": {
+    "message": "The Elsevier full-text API did not return the full text."
+  },
   "routeUsedPreprint": {
     "message": "Source: bioRxiv / medRxiv preprint (structured full text)."
   },
@@ -175,6 +196,9 @@
   },
   "abstractOnlyPdfReady": {
     "message": "If you have access, use \"Quick PDF parse\" above to get the full text from the PDF."
+  },
+  "abstractOnlyElsevierKey": {
+    "message": "This is an Elsevier article: add an Elsevier API key in Settings to fetch the structured full text from your institution's network."
   },
   "btnExportAbstract": {
     "message": "Export abstract anyway"
@@ -429,7 +453,46 @@
     "message": "PDF parsing"
   },
   "optPdfHelp": {
-    "message": "For pages without usable full text, a third-party service can parse the article PDF with your own key. Once a key is set, the popup shows \"Parse PDF\" on articles that link a PDF. Clicking it sends the PDF link and your key to that service right away, without asking again, so only use it for PDFs you may share with that service."
+    "message": "For pages without usable full text, a third-party service can parse the article PDF with your own key (full layout, slower). For text only, \"Quick PDF parse\" in the popup needs no key and sends nothing to any service. Once a key is set, the popup shows \"Parse PDF\" on articles with a PDF; clicking it sends the PDF and your key to that service right away, without asking again, so only use it for PDFs you may share with that service."
+  },
+  "optSectionPublisher": {
+    "message": "Publisher full-text APIs"
+  },
+  "optPublisherHelp": {
+    "message": "With an Elsevier API key, when a ScienceDirect, Cell or other Elsevier article page shows only the abstract, the structured full text is fetched from Elsevier's full-text API. Elsevier decides by your network: full text comes only from a network your institution subscribes from (campus network, institutional VPN)."
+  },
+  "optElsevierKey": {
+    "message": "Elsevier API key"
+  },
+  "optElsevierKeyHelp": {
+    "message": "Free from the Elsevier Developer Portal. Stored only in this browser and sent only to api.elsevier.com."
+  },
+  "optElsevierNoKey": {
+    "message": "Enter a key first."
+  },
+  "optElsevierOk": {
+    "message": "The key works."
+  },
+  "optElsevierErr_auth": {
+    "message": "The key is invalid or not enabled for the full-text API."
+  },
+  "optElsevierErr_quota": {
+    "message": "Elsevier's rate limit was reached. Try again later."
+  },
+  "optElsevierErr_unavailable": {
+    "message": "Elsevier answered \"Service Unavailable\", which it also does for a wrong key. Check the key; if it is right, the service is temporarily down."
+  },
+  "optElsevierErr_not_found": {
+    "message": "The test article was not found; the key may still work. Try it on an article page."
+  },
+  "optElsevierErr_timeout": {
+    "message": "api.elsevier.com did not respond in time."
+  },
+  "optElsevierErr_network": {
+    "message": "Could not reach api.elsevier.com."
+  },
+  "optElsevierErr_http": {
+    "message": "The Elsevier API returned an error. Try again later."
   },
   "optPdfProvider": {
     "message": "PDF parsing service"
@@ -441,7 +504,7 @@
     "message": "MinerU"
   },
   "optPdfNote_paddleocr": {
-    "message": "PaddleOCR (Baidu AI Studio) receives the PDF link and your key, downloads the PDF itself, and returns text and images from *.bj.bcebos.com. Free daily quota."
+    "message": "PaddleOCR (Baidu AI Studio) receives the PDF file and your key: your browser downloads the PDF first (so subscription articles work), and sends the link instead if that fails. Text and images come back from *.bj.bcebos.com. Free daily quota."
   },
   "optPdfNote_mineru": {
     "message": "MinerU (OpenDataLab) receives the PDF link and your key, downloads the PDF itself, and returns a ZIP from cdn-mineru.openxlab.org.cn."

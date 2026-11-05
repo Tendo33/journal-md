@@ -216,6 +216,12 @@ function abstractOnlyLines(result, action) {
   if (pageInfo && pageInfo.pdf && pageInfo.pdf.url) {
     lines.push({ text: t(lang, 'abstractOnlyPdfReady'), cls: 'note' });
   }
+  // Elsevier 的文章、还没填 Key（接口那一步什么也没说）：提示可以在设置里填 Elsevier API Key
+  const notes = result.notices || [];
+  if (/^10\.1016\//i.test((result.meta && result.meta.doi) || '') && !notes.some((n) => n.code === 'elsevier_fallback')) {
+    lines.push({ text: t(lang, 'abstractOnlyElsevierKey'), cls: 'note' });
+  }
+  for (const n of notes.filter((x) => x.code === 'elsevier_fallback')) lines.push({ text: describeResult({ ok: true, notices: [n] }, lang, action).notes[0], cls: 'note' });
   lines.push({ cls: 'note', button: { label: t(lang, 'btnExportAbstract'), onClick: () => run(action, true) } });
   return lines;
 }

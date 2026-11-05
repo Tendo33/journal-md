@@ -31,6 +31,9 @@ const ALLOWED_HOST_PERMISSIONS = [
   'https://www.cell.com/*',
   'https://academic.oup.com/*',
   'https://www.tandfonline.com/*',
+  'https://www.sciencedirect.com/*',
+  // Elsevier 全文接口（用户自己的 API Key；Simon 2026-11-05：安装时授予）
+  'https://api.elsevier.com/*',
   // 页面上只有摘要时找合法的免费全文（Simon 2026-11-05：安装时授予）：Unpaywall 查询，bioRxiv / medRxiv 对应关系和预印本 JATS
   'https://api.unpaywall.org/*',
   'https://api.biorxiv.org/*',

@@ -48,8 +48,8 @@ describe('detectSite', () => {
   });
 
   test('P1 sites are recognised as planned and request no permission', () => {
-    const r = detectSite('https://www.sciencedirect.com/science/article/pii/1');
-    expect(r.site.id).toBe('sciencedirect');
+    const r = detectSite('https://www.biorxiv.org/content/10.1101/2024.01.01.000001v1');
+    expect(r.site.id).toBe('biorxiv');
     expect(r.supported).toBe(false);
   });
 
@@ -74,7 +74,7 @@ describe('detectSite', () => {
   });
 
   test('content scripts only run on supported sites', () => {
-    expect(SUPPORTED_SITE_IDS).toEqual(['pmc', 'europepmc', 'pubmed', 'springer', 'nature', 'frontiers', 'mdpi', 'plos', 'elife', 'wiley', 'cell', 'oup', 'tandf']);
+    expect(SUPPORTED_SITE_IDS).toEqual(['pmc', 'europepmc', 'pubmed', 'springer', 'nature', 'frontiers', 'mdpi', 'plos', 'elife', 'wiley', 'cell', 'oup', 'tandf', 'sciencedirect']);
     expect(manifest.content_scripts[0].matches).toEqual(SUPPORTED_PAGE_PATTERNS);
   });
 });

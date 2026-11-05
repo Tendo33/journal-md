@@ -53,6 +53,7 @@
 | Cell Press（cell.com） | Europe PMC JATS（按 DOI，开放获取时） | 当前页面 |
 | Oxford Academic（academic.oup.com） | Europe PMC JATS（按 DOI，开放获取时） | 当前页面 |
 | Taylor & Francis Online | Europe PMC JATS（按 DOI，开放获取时） | 当前页面（表格内容在弹窗里，只导出表题） |
+| ScienceDirect | Elsevier 全文接口（填了 Elsevier API Key、在订阅的机构网络里） | 题录 + 摘要（页面有人机验证，不从页面取正文），再找免费版本 |
 
 只转换你本来就能看到的页面：不绕过付费墙，不批量抓取。订阅文章在你有权限时也能从当前页面导出。
 
@@ -90,6 +91,7 @@
 | 在文章页显示 Markdown 按钮 | 右下角 M↓ 按钮 | 开启 |
 | 优先使用结构化全文 | 先取 Europe PMC JATS（Frontiers 用自己的 XML），失败或超时用当前页面 | 开启 |
 | 只有摘要时查找免费版本 | 按 DOI 查 Unpaywall 和 bioRxiv / medRxiv（只发 DOI） | 开启 |
+| Elsevier API Key | 填了之后，Elsevier 的文章（ScienceDirect、Cell、Lancet 等，DOI 以 `10.1016/` 开头，包括在 PubMed 上打开的）页面只有摘要时从 Elsevier 全文接口取结构化全文；Elsevier 按你的网络判断订阅。在 [Elsevier 开发者网站](https://dev.elsevier.com/apikey/manage) 免费申请，只存本浏览器、只发给 api.elsevier.com | 未填 |
 | 界面语言 | 跟随浏览器 / 中文 / English | 跟随浏览器 |
 | PDF 解析 | 选择 PaddleOCR（默认）或 MinerU，填写并测试 Key；Key 只存在本浏览器 | PaddleOCR，未填 Key |
 | 站点 | 逐个关闭不想导出的站点 | 全部开启 |

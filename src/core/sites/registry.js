@@ -176,8 +176,21 @@ export const SITES = [
   },
   // PRD §1.1 P1：只用来在弹窗里说明「计划支持」，不申请任何权限（识别靠点击图标时的 activeTab）
   { id: 'biorxiv', name: 'bioRxiv / medRxiv', status: SITE_STATUS.PLANNED, hosts: ['www.biorxiv.org', 'www.medrxiv.org'] },
-  // ScienceDirect 的页面有人机验证，目前靠 Elsevier 全文 API（填了 Key 时）
-  { id: 'sciencedirect', name: 'ScienceDirect', status: SITE_STATUS.PLANNED, hosts: ['www.sciencedirect.com'] },
+  // ScienceDirect：页面有人机验证，没法照着真实页面写正文适配器。只读题录（citation_*）和地址里的 PII，
+  // 正文来自 Elsevier 全文接口（用户填了 Key、在订阅的机构网络里）；没有 Key 时按「只有摘要」去找免费版本
+  {
+    id: 'sciencedirect',
+    name: 'ScienceDirect',
+    status: SITE_STATUS.SUPPORTED,
+    publisher: true,
+    hosts: ['www.sciencedirect.com'],
+    // /science/article/pii/S0092867420302294、/science/article/abs/pii/S…
+    article: (u) => {
+      const m = u.pathname.match(/^\/science\/article\/(?:abs\/)?pii\/(S?[\dX]{15,17})\/?$/i);
+      return m ? { pii: m[1].toUpperCase() } : null;
+    },
+    routes: ['jats', 'dom'],
+  },
 ];
 
 export const SUPPORTED_SITE_IDS = SITES.filter((s) => s.status === SITE_STATUS.SUPPORTED).map((s) => s.id);
@@ -243,4 +256,5 @@ export const SUPPORTED_PAGE_PATTERNS = [
   'https://www.cell.com/*/abstract/*',
   'https://academic.oup.com/*',
   'https://www.tandfonline.com/doi/*',
+  'https://www.sciencedirect.com/science/article/*',
 ];

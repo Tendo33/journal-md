@@ -428,6 +428,33 @@ export const TANDF_CONFIG = {
   },
 };
 
+// ScienceDirect：只取 citation_* 题录和摘要（页面有人机验证，正文结构没法照着真实页面核对）；
+// 正文走 Elsevier 全文接口（pipeline 里的 elsevierFullText）
+export const SCIENCEDIRECT_CONFIG = {
+  route: SOURCE_ROUTES.DOM_SCIENCEDIRECT,
+  root: ['article', 'main', '#mathjax-container'],
+  title: ['h1 .title-text', 'h1'],
+  authors: '#author-group .react-xocs-alternative-link, .author-group .author .content',
+  journal: '.publication-title-link, .publication-title',
+  date: '',
+  metaArea: ['#article-identifier-links', '.article-identifier-links', '.ArticleIdentifierLinks'],
+  doi: 'a.doi, a[href*="doi.org/10."]',
+  license: '.license-info a[href*="creativecommons.org"], head link[rel="license"]',
+  abstract: '#abstracts .abstract.author, .Abstracts .abstract.author',
+  keywords: '.Keywords, .keywords-section',
+  keywordItems: '.keywords-section .keyword span',
+  // 正文容器只认 id="body"；拿不到就当只有摘要（交给 Elsevier 接口和免费版本）
+  body: '#body',
+  refList: '.Bibliography, #references',
+  refItems: '.Bibliography .reference, .bibliography .reference',
+  refText: '',
+  refLabel: '.label',
+  supp: '',
+  suppCaption: '',
+  remove: [],
+  selectors: {},
+};
+
 export const PUBLISHER_CONFIGS = {
   springer: SPRINGER_CONFIG,
   nature: NATURE_CONFIG,
@@ -439,6 +466,7 @@ export const PUBLISHER_CONFIGS = {
   cell: CELL_CONFIG,
   oup: OUP_CONFIG,
   tandf: TANDF_CONFIG,
+  sciencedirect: SCIENCEDIRECT_CONFIG,
 };
 
 export const PUBLISHER_ADAPTERS = Object.fromEntries(Object.entries(PUBLISHER_CONFIGS)

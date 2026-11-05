@@ -97,6 +97,20 @@
       </div>
     </section>
 
+    <section class="grp" aria-labelledby="sec-publisher">
+      <h2 id="sec-publisher" data-i18n="optSectionPublisher"></h2>
+      <p class="grp-desc" data-i18n="optPublisherHelp"></p>
+      <div class="it it-col">
+        <label for="elsevierKey" class="lbl" data-i18n="optElsevierKey"></label>
+        <div class="token-row">
+          <input id="elsevierKey" class="field" type="password" spellcheck="false" autocomplete="off" aria-describedby="elsevierKey-help elsevier-status">
+          <button id="elsevierTest" type="button" class="btn btn-secondary" data-i18n="optPdfTest"></button>
+        </div>
+        <small id="elsevierKey-help" class="help"><span data-i18n="optElsevierKeyHelp"></span> <a id="elsevierKeyLink" href="https://dev.elsevier.com/apikey/manage" target="_blank" rel="noopener noreferrer" data-i18n="optPdfGetToken"></a></small>
+        <p id="elsevier-status" class="pdf-status" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
     <section class="grp" aria-labelledby="sec-sites">
       <h2 id="sec-sites" data-i18n="optSectionSites"></h2>
       <p class="grp-desc" data-i18n="optSitesHelp"></p>

@@ -86,7 +86,7 @@ describe('action runner (context menu / shortcuts)', () => {
   test('unsupported tab never messages the page', async () => {
     const tabs = { sendMessage: jest.fn() };
     const runner = createActionRunner({ tabs, scripting: {}, action, timers });
-    await expect(runner.run({ id: 3, url: 'https://www.sciencedirect.com/science/article/pii/S1' }, 'download')).resolves.toEqual({ ok: false, error: 'site_planned' });
+    await expect(runner.run({ id: 3, url: 'https://www.biorxiv.org/content/10.1101/2024.01.01.000001v1' }, 'download')).resolves.toEqual({ ok: false, error: 'site_planned' });
     expect(tabs.sendMessage).not.toHaveBeenCalled();
     expect(action.setBadgeText).toHaveBeenLastCalledWith({ tabId: 3, text: '!' });
   });

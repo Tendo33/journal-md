@@ -80,6 +80,27 @@
   "routeUsedDom": {
     "message": "来源：当前页面。"
   },
+  "routeUsedElsevier": {
+    "message": "来源：Elsevier 全文接口（结构化全文）。"
+  },
+  "noticeElsevierFulltext": {
+    "message": "本页只有摘要，全文来自 Elsevier 全文接口（你的 Key 和机构网络）。"
+  },
+  "noticeElsevier_not_entitled": {
+    "message": "Elsevier 接口只给了摘要：当前网络没有这篇文章的订阅。"
+  },
+  "noticeElsevier_auth": {
+    "message": "Elsevier API Key 无效，请在设置里检查。"
+  },
+  "noticeElsevier_quota": {
+    "message": "超过 Elsevier 的调用额度。"
+  },
+  "noticeElsevier_unavailable": {
+    "message": "Elsevier 全文接口不可用（也可能是 API Key 不对）。"
+  },
+  "noticeElsevier_other": {
+    "message": "Elsevier 全文接口没有返回全文。"
+  },
   "routeUsedPreprint": {
     "message": "来源：bioRxiv / medRxiv 预印本（结构化全文）。"
   },
@@ -175,6 +196,9 @@
   },
   "abstractOnlyPdfReady": {
     "message": "有访问权限时，可以用上面的「快速解析 PDF」直接从 PDF 取全文。"
+  },
+  "abstractOnlyElsevierKey": {
+    "message": "这是 Elsevier 的文章：在设置里填 Elsevier API Key 后，在机构网络里可以直接取结构化全文。"
   },
   "btnExportAbstract": {
     "message": "仍导出摘要"
@@ -429,7 +453,46 @@
     "message": "PDF 解析"
   },
   "optPdfHelp": {
-    "message": "页面没有可用全文时，可以用你自己的 Key 让第三方服务解析文章 PDF。填好 Key 后，弹窗会在带 PDF 链接的文章页显示「解析 PDF」。点击后会直接把 PDF 链接和 Key 发给所选服务，不再确认，所以只用于你有权分享给该服务的 PDF。"
+    "message": "页面没有可用全文时，可以用你自己的 Key 让第三方服务解析文章 PDF（排版完整，较慢）；只要文字的话，弹窗里的「快速解析 PDF」不需要 Key、不发给任何服务。填好 Key 后，弹窗会在带 PDF 的文章页显示「解析 PDF」，点击后直接把 PDF 和 Key 发给所选服务，不再确认，所以只用于你有权分享给该服务的 PDF。"
+  },
+  "optSectionPublisher": {
+    "message": "出版商全文接口"
+  },
+  "optPublisherHelp": {
+    "message": "填了 Elsevier API Key 后，ScienceDirect、Cell 等 Elsevier 文章页面上只有摘要时，会从 Elsevier 全文接口取结构化全文。是否给全文由 Elsevier 按你的网络判断：在订阅了的机构网络里（校园网、机构 VPN）才有全文。"
+  },
+  "optElsevierKey": {
+    "message": "Elsevier API Key"
+  },
+  "optElsevierKeyHelp": {
+    "message": "在 Elsevier 开发者网站免费申请。Key 只存在本浏览器，只发给 api.elsevier.com。"
+  },
+  "optElsevierNoKey": {
+    "message": "请先填写 Key。"
+  },
+  "optElsevierOk": {
+    "message": "Key 可用。"
+  },
+  "optElsevierErr_auth": {
+    "message": "Key 无效或没有开通全文接口。"
+  },
+  "optElsevierErr_quota": {
+    "message": "超过 Elsevier 的调用额度，请稍后再试。"
+  },
+  "optElsevierErr_unavailable": {
+    "message": "Elsevier 返回「服务不可用」：Key 不对时也是这个回答。请检查 Key；Key 没问题的话就是服务暂时不可用。"
+  },
+  "optElsevierErr_not_found": {
+    "message": "测试文章没找到，Key 可能可用，请在文章页上试一次。"
+  },
+  "optElsevierErr_timeout": {
+    "message": "连接 api.elsevier.com 超时。"
+  },
+  "optElsevierErr_network": {
+    "message": "连接 api.elsevier.com 失败。"
+  },
+  "optElsevierErr_http": {
+    "message": "Elsevier 接口返回错误，请稍后再试。"
   },
   "optPdfProvider": {
     "message": "PDF 解析服务"
@@ -441,7 +504,7 @@
     "message": "MinerU"
   },
   "optPdfNote_paddleocr": {
-    "message": "PaddleOCR（百度飞桨星河社区）会收到 PDF 链接和你的 Key，由它自己下载 PDF，结果文字和图片来自 *.bj.bcebos.com。有每日免费额度。"
+    "message": "PaddleOCR（百度飞桨星河社区）会收到 PDF 文件和你的 Key：PDF 先由你的浏览器下载（订阅文章也能用），下载不成功时改发 PDF 链接。结果文字和图片来自 *.bj.bcebos.com。有每日免费额度。"
   },
   "optPdfNote_mineru": {
     "message": "MinerU（OpenDataLab）会收到 PDF 链接和你的 Key，由它自己下载 PDF，结果 ZIP 来自 cdn-mineru.openxlab.org.cn。"

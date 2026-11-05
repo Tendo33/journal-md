@@ -26,6 +26,10 @@ function findOpenVersion(doi) {
   return chrome.runtime.sendMessage({ type: MSG.FIND_OPEN_VERSION, doi });
 }
 
+function fetchElsevier({ doi, pii }) {
+  return chrome.runtime.sendMessage({ type: MSG.FETCH_ELSEVIER, doi, pii });
+}
+
 /** 出版商同站 XML（Frontiers citation_xml_url）：只取和当前页同源的地址，在页面里请求（带用户自己的 Cookie，不经过第三方） */
 /** 本页的服务器 HTML（MDPI）：只取和当前页同源、同路径的地址，不跟着跳到别的站 */
 async function fetchPageHtml(url) {
@@ -83,7 +87,7 @@ export function waitForDomSettled(doc, { quietMs = 400, maxMs = 3000 } = {}) {
 const RETRY_ERRORS = ['no_content', 'page_changed', 'abstract_only'];
 
 async function exportOnce(settings, action, allowAbstract) {
-  return exportArticle({ doc: document, url: location.href, settings, fetchJats, services: { lookupDoi, fetchSiteXml, fetchPageHtml, findOpenVersion }, format: action === ACTIONS.ZIP ? 'zip' : 'md', allowAbstract });
+  return exportArticle({ doc: document, url: location.href, settings, fetchJats, services: { lookupDoi, fetchSiteXml, fetchPageHtml, findOpenVersion, fetchElsevier }, format: action === ACTIONS.ZIP ? 'zip' : 'md', allowAbstract });
 }
 
 async function deliver(result, action) {

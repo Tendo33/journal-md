@@ -3,6 +3,7 @@
 // PDF 解析任务（L3，默认关闭）。
 import { createJatsService, createDoiLookupService } from '../core/europepmc/client';
 import { createOpenVersionService } from '../core/oa/open-version';
+import { fetchElsevierXml, loadPublisherKeys, testElsevierKey } from '../core/elsevier/client';
 import { loadSettings, SETTINGS_KEY } from '../config/settings';
 import { resolveLanguage } from '../config/i18n';
 import { errorText } from '../ui/shared/result-text';
@@ -84,6 +85,10 @@ export function handleMessage(message, sender) {
     return doiLookup.get(message.doi);
   case MSG.FIND_OPEN_VERSION:
     return openVersions.get(message.doi);
+  case MSG.FETCH_ELSEVIER:
+    return loadPublisherKeys().then((keys) => fetchElsevierXml({ doi: message.doi, pii: message.pii }, keys.elsevier, { fetchImpl: (...args) => fetch(...args) }));
+  case MSG.ELSEVIER_TEST:
+    return isExtensionPageSender(sender, chrome.runtime.id) ? testElsevierKey(message.key, { fetchImpl: (...args) => fetch(...args) }) : null;
   case MSG.DOWNLOAD:
     return downloadMarkdown({ markdown: message.markdown, filename: message.filename });
   case MSG.DOWNLOAD_ZIP:

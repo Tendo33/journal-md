@@ -31,7 +31,7 @@ describe('i18n', () => {
 
 describe('settings', () => {
   test('defaults and validation', () => {
-    expect(normalizeSettings(null)).toEqual({ ...DEFAULT_SETTINGS, sites: { pmc: true, europepmc: true, pubmed: true, springer: true, nature: true, frontiers: true, mdpi: true, plos: true, elife: true, wiley: true, cell: true, oup: true, tandf: true } });
+    expect(normalizeSettings(null)).toEqual({ ...DEFAULT_SETTINGS, sites: { pmc: true, europepmc: true, pubmed: true, springer: true, nature: true, frontiers: true, mdpi: true, plos: true, elife: true, wiley: true, cell: true, oup: true, tandf: true, sciencedirect: true } });
     expect(normalizeSettings({ language: 'fr', filenameTemplate: '   ', includeImages: 'yes', sites: { pmc: false, nature: false } }))
       .toMatchObject({ language: 'auto', filenameTemplate: '{title} ({year})', includeImages: true, sites: { pmc: false, europepmc: true, pubmed: true, nature: false } });
   });
@@ -47,7 +47,8 @@ describe('settings', () => {
 describe('popup view logic', () => {
   test('quickCheck classifies tabs without touching the page', () => {
     expect(quickCheck('chrome://newtab', {})).toEqual({ ok: false, error: 'unsupported_page' });
-    expect(quickCheck('https://www.sciencedirect.com/science/article/pii/S0092867420302294', {})).toEqual({ ok: false, error: 'site_planned', siteName: 'ScienceDirect' });
+    expect(quickCheck('https://www.biorxiv.org/content/10.1101/2024.01.01.000001v1', {})).toEqual({ ok: false, error: 'site_planned', siteName: 'bioRxiv / medRxiv' });
+    expect(quickCheck('https://www.sciencedirect.com/science/article/pii/S0092867420302294', {})).toEqual({ ok: true, siteId: 'sciencedirect', siteName: 'ScienceDirect' });
     expect(quickCheck('https://www.tandfonline.com/doi/full/10.1080/1', {})).toEqual({ ok: true, siteId: 'tandf', siteName: 'Taylor & Francis Online' });
     expect(quickCheck('https://www.frontiersin.org/journals/genetics', {})).toEqual({ ok: false, error: 'not_article' });
     expect(quickCheck('https://pubmed.ncbi.nlm.nih.gov/1/', { sites: { pubmed: false } })).toMatchObject({ error: 'site_disabled' });

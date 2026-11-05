@@ -7,7 +7,7 @@
 所有权限都在安装时授予，Chrome / Edge 包和 Firefox 包相同。**没有 `optional_permissions`、`optional_host_permissions`**，扩展在使用中从不调用 `permissions.request`（单测扫描 `src/`：没有 `permissions.request`，也不引用 vendored 内核里的权限申请函数；e2e 记录弹窗里的调用次数为 0）。
 
 - permissions：`activeTab`、`storage`、`downloads`、`contextMenus`、`clipboardWrite`、`scripting`、`declarativeNetRequestWithHostAccess`
-- host_permissions（27 个）：
+- host_permissions（29 个）：
 
 | host | 用途 |
 |---|---|
@@ -25,6 +25,8 @@
 | `https://www.cell.com/*` | Cell Press 文章页；content script 只匹配 `/*/fulltext/*`、`/*/abstract/*` |
 | `https://academic.oup.com/*` | Oxford Academic 文章页（地址没有固定的文章前缀，整站匹配，脚本加载时不读页面） |
 | `https://www.tandfonline.com/*` | Taylor & Francis Online 文章页；content script 只匹配 `/doi/*` |
+| `https://www.sciencedirect.com/*` | ScienceDirect 文章页（只读题录和摘要）；content script 只匹配 `/science/article/*` |
+| `https://api.elsevier.com/*` | Elsevier 全文接口：用户填了 Elsevier API Key、Elsevier 文章页面只有摘要时请求；Key 放在 `X-ELS-APIKey` 头里，不带 Cookie |
 | `https://api.unpaywall.org/*` | 页面上只有摘要时按 DOI 查合法的免费版本（PMC、预印本、机构知识库）。只发 DOI 和 Unpaywall 要求的联系邮箱，不带 Cookie 和页面地址；设置里可关 |
 | `https://api.biorxiv.org/*` | 同上：期刊 DOI → bioRxiv / medRxiv 预印本 DOI 和全文 XML 地址 |
 | `https://www.biorxiv.org/*`、`https://www.medrxiv.org/*` | 下载预印本的 JATS XML（`/content/early/….source.xml`）。这两个站点还没有页面适配器，不注入 content script |

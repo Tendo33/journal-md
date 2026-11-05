@@ -3,11 +3,14 @@
 //   PubMed 页：DOM 取题录和摘要；有 PMCID → Europe PMC 全文；否则「仅摘要」
 //   出版商页（Springer/BMC、Nature、Frontiers、MDPI、PLOS、eLife），开启「优先结构化来源」时：
 //     同站 XML（目前只有 Frontiers 的 citation_xml_url）→ 按 DOI 查 Europe PMC，开放获取就取 fullTextXML → 当前页 DOM
+// 只剩摘要、是 Elsevier 的文章（10.1016/ 或 ScienceDirect 的 PII）、用户填了 Elsevier API Key 时：先取 Elsevier 全文接口（正式版，按机构网络判断权限）
 // 只剩摘要、开启了「查找免费版本」时：按 DOI 查 Unpaywall 和 bioRxiv / medRxiv（后台），取 PMC 或预印本的 JATS（见 core/oa/open-version.js）
 // 最后只剩摘要时默认不导出（返回 ERR.ABSTRACT_ONLY，带全文 / PDF 链接），用户在弹窗里选「仍导出摘要」才传 allowAbstract
 // 纯函数 + 注入依赖（fetchJats、services），content script 和测试共用。
 import { hasBody, hasContent, SOURCE_ROUTES } from '../article-ir';
 import { parseJats } from '../parsers/jats';
+import { parseElsevier } from '../parsers/elsevier';
+import { isElsevierDoi } from '../elsevier/client';
 import { extractPmc } from '../adapters/pmc';
 import { extractEuropePmc } from '../adapters/europepmc';
 import { extractPubmed } from '../adapters/pubmed';
@@ -258,6 +261,36 @@ function abstractOnlyFailure(ir, notices, openVersions = []) {
 }
 
 /**
+ * Elsevier 全文接口（后台带用户的 Key 请求，Key 不经过页面）：拿到正文就用；DOI 必须一致（按 PII 请求时以 PII 为准）
+ */
+async function elsevierFullText(dom, url, ids, services, notices) {
+  const pii = ids.pii || '';
+  if (!services.fetchElsevier || !(isElsevierDoi(dom.meta.doi) || pii)) return null;
+  const res = await callService(services.fetchElsevier, { doi: dom.meta.doi, pii });
+  if (!res.ok) {
+    if (res.reason !== 'no_key') notices.push({ code: NOTICE.ELSEVIER_FALLBACK, reason: res.reason || 'network' });
+    return null;
+  }
+  try {
+    const ir = parseElsevier(res.xml, { url, pii });
+    if (!hasBody(ir)) { notices.push({ code: NOTICE.ELSEVIER_FALLBACK, reason: 'not_entitled' }); return null; }
+    if (dom.meta.doi && ir.meta.doi && !same(ir.meta.doi, dom.meta.doi)) { notices.push({ code: NOTICE.ELSEVIER_FALLBACK, reason: 'mismatch' }); return null; }
+    ir.meta.url = url;
+    if (!ir.meta.title) ir.meta.title = dom.meta.title;
+    if (!ir.meta.authors.length) ir.meta.authors = dom.meta.authors;
+    if (!ir.meta.journal) ir.meta.journal = dom.meta.journal;
+    if (!ir.meta.year) ir.meta.year = dom.meta.year;
+    if (!ir.meta.pmid) ir.meta.pmid = dom.meta.pmid;
+    ir.meta.mesh = dom.meta.mesh || [];
+    notices.push({ code: NOTICE.ELSEVIER_FULLTEXT });
+    return ir;
+  } catch (_) {
+    notices.push({ code: NOTICE.ELSEVIER_FALLBACK, reason: 'parse' });
+    return null;
+  }
+}
+
+/**
  * 本页只有摘要：找别处的免费全文。拿到 JATS 就返回 IR（题录用本页的，全文版本记在 meta.fullTextSource），
  * 否则返回链接。PMC 版本的 JATS 必须是同一篇（DOI 一致）；预印本的对应关系来自 bioRxiv 自己，DOI 本来就不同。
  */
@@ -284,7 +317,7 @@ async function openVersion(dom, url, services, notices) {
 /**
  * @param {{ doc:Document, url:string, settings?:object, fetchJats:(pmcid:string)=>Promise<object>, now?:Date,
  *   services?:{ lookupDoi?:(doi:string)=>Promise<object>, fetchSiteXml?:(url:string)=>Promise<object>, fetchPageHtml?:(url:string)=>Promise<object>,
- *     findOpenVersion?:(doi:string)=>Promise<object> },
+ *     findOpenVersion?:(doi:string)=>Promise<object>, fetchElsevier?:(ids:{doi:string,pii:string})=>Promise<object> },
  *   format?:'md'|'zip', allowAbstract?:boolean }} args
  */
 export async function exportArticle({ doc, url, settings: rawSettings, fetchJats, services = {}, now, format = 'md', allowAbstract = false }) {
@@ -319,6 +352,8 @@ export async function exportArticle({ doc, url, settings: rawSettings, fetchJats
     }
     if (!dom.meta.title) return fail(ERR.NO_CONTENT);
     if (allowAbstract) return finish(dom, settings, notices, now, format);
+    const els = await elsevierFullText(dom, url, det.ids, services, notices);
+    if (els) return finish(els, settings, notices, now, format);
     const open = settings.findOpenVersions ? await openVersion(dom, url, services, notices) : { ir: null, links: [] };
     if (open.ir) return finish(open.ir, settings, notices, now, format);
     return abstractOnlyFailure(dom, notices, open.links);
@@ -347,6 +382,8 @@ export async function exportArticle({ doc, url, settings: rawSettings, fetchJats
     dom.meta.abstractOnly = true;
     dom.meta.fullTextUrl = dom.meta.doi ? `https://doi.org/${dom.meta.doi}` : '';
     if (!allowAbstract) {
+      const els = await elsevierFullText(dom, url, det.ids, services, notices);
+      if (els) return finish(els, settings, notices, now, format);
       const open = settings.findOpenVersions ? await openVersion(dom, url, services, notices) : { ir: null, links: [] };
       if (open.ir) return finish(open.ir, settings, notices, now, format);
       return abstractOnlyFailure(dom, notices, open.links);

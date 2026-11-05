@@ -53,6 +53,7 @@ Export a full-text article page from PubMed Central, Nature, Frontiers and other
 | Cell Press (cell.com) | Europe PMC JATS (by DOI, when open access) | the page |
 | Oxford Academic (academic.oup.com) | Europe PMC JATS (by DOI, when open access) | the page |
 | Taylor & Francis Online | Europe PMC JATS (by DOI, when open access) | the page (table contents live in a pop-up; only table titles are exported) |
+| ScienceDirect | Elsevier full-text API (with your Elsevier API key, on a subscribed institutional network) | citation + abstract (the page has a bot check, so the body is not read from it), then free versions |
 
 It converts only pages you can already read: no paywall bypassing, no bulk crawling. Subscription articles you have access to can be exported from the page.
 
