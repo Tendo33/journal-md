@@ -98,6 +98,7 @@ describe('background: ZIP download and asset proxy', () => {
     expect(assetAllowed('https://media.springernature.com/a.jpg')).toBe(true);
     expect(assetAllowed('https://corpus-prod.f505aadad1e46610c8f8563037eb3c4b.r2.cloudflarestorage.com/x.PNG_L')).toBe(true);
     expect(assetAllowed('https://other-bucket.r2.cloudflarestorage.com/x.png')).toBe(false);
+    expect(assetAllowed('https://oup.silverchair-cdn.com/oup/backfile/x.jpeg')).toBe(true);
     expect(assetAllowed('https://static-content.springer.com/a.jpg')).toBe(false);
     expect(assetAllowed('http://www.frontiersin.org/a.jpg')).toBe(false);
     expect(assetAllowed('https://user:pw@www.frontiersin.org/a.jpg')).toBe(false);

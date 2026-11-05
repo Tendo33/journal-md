@@ -48,8 +48,8 @@ describe('detectSite', () => {
   });
 
   test('P1 sites are recognised as planned and request no permission', () => {
-    const r = detectSite('https://www.sciencedirect.com/science/article/pii/1');
-    expect(r.site.id).toBe('sciencedirect');
+    const r = detectSite('https://www.biorxiv.org/content/10.1101/2024.01.01.000001v1');
+    expect(r.site.id).toBe('biorxiv');
     expect(r.supported).toBe(false);
   });
 
@@ -62,16 +62,19 @@ describe('detectSite', () => {
 
   test('supported sites are covered by host permissions; planned sites request none', () => {
     const hostPerms = manifest.host_permissions.map((h) => h.replace(/^https:\/\//, '').replace(/\/.*$/, ''));
+    // bioRxiv / medRxiv 还没有页面适配器，但后台要从这两个域名取预印本 JATS（core/oa/biorxiv.js）
+    const grantedForOtherUse = ['www.biorxiv.org', 'www.medrxiv.org'];
     for (const s of SITES) {
       for (const h of s.hosts) {
         if (s.status === 'supported') expect(hostPerms).toContain(h);
-        else expect(hostPerms).not.toContain(h);
+        else if (!grantedForOtherUse.includes(h)) expect(hostPerms).not.toContain(h);
       }
     }
+    expect(manifest.content_scripts[0].matches.some((m) => /biorxiv|medrxiv/.test(m))).toBe(false);
   });
 
   test('content scripts only run on supported sites', () => {
-    expect(SUPPORTED_SITE_IDS).toEqual(['pmc', 'europepmc', 'pubmed', 'springer', 'nature', 'frontiers', 'mdpi', 'plos', 'elife']);
+    expect(SUPPORTED_SITE_IDS).toEqual(['pmc', 'europepmc', 'pubmed', 'springer', 'nature', 'frontiers', 'mdpi', 'plos', 'elife', 'wiley', 'cell', 'oup', 'tandf', 'sciencedirect']);
     expect(manifest.content_scripts[0].matches).toEqual(SUPPORTED_PAGE_PATTERNS);
   });
 });

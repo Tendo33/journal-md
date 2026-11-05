@@ -35,12 +35,24 @@
     "https://www.mdpi.com/*",
     "https://journals.plos.org/*",
     "https://elifesciences.org/*",
+    "https://onlinelibrary.wiley.com/*",
+    "https://*.onlinelibrary.wiley.com/*",
+    "https://www.cell.com/*",
+    "https://academic.oup.com/*",
+    "https://www.tandfonline.com/*",
+    "https://www.sciencedirect.com/*",
+    "https://api.elsevier.com/*",
+    "https://api.unpaywall.org/*",
+    "https://api.biorxiv.org/*",
+    "https://www.biorxiv.org/*",
+    "https://www.medrxiv.org/*",
     "https://paddleocr.aistudio-app.com/*",
     "https://*.bj.bcebos.com/*",
     "https://mineru.net/*",
     "https://cdn-mineru.openxlab.org.cn/*",
     "https://corpus-prod.f505aadad1e46610c8f8563037eb3c4b.r2.cloudflarestorage.com/*",
-    "https://media.springernature.com/*"
+    "https://media.springernature.com/*",
+    "https://oup.silverchair-cdn.com/*"
   ],
   "background": {
     "service_worker": "background.js",
@@ -62,7 +74,14 @@
         "https://www.frontiersin.org/articles/*",
         "https://www.mdpi.com/*",
         "https://journals.plos.org/*",
-        "https://elifesciences.org/articles/*"
+        "https://elifesciences.org/articles/*",
+        "https://onlinelibrary.wiley.com/doi/*",
+        "https://*.onlinelibrary.wiley.com/doi/*",
+        "https://www.cell.com/*/fulltext/*",
+        "https://www.cell.com/*/abstract/*",
+        "https://academic.oup.com/*",
+        "https://www.tandfonline.com/doi/*",
+        "https://www.sciencedirect.com/science/article/*"
       ],
       "js": [
         "content.js"

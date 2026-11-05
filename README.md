@@ -28,7 +28,8 @@
 - **四个入口**：页面右下角的 **M↓ 悬浮按钮**（菜单：下载 .md、下载 ZIP、复制）、工具栏弹窗、右键菜单、快捷键 `Alt+Shift+J`（导出）。悬浮按钮可以用键盘操作、读屏可读，跟随系统深色模式，可在设置里或按钮菜单里隐藏。
 - **输出**：YAML front matter（title、authors、journal、year、doi、pmid、pmcid、license、url、`source_route`、exported）；公式写成 `$…$` / `$$…$$`；没有合并单元格的表格写成 GFM 表格，有合并单元格的保留 HTML；正文引用变成 `[^n]` 脚注，参考文献带 DOI 链接；数据可用性、基金、利益冲突、致谢各自成节；补充材料列出文件名和链接。
 - **下载 ZIP**：`article.md` + `images/`，正文里的图片链接改成包内路径。Springer / BMC / Nature 和 PLOS 的图片服务器（`media.springernature.com`、PLOS 的图片存储）不允许跨站下载，由后台下载。个别图片下载失败时照样生成 ZIP，这些图片保留网络链接并给出提示。
-- **PDF 解析（可选）**：页面上没有可用全文时，可以用你自己的 Key 让 **PaddleOCR**（默认）或 **MinerU** 解析文章 PDF，结果下载为 ZIP。在设置里给所选服务填好 Key，弹窗里就会出现「用 … 解析 PDF」按钮；点击后直接发送 PDF 链接，不再确认。请只解析你有权分享给第三方的 PDF。Key 只存在本浏览器（`chrome.storage.local`）。
+- **PDF 快速解析**：文章页有 PDF 时，弹窗里有「快速解析 PDF」：在本页下载 PDF（带你的登录状态），用 pdf.js 读文字层转成 Markdown（分栏、标题、断词、图注、参考文献），几秒完成，**不发给任何服务、不需要 Key**。公式、表格、图片可能不完整；扫描版 PDF 没有文字层，请用下面的 PDF 解析。
+- **PDF 解析（可选）**：页面上没有可用全文时，可以用你自己的 Key 让 **PaddleOCR**（默认）或 **MinerU** 解析文章 PDF，结果下载为 ZIP。在设置里给所选服务填好 Key，弹窗里就会出现「用 … 解析 PDF」按钮；点击后直接发送，不再确认。用 PaddleOCR 时，插件先在你的浏览器里（用你的网络和登录状态）下载 PDF 再上传，所以有订阅权限的文章也能解析；下载失败时退回只发链接。MinerU 仍只发链接。请只解析你有权分享给第三方的 PDF。Key 只存在本浏览器（`chrome.storage.local`）。
 - **中英文界面**，跟随浏览器语言，也可在设置里切换。
 
 | 页面内按钮 | 导出的 Markdown |
@@ -40,7 +41,7 @@
 | 网站 | 优先使用的结构化全文 | 兜底 |
 | --- | --- | --- |
 | PubMed Central（pmc.ncbi.nlm.nih.gov） | Europe PMC JATS（按 PMCID） | 当前页面 |
-| Europe PMC（europepmc.org） | Europe PMC JATS（按 PMCID） | 当前页面（没有全文时只导出摘要，并标记 `abstract_only`） |
+| Europe PMC（europepmc.org） | Europe PMC JATS（按 PMCID） | 当前页面 |
 | PubMed（pubmed.ncbi.nlm.nih.gov） | 有 PMCID 且开放获取时取全文 | 题录 + 摘要 + MeSH，标记「仅摘要」 |
 | Springer Link / BMC / SpringerOpen | Europe PMC JATS（按 DOI 查找，开放获取时） | 当前页面 |
 | Nature / Scientific Reports | Europe PMC JATS（按 DOI） | 当前页面 |
@@ -48,8 +49,15 @@
 | MDPI | Europe PMC JATS（按 DOI） | 当前页面 |
 | PLOS | Europe PMC JATS（按 DOI） | 当前页面 |
 | eLife | Europe PMC JATS（按 DOI） | 当前页面 |
+| Wiley Online Library（含 `*.onlinelibrary.wiley.com` 学会期刊） | Europe PMC JATS（按 DOI，开放获取时） | 当前页面（有订阅权限时就是全文） |
+| Cell Press（cell.com） | Europe PMC JATS（按 DOI，开放获取时） | 当前页面 |
+| Oxford Academic（academic.oup.com） | Europe PMC JATS（按 DOI，开放获取时） | 当前页面 |
+| Taylor & Francis Online | Europe PMC JATS（按 DOI，开放获取时） | 当前页面（表格内容在弹窗里，只导出表题） |
+| ScienceDirect | Elsevier 全文接口（填了 Elsevier API Key、在订阅的机构网络里） | 题录 + 摘要（页面有人机验证，不从页面取正文），再找免费版本 |
 
 只转换你本来就能看到的页面：不绕过付费墙，不批量抓取。订阅文章在你有权限时也能从当前页面导出。
+
+页面上只有摘要时（通常是没有访问权限），插件会按 DOI 向 **Unpaywall** 和 **bioRxiv / medRxiv** 查合法的免费版本：PMC 上的作者稿、bioRxiv / medRxiv 预印本能取到结构化全文，直接导出（题录仍用期刊页的，文件开头注明全文来自哪个版本）；其他免费版本（arXiv 预印本、机构知识库的 PDF）在弹窗里列出链接，PDF 可以一键解析，arXiv 预印本请用 [arXiv to Markdown](https://github.com/Tendo33/arxiv-md) 导出。都没有时不生成文件；只需要题录和摘要，点「仍导出摘要」（导出的文件标记 `abstract_only`）。不使用 Sci-Hub、LibGen 一类的影子图书馆。
 
 ## 安装
 
@@ -82,6 +90,8 @@
 | 包含图片 | 关闭后只保留图注 | 开启 |
 | 在文章页显示 Markdown 按钮 | 右下角 M↓ 按钮 | 开启 |
 | 优先使用结构化全文 | 先取 Europe PMC JATS（Frontiers 用自己的 XML），失败或超时用当前页面 | 开启 |
+| 只有摘要时查找免费版本 | 按 DOI 查 Unpaywall 和 bioRxiv / medRxiv（只发 DOI） | 开启 |
+| Elsevier API Key | 填了之后，Elsevier 的文章（ScienceDirect、Cell、Lancet 等，DOI 以 `10.1016/` 开头，包括在 PubMed 上打开的）页面只有摘要时从 Elsevier 全文接口取结构化全文；Elsevier 按你的网络判断订阅。在 [Elsevier 开发者网站](https://dev.elsevier.com/apikey/manage) 免费申请，只存本浏览器、只发给 api.elsevier.com | 未填 |
 | 界面语言 | 跟随浏览器 / 中文 / English | 跟随浏览器 |
 | PDF 解析 | 选择 PaddleOCR（默认）或 MinerU，填写并测试 Key；Key 只存在本浏览器 | PaddleOCR，未填 Key |
 | 站点 | 逐个关闭不想导出的站点 | 全部开启 |
@@ -94,14 +104,14 @@
 
 ## 隐私
 
-打开弹窗、加载页面时不发任何请求。导出时才会向 Europe PMC 请求开放获取全文（只发 PMCID 或 DOI，不带 Cookie 和页面地址）。PDF 解析只在你填了 Key 并点击解析时发生，只发给你选的那一个服务。所有权限都在安装时授予，使用中不会再弹出权限请求。详见 [PRIVACY.md](./PRIVACY.md)，权限说明见 [docs/permissions.md](./docs/permissions.md)。
+打开弹窗、加载页面时不发任何请求。导出时才会向 Europe PMC 请求开放获取全文（只发 PMCID 或 DOI，不带 Cookie 和页面地址）；页面上只有摘要时，再按 DOI 查 Unpaywall 和 bioRxiv / medRxiv。PDF 解析只在你填了 Key 并点击解析时发生，只发给你选的那一个服务。所有权限都在安装时授予，使用中不会再弹出权限请求。详见 [PRIVACY.md](./PRIVACY.md)，权限说明见 [docs/permissions.md](./docs/permissions.md)。
 
 ## 已知限制
 
 - Springer Link / Nature 页面上的表格只有表题和「完整表格」链接（表格内容在单独页面）；能从 Europe PMC 取到 JATS 时表格是完整的。
 - PLOS 的 JATS 下载链接会跳转到没有跨域许可的存储域名，所以 PLOS 走 Europe PMC 或页面；MDPI 的 XML 下载有人机验证，同样不用。
 - eLife 页面会把较长的图注折叠成「see more」，只从页面导出时图注可能不完整（走 Europe PMC 时完整）。
-- PDF 解析把 PDF 链接交给第三方服务自己下载；需要登录或订阅才能下载的 PDF 通常会失败。
+- 用 MinerU 解析时只把 PDF 链接交给它自己下载，需要登录或订阅才能下载的 PDF 通常会失败；PaddleOCR 由浏览器先下载再上传，没有这个问题（单个文件上限 50 MB）。
 
 ## 开发
 

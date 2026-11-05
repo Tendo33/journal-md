@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="article">
+  <front>
+    <article-meta>
+      <article-id pub-id-type="doi">10.1101/2024.01.01.000001</article-id>
+      <title-group><article-title>A synthetic preprint about widget folding</article-title></title-group>
+      <contrib-group><contrib contrib-type="author"><name><surname>Doe</surname><given-names>Jane</given-names></name></contrib></contrib-group>
+      <abstract><p>We describe a made-up method for folding widgets.</p></abstract>
+    </article-meta>
+  </front>
+  <body>
+    <sec><title>Introduction</title><p>Widgets fold in two ways, as shown in <xref ref-type="fig" rid="F1">Figure 1</xref>.</p></sec>
+    <sec><title>Methods</title><p>We folded 12 widgets and counted the creases.</p>
+      <fig id="F1"><label>Figure 1.</label><caption><p>Two folding modes.</p></caption><graphic xlink:href="000001v1_fig1.tif"/></fig>
+    </sec>
+  </body>
+</article>

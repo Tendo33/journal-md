@@ -77,7 +77,7 @@ describe('verifyPermissions rejects anything outside the allowlist', () => {
     [{ optional_host_permissions: ['https://api.example.com/*'] }, 'optional_host_permissions must not be declared (all hosts are granted at install)'],
     [{ optional_permissions: ['declarativeNetRequestWithHostAccess'] }, 'optional_permissions must not be declared (all permissions are granted at install)'],
     [{ permissions: ['storage'] }, 'declarativeNetRequestWithHostAccess must be a required permission in every build'],
-    [{ content_scripts: [{ matches: ['https://www.sciencedirect.com/*'] }] }, 'content_scripts match outside host_permissions: https://www.sciencedirect.com/*'],
+    [{ content_scripts: [{ matches: ['https://www.jstor.org/*'] }] }, 'content_scripts match outside host_permissions: https://www.jstor.org/*'],
   ])('%j', (m, msg) => {
     expect(verifyPermissions(m)).toContain(msg);
   });

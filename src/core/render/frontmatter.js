@@ -45,6 +45,10 @@ export function renderFrontMatter(meta, { sourceRoute, exported, tags = ['paper'
   if (meta.license) add('license', yamlScalar(meta.license));
   if (meta.url) add('url', yamlScalar(meta.url));
   add('source_route', yamlScalar(sourceRoute));
+  if (meta.fullTextSource && meta.fullTextSource.url) {
+    add('fulltext_source', yamlScalar(meta.fullTextSource.url));
+    if (meta.fullTextSource.version) add('fulltext_version', yamlScalar(meta.fullTextSource.version));
+  }
   if (meta.abstractOnly) add('abstract_only', 'true');
   add('exported', exported);
   add('tags', yamlList(tags));

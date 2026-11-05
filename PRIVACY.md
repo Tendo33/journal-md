@@ -14,6 +14,7 @@ Settings only: interface language, file name template, whether to include images
 
 ### `chrome.storage.local` (never synced)
 
+- **Elsevier API key** (if you enter one): stored only in this browser (`chrome.storage.local`), never synced, sent only to `api.elsevier.com`.
 - **PDF parsing settings**: which service you chose (PaddleOCR or MinerU) and **the keys you entered**. Keys are stored only in this browser profile and are sent only to the service they belong to.
 - **The last PDF parsing task**: service, article title and page address, state and progress, the job ID returned by the service, an error code if it failed, and the saved file name. It is overwritten by the next task.
 
@@ -31,10 +32,17 @@ Nothing is requested when a page loads or when you open the popup. The in-page b
 | `https://www.ebi.ac.uk/europepmc/` | On Springer/BMC, Nature, Frontiers, MDPI, PLOS and eLife pages, when "Prefer structured full text" is on (default) | The article's DOI, to look up its PMCID; then the PMCID if the article is open access |
 | `https://www.frontiersin.org/` | On Frontiers pages, when "Prefer structured full text" is on | A request for the article's own XML file, made from the page itself like any other request the page makes |
 | `https://www.mdpi.com/` | On MDPI pages | One request for the article page you are viewing (same address), made from the page itself like a reload, because the site re-renders its formulas after loading; nothing else is sent |
+| `https://api.unpaywall.org/` (Unpaywall, OurResearch) | Only when the page shows just the abstract and "Look for a free version" is on (default) | The article's DOI and the extension's contact address (`Tendo33@users.noreply.github.com`, required by Unpaywall), to find legal free copies (PMC, preprints, institutional repositories) |
+| `https://api.biorxiv.org/`, `https://www.biorxiv.org/`, `https://www.medrxiv.org/` (Cold Spring Harbor Laboratory) | Same as above | The article's DOI, to find its bioRxiv / medRxiv preprint; then a request for that preprint's full-text XML |
+| `https://api.elsevier.com/` (Elsevier) | Only when you entered an Elsevier API key and an Elsevier article page (DOI `10.1016/…`, or a ScienceDirect PII) shows just the abstract | The DOI or PII and your key (in the `X-ELS-APIKey` header), without cookies. Elsevier decides from your network whether to return the full text |
 | The sites hosting the article's images | Only for "Download ZIP" with images included | Requests for the images shown on the page, without cookies. Images on hosts the extension has access to (the supported sites and the two image servers below) may be fetched by the extension's background page when the image server does not allow it otherwise |
-| `media.springernature.com`, PLOS's image storage (`corpus-prod.…r2.cloudflarestorage.com`) | Only for "Download ZIP" on Springer / BMC / Nature / PLOS articles | Requests for the article's images, without cookies. Access to these two hosts is granted when you install the extension; nothing is asked when you export. If an image still cannot be downloaded, the ZIP is saved anyway, that image keeps its web link in article.md, and a message names the host |
+| `media.springernature.com`, PLOS's image storage (`corpus-prod.…r2.cloudflarestorage.com`), `oup.silverchair-cdn.com` | Only for "Download ZIP" on Springer / BMC / Nature / PLOS / Oxford Academic articles | Requests for the article's images, without cookies. Access to these hosts is granted when you install the extension; nothing is asked when you export. If an image still cannot be downloaded, the ZIP is saved anyway, that image keeps its web link in article.md, and a message names the host |
 
-Requests to Europe PMC carry no cookies and no page address. When Europe PMC cannot be reached, is slow, or has no open-access copy, the extension uses the page you are viewing instead. Turning off "Prefer structured full text" stops all Europe PMC requests except the PubMed full-text lookup for articles that show a PMCID.
+Requests to Europe PMC carry no cookies and no page address. When Europe PMC cannot be reached, is slow, or has no open-access copy, the extension uses the page you are viewing instead. Turning off "Prefer structured full text" stops all Europe PMC requests except the PubMed full-text lookup for articles that show a PMCID. Requests to Unpaywall and bioRxiv / medRxiv carry no cookies and no page address; turn off "Look for a free version" to stop them. Links to free versions found this way are shown in the popup; the extension opens or parses them only when you click.
+
+### Quick PDF parse (on this page, no service)
+
+"Quick PDF parse" downloads the article's PDF from the page you are on, like opening the PDF yourself (same site, with your sign-in), and reads its text layer with pdf.js inside that page. Nothing is sent to any other service and no key is needed. The extension injects its PDF reader (`pdf-fast.js`, part of the extension package) into the article tab only when you click the button.
 
 ### PDF parsing (optional, used only when you set it up)
 
@@ -44,16 +52,17 @@ PDF parsing is used only after you choose a service in Settings and enter your o
 
 What is sent:
 
-- **PaddleOCR (default)**, operated by Baidu (AI Studio): your access key, the model name and **the link to the PDF** are sent to `paddleocr.aistudio-app.com`. The extension does not upload the PDF file; the service downloads it from the link. The result (text and figure images) is downloaded from Baidu's storage domain `*.bj.bcebos.com`. To make AI Studio accept the request, the extension removes the `Origin` header on requests to `paddleocr.aistudio-app.com` only (a `declarativeNetRequest` rule).
+- **PaddleOCR (default)**, operated by Baidu (AI Studio): your access key, the model name and **the PDF file** are sent to `paddleocr.aistudio-app.com`. The extension first downloads the PDF from the article's own site (one of the supported sites) in your browser, with your own network and sign-in, so that articles you have access to through a subscription can be parsed; your cookies stay with the publisher and are never sent to Baidu. If that download fails (for example the publisher returns a sign-in page), only **the link to the PDF** is sent and the service downloads it itself. The result (text and figure images) is downloaded from Baidu's storage domain `*.bj.bcebos.com`. To make AI Studio accept the request, the extension removes the `Origin` header on requests to `paddleocr.aistudio-app.com` only (a `declarativeNetRequest` rule).
 - **MinerU**, operated by 上海人工智能创新中心（上海人工智能实验室）(Shanghai AI Laboratory, OpenDataLab): your key, **the link to the PDF**, and the model and language options are sent to `mineru.net`. The service downloads the PDF itself and returns a ZIP result on `cdn-mineru.openxlab.org.cn`, which your browser downloads.
 
-A PDF that needs a login or a subscription usually cannot be downloaded by these services, so parsing fails rather than sending your session. These services are third parties and their own terms govern what you submit; neither publishes a specific retention period for files or results. See the [Baidu privacy policy (in Chinese)](https://www.baidu.com/duty/yinsiquan.html) and the [OpenDataLab privacy policy (in Chinese)](https://sso.openxlab.org.cn/protocol/privacy). Do not send PDFs you are not allowed to share with a third party.
+With MinerU, a PDF that needs a login or a subscription usually cannot be downloaded by the service, so parsing fails rather than sending your session. With PaddleOCR, a subscription PDF you can open is uploaded as a file: check that the publisher's terms allow this before you click. These services are third parties and their own terms govern what you submit; neither publishes a specific retention period for files or results. See the [Baidu privacy policy (in Chinese)](https://www.baidu.com/duty/yinsiquan.html) and the [OpenDataLab privacy policy (in Chinese)](https://sso.openxlab.org.cn/protocol/privacy). Do not send PDFs you are not allowed to share with a third party.
 
 ## What the extension does not do
 
 - No project server, no analytics, no tracking, no account.
 - Its script runs only on the supported sites listed below and reads a page only when you export, copy or parse it (the in-page button only looks at the page address). It does not follow links to fetch paywalled content.
-- It does not send your browsing history, cookies or page addresses to Europe PMC or to the PDF services.
+- It does not send your browsing history, cookies or page addresses to Europe PMC, Unpaywall, bioRxiv / medRxiv or the PDF services.
+- It does not use shadow libraries (Sci-Hub, Library Genesis, Anna's Archive and the like); free versions come only from legal open-access sources.
 - It does not include anyone's API keys; PDF parsing uses only the key you enter.
 
 ## Permissions
@@ -65,17 +74,19 @@ A PDF that needs a login or a subscription usually cannot be downloaded by these
 | `downloads` | Save `.md`, `.zip` and PDF parsing results |
 | `contextMenus` | "Export this page as Markdown" / "Copy this page as Markdown" on supported pages |
 | `clipboardWrite` | Copy Markdown |
-| `https://pmc.ncbi.nlm.nih.gov/*`, `https://pubmed.ncbi.nlm.nih.gov/*`, `https://europepmc.org/*`, `https://link.springer.com/*`, `https://*.biomedcentral.com/*`, `https://*.springeropen.com/*`, `https://www.nature.com/*`, `https://www.frontiersin.org/*`, `https://www.mdpi.com/*`, `https://journals.plos.org/*`, `https://elifesciences.org/*` | Run the converter on article pages of these sites (and fetch images from them for ZIP files) |
+| `https://pmc.ncbi.nlm.nih.gov/*`, `https://pubmed.ncbi.nlm.nih.gov/*`, `https://europepmc.org/*`, `https://link.springer.com/*`, `https://*.biomedcentral.com/*`, `https://*.springeropen.com/*`, `https://www.nature.com/*`, `https://www.frontiersin.org/*`, `https://www.mdpi.com/*`, `https://journals.plos.org/*`, `https://elifesciences.org/*`, `https://onlinelibrary.wiley.com/*`, `https://*.onlinelibrary.wiley.com/*`, `https://www.cell.com/*`, `https://academic.oup.com/*`, `https://www.tandfonline.com/*`, `https://www.sciencedirect.com/*` | Run the converter on article pages of these sites (and fetch images from them for ZIP files) |
 | `https://www.ebi.ac.uk/europepmc/*` | Europe PMC REST API (full text and DOI lookup), only on export |
+| `https://api.elsevier.com/*` | Elsevier full-text API, only with your own key and only for Elsevier articles whose page shows just the abstract |
+| `https://api.unpaywall.org/*`, `https://api.biorxiv.org/*`, `https://www.biorxiv.org/*`, `https://www.medrxiv.org/*` | Look for a legal free version (Unpaywall; bioRxiv / medRxiv preprint and its full-text XML), only when you export a page that shows just the abstract |
 | `https://paddleocr.aistudio-app.com/*`, `https://*.bj.bcebos.com/*` | PDF parsing with PaddleOCR. Contacted only when you click "Parse PDF" with PaddleOCR selected and a key entered |
 | `https://mineru.net/*`, `https://cdn-mineru.openxlab.org.cn/*` | PDF parsing with MinerU. Contacted only when you click "Parse PDF" with MinerU selected and a key entered |
-| `https://media.springernature.com/*` | Download the images of Springer Link / BMC / Nature articles into the ZIP (this image server does not allow web pages to download them). Contacted only for "Download ZIP" |
+| `https://media.springernature.com/*`, `https://oup.silverchair-cdn.com/*` | Download the images of Springer Link / BMC / Nature / Oxford Academic articles into the ZIP (these image servers do not allow web pages to download them). Contacted only for "Download ZIP" |
 | `https://corpus-prod.f505aadad1e46610c8f8563037eb3c4b.r2.cloudflarestorage.com/*` | PLOS's image storage (every PLOS figure and formula image redirects to this one Cloudflare R2 bucket). Contacted only for "Download ZIP" on a PLOS article |
 | `declarativeNetRequestWithHostAccess` | Remove the `Origin` header on the extension's own requests to `paddleocr.aistudio-app.com` only. The rule is present from install, but no request goes to that domain unless you parse a PDF with PaddleOCR |
 
 All of these are granted when you install the extension, in both Chrome/Edge and Firefox. The extension declares no optional permissions and never asks for a permission while you use it.
 
-In Firefox the extension declares two required data collection categories: `websiteContent` (as arXiv to Markdown, which shares the PDF parsing code: article content is read in your browser to build the Markdown and, when you parse a PDF, the article's PDF link is sent to the service you chose) and `authenticationInfo` (the PDF service key you enter is sent to that service with each parsing request). The key is your own credential; it is stored only in this browser and sent only to the service it belongs to.
+In Firefox the extension declares two required data collection categories: `websiteContent` (as arXiv to Markdown, which shares the PDF parsing code: article content is read in your browser to build the Markdown and, when you parse a PDF, the article PDF — the file with PaddleOCR, or its link — is sent to the service you chose) and `authenticationInfo` (the PDF service key you enter is sent to that service with each parsing request). The key is your own credential; it is stored only in this browser and sent only to the service it belongs to.
 
 ## Your choices
 

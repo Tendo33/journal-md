@@ -1,0 +1,10 @@
+{
+  "doi": "10.1016/j.example.2024.01.001",
+  "is_oa": true,
+  "oa_locations": [
+    { "host_type": "repository", "version": "submittedVersion", "url": "https://arxiv.org/abs/2401.01234", "url_for_pdf": "https://arxiv.org/pdf/2401.01234", "url_for_landing_page": "https://arxiv.org/abs/2401.01234", "license": null, "repository_institution": "Cornell University - arXiv" },
+    { "host_type": "repository", "version": "acceptedVersion", "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9000001", "url_for_pdf": null, "url_for_landing_page": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9000001", "license": null, "repository_institution": "pubmedcentral.nih.gov" },
+    { "host_type": "repository", "version": "acceptedVersion", "url": "https://repository.example.edu/bitstream/123/paper.pdf", "url_for_pdf": "https://repository.example.edu/bitstream/123/paper.pdf", "url_for_landing_page": "https://repository.example.edu/handle/123", "license": "cc-by-nc", "repository_institution": "Example University" },
+    { "host_type": "repository", "version": "acceptedVersion", "url": "http://europepmc.org/articles/PMC9000001", "url_for_pdf": null, "url_for_landing_page": "http://europepmc.org/articles/PMC9000001", "license": null, "repository_institution": "europepmc.org" }
+  ]
+}

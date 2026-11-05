@@ -4,7 +4,7 @@ import path from 'path';
 import { inspectPage } from '@core/export/pipeline';
 import * as popupView from '@/ui/popup/popup-view';
 import * as hosts from '@core/zip-image-hosts';
-import { originNeededFor, PLOS_IMAGE_ORIGIN, SPRINGER_IMAGE_ORIGIN, ZIP_IMAGE_ORIGINS } from '@core/zip-image-hosts';
+import { originNeededFor, PLOS_IMAGE_ORIGIN, SPRINGER_IMAGE_ORIGIN, OUP_IMAGE_ORIGIN, ZIP_IMAGE_ORIGINS } from '@core/zip-image-hosts';
 import { buildArticleZip } from '@/content/zip-export';
 import { describeResult } from '@/ui/shared/result-text';
 const manifest = require('../src/manifest.json');
@@ -20,6 +20,7 @@ describe('which images sit on the two install-time image CDNs (background proxy 
     ['https://journals.plos.org/ploscompbiol/article/file?type=thumbnail&id=10.1371/journal.pcbi.1012733.e001', PLOS_IMAGE_ORIGIN],
     ['https://corpus-prod.f505aadad1e46610c8f8563037eb3c4b.r2.cloudflarestorage.com/10.1371/x.PNG_L', PLOS_IMAGE_ORIGIN],
     ['https://media.springernature.com/lw685/springer-static/image/a.jpg', SPRINGER_IMAGE_ORIGIN],
+    ['https://oup.silverchair-cdn.com/oup/backfile/Content_public/Journal/nar/1/f1.jpeg', OUP_IMAGE_ORIGIN],
     ['https://iiif.elifesciences.org/lax/09560%2Ff1.tif/full/617,/0/default.jpg', ''],
     ['https://cdn.ncbi.nlm.nih.gov/pmc/blobs/a/b.jpg', ''],
     ['https://journals.plos.org/plosone/article?id=10.1371/journal.pone.1', ''],

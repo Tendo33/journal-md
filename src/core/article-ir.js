@@ -5,6 +5,7 @@
 //     title, authors: [{ name, affiliations: [string] }], journal, year (number|null),
 //     doi, pmid, pmcid, license, url, keywords: [string], mesh: [string],
 //     abstractOnly: boolean, fullTextUrl, pdfUrl,
+//     fullTextSource: { kind:'pmc'|'preprint', url, version, server?, date? } | null  // 全文来自别处的免费版本（不是本页）
 //   },
 //   abstract: [Section],            // 结构化摘要的每个小标题一节；非结构化就是一节无标题
 //   sections: [Section],            // 正文
@@ -36,6 +37,9 @@
 export const SOURCE_ROUTES = Object.freeze({
   JATS_EUROPEPMC: 'jats-europepmc',
   JATS_FRONTIERS: 'jats-frontiers', // 出版商同站 XML（citation_xml_url）
+  JATS_PREPRINT: 'jats-preprint',
+  XML_ELSEVIER: 'xml-elsevier', // Elsevier 全文接口（ScienceDirect / Cell 等，用户的 API Key）
+  DOM_SCIENCEDIRECT: 'dom-sciencedirect', // bioRxiv / medRxiv 预印本 JATS（页面上只有摘要时找到的免费版本）
   DOM_PMC: 'dom-pmc',
   DOM_EUROPEPMC: 'dom-europepmc',
   DOM_PUBMED: 'dom-pubmed',
@@ -45,6 +49,10 @@ export const SOURCE_ROUTES = Object.freeze({
   DOM_MDPI: 'dom-mdpi',
   DOM_PLOS: 'dom-plos',
   DOM_ELIFE: 'dom-elife',
+  DOM_WILEY: 'dom-wiley',
+  DOM_CELL: 'dom-cell',
+  DOM_OUP: 'dom-oup',
+  DOM_TANDF: 'dom-tandf',
 });
 
 export function createMeta(overrides = {}) {
@@ -63,6 +71,7 @@ export function createMeta(overrides = {}) {
     abstractOnly: false,
     fullTextUrl: '',
     pdfUrl: '',
+    fullTextSource: null,
     ...overrides,
   };
 }

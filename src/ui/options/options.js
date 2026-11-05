@@ -2,6 +2,7 @@
 import { loadSettings, saveSettings } from '../../config/settings';
 import { applyI18n, resolveLanguage, t } from '../../config/i18n';
 import { SITES, SITE_STATUS } from '../../core/sites/registry';
+import { loadPublisherKeys, savePublisherKeys } from '../../core/elsevier/client';
 import { buildFilename } from '../../core/filename';
 import { loadPdfSettings, savePdfSettings } from '../../pdf/settings';
 import { createPdfRegistry } from '../../pdf/providers';
@@ -91,6 +92,26 @@ function renderPdf() {
   $('pdfKeyLink').href = provider.keyUrl;
 }
 
+function elsevierStatus(text, state = '') {
+  const el = $('elsevier-status');
+  el.dataset.state = state;
+  el.textContent = '';
+  if (text) requestAnimationFrame(() => { el.textContent = text; });
+}
+
+async function onElsevierTest() {
+  const key = $('elsevierKey').value.trim();
+  if (!key) return elsevierStatus(t(lang, 'optElsevierNoKey'), 'failed');
+  await savePublisherKeys({ elsevier: key });
+  elsevierStatus(t(lang, 'optPdfTesting'), 'running');
+  let r;
+  try { r = await chrome.runtime.sendMessage({ type: MSG.ELSEVIER_TEST, key }); } catch (_) { r = { ok: false, reason: 'network' }; }
+  if (r && r.ok) return elsevierStatus(t(lang, 'optElsevierOk'), 'done');
+  const key2 = `optElsevierErr_${(r && r.reason) || 'network'}`;
+  const text = t(lang, key2);
+  return elsevierStatus(text === key2 ? t(lang, 'optElsevierErr_network') : text, 'failed');
+}
+
 // 换后端只是保存选择：两个后端的域名都在安装时授予，不再申请权限（Simon 2026-10-30 18:06）
 async function onPdfProvider(e) {
   const id = e.target.value;
@@ -131,6 +152,7 @@ async function main() {
   $('filename').value = settings.filenameTemplate;
   $('includeImages').checked = settings.includeImages;
   $('preferJats').checked = settings.preferJats;
+  $('findOpenVersions').checked = settings.findOpenVersions;
   $('showFab').checked = settings.showFab;
   document.querySelectorAll('input[name="language"]').forEach((r) => { r.checked = r.value === settings.language; });
   render();
@@ -143,6 +165,7 @@ async function main() {
   });
   $('includeImages').addEventListener('change', (e) => update({ includeImages: e.target.checked }));
   $('preferJats').addEventListener('change', (e) => update({ preferJats: e.target.checked }));
+  $('findOpenVersions').addEventListener('change', (e) => update({ findOpenVersions: e.target.checked }));
   $('showFab').addEventListener('change', (e) => update({ showFab: e.target.checked }));
   document.querySelectorAll('input[name="pdfProvider"]').forEach((r) => r.addEventListener('change', onPdfProvider));
   let tokenTimer = null;
@@ -155,6 +178,14 @@ async function main() {
     }, 400);
   });
   $('pdfTest').addEventListener('click', onPdfTest);
+  // Elsevier 全文接口的 Key：只存本浏览器，只发给 api.elsevier.com
+  loadPublisherKeys().then((keys) => { $('elsevierKey').value = keys.elsevier; });
+  let elsevierTimer = null;
+  $('elsevierKey').addEventListener('input', () => {
+    clearTimeout(elsevierTimer);
+    elsevierTimer = setTimeout(async () => { await savePublisherKeys({ elsevier: $('elsevierKey').value }); announceSaved(); }, 400);
+  });
+  $('elsevierTest').addEventListener('click', onElsevierTest);
   // 页面上点了「隐藏此按钮」时，设置页同步开关状态
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'sync' && changes.settings && changes.settings.newValue) $('showFab').checked = changes.settings.newValue.showFab !== false;

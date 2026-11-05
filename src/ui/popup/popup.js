@@ -1,7 +1,7 @@
 import { loadSettings } from '../../config/settings';
 import { applyI18n, resolveLanguage, t } from '../../config/i18n';
 import { MSG, ACTIONS } from '../../utils/messages';
-import { describeResult, errorText } from '../shared/result-text';
+import { describeResult, errorText, openLinkText } from '../shared/result-text';
 import { quickCheck, emptyText, routeItems, shortcutText, exportShortcut } from './popup-view';
 import { loadPdfSettings, pdfReady, PDF_TASK_KEY } from '../../pdf/settings';
 import { pdfStatusText, providerLabel } from '../shared/pdf-text';
@@ -42,19 +42,28 @@ function setStatus(lines) {
   statusFrame = requestAnimationFrame(() => {
     if (seq !== statusSeq) return;
     el.textContent = '';
-    for (const { text, cls, href } of lines) {
-      if (!text) continue;
+    for (const { text, cls, href, linkText, button } of lines) {
+      if (!text && !button) continue;
       const p = document.createElement('p');
       p.className = cls;
-      p.textContent = text;
+      p.textContent = text || '';
       if (href) {
         p.append(' ');
         const a = document.createElement('a');
         a.href = href;
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
-        a.textContent = t(lang, 'noticeFullTextLink');
+        a.textContent = linkText || t(lang, 'noticeFullTextLink');
         p.append(a);
+      }
+      if (button) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'btn btn-secondary';
+        b.textContent = button.label;
+        b.addEventListener('click', button.onClick);
+        if (text) p.append(document.createElement('br'));
+        p.append(b);
       }
       el.append(p);
     }
@@ -127,22 +136,47 @@ function setPdfStatus(task) {
 async function setupPdf() {
   pdfSettings = await loadPdfSettings();
   const pdf = pageInfo && pageInfo.pdf;
-  if (!pdfReady(pdfSettings) || !pdf || !pdf.url) return;
+  // 快速解析（文字层）不需要 Key：本页有 PDF 就显示
+  if (pdf && pdf.url) {
+    $('pdf-fast').hidden = false;
+    show('pdf-row', true);
+  }
+  if (!pdfReady(pdfSettings)) { $('pdf').hidden = true; return; }
   const name = providerLabel(pdfSettings.provider);
   $('pdf').textContent = t(lang, 'pdfButton', { provider: name });
   $('pdf').title = t(lang, 'pdfButtonTitle', { provider: name });
-  show('pdf-row', true);
+  // 本页没有 PDF 时不显示按钮；解析别处免费版本的 PDF 时只显示状态行
+  $('pdf').hidden = !(pdf && pdf.url);
   // 弹窗重新打开时显示这一页上次任务的状态
   const got = await chrome.storage.local.get(PDF_TASK_KEY);
   const task = got && got[PDF_TASK_KEY];
+  show('pdf-row', !$('pdf').hidden || !$('pdf-fast').hidden || !!(task && task.pageUrl === tab.url));
   if (task && task.pageUrl === tab.url) setPdfStatus(task);
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local' && changes[PDF_TASK_KEY] && changes[PDF_TASK_KEY].newValue && changes[PDF_TASK_KEY].newValue.pageUrl === tab.url) setPdfStatus(changes[PDF_TASK_KEY].newValue);
   });
 }
 
-async function startPdf() {
-  const pdf = pageInfo.pdf;
+/** 快速解析：把 pdf-fast.js 注入文章页，在页面里下载 PDF、读文字层、保存 Markdown（不经过第三方） */
+async function startFastPdf() {
+  if ($('pdf-fast').getAttribute('aria-disabled') === 'true') return;
+  $('pdf-fast').setAttribute('aria-disabled', 'true');
+  setPdfStatus({ state: 'fast' });
+  let r;
+  try {
+    await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['pdf-fast.js'] });
+    r = await chrome.tabs.sendMessage(tab.id, { type: MSG.PDF_FAST, pdfUrl: pageInfo.pdf.url, meta: pageInfo.meta });
+  } catch (_) {
+    r = { ok: false, error: 'content_unreachable' };
+  }
+  $('pdf-fast').removeAttribute('aria-disabled');
+  setPdfStatus(r && r.ok ? { state: 'fast_done', ...r } : { state: 'fast_failed', error: (r && r.error) || 'pdf_parse' });
+}
+
+/** pdfUrl：别处免费版本的 PDF（默认解析本页的 PDF） */
+async function startPdf(pdfUrl) {
+  const pdf = typeof pdfUrl === 'string' ? { url: pdfUrl, license: '' } : pageInfo.pdf;
+  show('pdf-row', true);
   $('pdf').setAttribute('aria-disabled', 'true');
   setPdfStatus({ state: 'checking', provider: pdfSettings.provider });
   let r;
@@ -168,7 +202,31 @@ function onPdfClick() {
   startPdf();
 }
 
-async function run(action) {
+/** 只有摘要：说明原因，给全文链接；有 PDF 时提示用 PDF 解析；最后是「仍导出摘要」按钮 */
+function abstractOnlyLines(result, action) {
+  const lines = [{ text: errorText(lang, 'abstract_only'), cls: 'alert err' }];
+  if (result.fullTextUrl) lines.push({ text: t(lang, 'abstractOnlyPublisher'), cls: 'note', href: result.fullTextUrl });
+  // 别处的免费版本（Unpaywall、bioRxiv / medRxiv）：链接；PDF 在填了 Key 时可以直接解析
+  const open = (result.openVersions || []).slice(0, 4);
+  if (open.length) lines.push({ text: t(lang, 'openVersionsTitle'), cls: 'note' });
+  for (const l of open) {
+    const canParse = l.pdfUrl && pdfSettings && pdfReady(pdfSettings);
+    lines.push({ text: openLinkText(lang, l), cls: 'note', href: l.url, linkText: t(lang, 'openLinkOpen'), button: canParse ? { label: t(lang, 'btnParseThisPdf'), onClick: () => startPdf(l.pdfUrl) } : null });
+  }
+  if (pageInfo && pageInfo.pdf && pageInfo.pdf.url) {
+    lines.push({ text: t(lang, 'abstractOnlyPdfReady'), cls: 'note' });
+  }
+  // Elsevier 的文章、还没填 Key（接口那一步什么也没说）：提示可以在设置里填 Elsevier API Key
+  const notes = result.notices || [];
+  if (/^10\.1016\//i.test((result.meta && result.meta.doi) || '') && !notes.some((n) => n.code === 'elsevier_fallback')) {
+    lines.push({ text: t(lang, 'abstractOnlyElsevierKey'), cls: 'note' });
+  }
+  for (const n of notes.filter((x) => x.code === 'elsevier_fallback')) lines.push({ text: describeResult({ ok: true, notices: [n] }, lang, action).notes[0], cls: 'note' });
+  lines.push({ cls: 'note', button: { label: t(lang, 'btnExportAbstract'), onClick: () => run(action, true) } });
+  return lines;
+}
+
+async function run(action, allowAbstract = false) {
   if (busy) return;
   busy = true;
   const buttons = [$('export'), $('copy'), $('zip')];
@@ -177,7 +235,7 @@ async function run(action) {
   setStatus([{ text: t(lang, 'statusWorking'), cls: 'alert info run' }]);
   let result;
   try {
-    result = await sendToTab({ type: MSG.EXPORT, action: action === ACTIONS.COPY ? ACTIONS.NONE : action });
+    result = await sendToTab({ type: MSG.EXPORT, action: action === ACTIONS.COPY ? ACTIONS.NONE : action, allowAbstract });
     if (result && result.ok && action === ACTIONS.COPY) {
       // popup 有焦点和用户手势，在这里写剪贴板最稳
       await navigator.clipboard.writeText(result.markdown);
@@ -187,7 +245,8 @@ async function run(action) {
     result = { ok: false, error: action === ACTIONS.COPY && result && result.ok ? 'clipboard_failed' : 'content_unreachable' };
   }
   const text = describeResult(result, lang, action);
-  const lines = [{ text: text.status, cls: result && result.ok ? 'alert ok' : 'alert err' }];
+  let lines = [{ text: text.status, cls: result && result.ok ? 'alert ok' : 'alert err' }];
+  if (result && !result.ok && result.error === 'abstract_only') lines = abstractOnlyLines(result, action);
   if (result && result.ok) {
     lines.push({ text: text.route, cls: 'note' });
     for (const n of text.notes) lines.push({ text: n, cls: 'note' });
@@ -209,6 +268,7 @@ async function main() {
   $('copy').addEventListener('click', () => run(ACTIONS.COPY));
   $('zip').addEventListener('click', () => run(ACTIONS.ZIP));
   $('pdf').addEventListener('click', onPdfClick);
+  $('pdf-fast').addEventListener('click', startFastPdf);
   $('footer-version').textContent = `v${chrome.runtime.getManifest().version}`;
   chrome.commands.getAll().then((cmds) => {
     $('shortcut-kbd').textContent = exportShortcut(lang, cmds);

@@ -22,6 +22,14 @@ function lookupDoi(doi) {
   return chrome.runtime.sendMessage({ type: MSG.LOOKUP_DOI, doi });
 }
 
+function findOpenVersion(doi) {
+  return chrome.runtime.sendMessage({ type: MSG.FIND_OPEN_VERSION, doi });
+}
+
+function fetchElsevier({ doi, pii }) {
+  return chrome.runtime.sendMessage({ type: MSG.FETCH_ELSEVIER, doi, pii });
+}
+
 /** 出版商同站 XML（Frontiers citation_xml_url）：只取和当前页同源的地址，在页面里请求（带用户自己的 Cookie，不经过第三方） */
 /** 本页的服务器 HTML（MDPI）：只取和当前页同源、同路径的地址，不跟着跳到别的站 */
 async function fetchPageHtml(url) {
@@ -75,10 +83,11 @@ export function waitForDomSettled(doc, { quietMs = 400, maxMs = 3000 } = {}) {
   });
 }
 
-const RETRY_ERRORS = ['no_content', 'page_changed'];
+// abstract_only 也重试：单页应用可能先渲染摘要、正文稍后才出来
+const RETRY_ERRORS = ['no_content', 'page_changed', 'abstract_only'];
 
-async function exportOnce(settings, action) {
-  return exportArticle({ doc: document, url: location.href, settings, fetchJats, services: { lookupDoi, fetchSiteXml, fetchPageHtml }, format: action === ACTIONS.ZIP ? 'zip' : 'md' });
+async function exportOnce(settings, action, allowAbstract) {
+  return exportArticle({ doc: document, url: location.href, settings, fetchJats, services: { lookupDoi, fetchSiteXml, fetchPageHtml, findOpenVersion, fetchElsevier }, format: action === ACTIONS.ZIP ? 'zip' : 'md', allowAbstract });
 }
 
 async function deliver(result, action) {
@@ -106,7 +115,7 @@ async function deliver(result, action) {
   return result;
 }
 
-async function runExport(action, withToast) {
+async function runExport(action, withToast, allowAbstract = false) {
   let lang = 'en';
   let result;
   // 任何一步出错都要落到最后的提示上，不能静默失败（QA JM-M2-02）
@@ -114,10 +123,10 @@ async function runExport(action, withToast) {
     const settings = await loadSettings();
     lang = resolveLanguage(settings.language);
     if (withToast) showToast(t(lang, 'statusWorking'), 'working', { lang, beside: fabBottom(document) });
-    result = await exportOnce(settings, action);
+    result = await exportOnce(settings, action, allowAbstract);
     if (!result.ok && RETRY_ERRORS.includes(result.error)) {
       await waitForDomSettled(document);
-      result = await exportOnce(settings, action);
+      result = await exportOnce(settings, action, allowAbstract);
     }
     result = await deliver(result, action);
   } catch (e) {
@@ -126,6 +135,7 @@ async function runExport(action, withToast) {
   }
   if (withToast) {
     const text = describeResult(result, lang, action);
+    if (result.error === 'abstract_only') text.notes.push(t(lang, 'abstractOnlyToastHint'));
     showToast([text.status, ...text.notes].filter(Boolean).join(' '), result.ok ? 'success' : 'error', { lang, beside: fabBottom(document) });
   }
   delete result.assets;
@@ -145,7 +155,7 @@ function onMessage(message, _sender, sendResponse) {
   }
   if (message.type === MSG.EXPORT) {
     const action = Object.values(ACTIONS).includes(message.action) ? message.action : ACTIONS.NONE;
-    runExport(action, !!message.toast).then(sendResponse);
+    runExport(action, !!message.toast, message.allowAbstract === true).then(sendResponse);
     return true;
   }
   return false;

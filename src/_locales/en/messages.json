@@ -80,6 +80,63 @@
   "routeUsedDom": {
     "message": "Source: this page."
   },
+  "routeUsedElsevier": {
+    "message": "Source: Elsevier full-text API (structured full text)."
+  },
+  "noticeElsevierFulltext": {
+    "message": "This page only shows the abstract; the full text comes from the Elsevier full-text API (your key and institution's network)."
+  },
+  "noticeElsevier_not_entitled": {
+    "message": "The Elsevier API returned only the abstract: this network has no subscription to the article."
+  },
+  "noticeElsevier_auth": {
+    "message": "The Elsevier API key is invalid; check it in Settings."
+  },
+  "noticeElsevier_quota": {
+    "message": "Elsevier's rate limit was reached."
+  },
+  "noticeElsevier_unavailable": {
+    "message": "The Elsevier full-text API was unavailable (or the API key is wrong)."
+  },
+  "noticeElsevier_other": {
+    "message": "The Elsevier full-text API did not return the full text."
+  },
+  "routeUsedPreprint": {
+    "message": "Source: bioRxiv / medRxiv preprint (structured full text)."
+  },
+  "noticeOpenPreprint": {
+    "message": "This page only shows the abstract; the full text comes from the {server} preprint{version} and may differ from the published version."
+  },
+  "noticeOpenPmc": {
+    "message": "This page only shows the abstract; the full text comes from a free copy in PubMed Central."
+  },
+  "noticeOpenPmcAccepted": {
+    "message": "This page only shows the abstract; the full text comes from the author manuscript in PubMed Central and may differ from the published version."
+  },
+  "openLink": {
+    "message": "{where} ({version}):"
+  },
+  "openLinkArxiv": {
+    "message": "arXiv preprint: export it with arXiv to Markdown"
+  },
+  "openVersion_submittedVersion": {
+    "message": "preprint"
+  },
+  "openVersion_acceptedVersion": {
+    "message": "accepted manuscript"
+  },
+  "openVersion_publishedVersion": {
+    "message": "published version"
+  },
+  "openVersionsTitle": {
+    "message": "Free versions found:"
+  },
+  "openLinkOpen": {
+    "message": "Open"
+  },
+  "btnParseThisPdf": {
+    "message": "Parse this PDF"
+  },
   "noticeAbstractOnly": {
     "message": "Abstract only: no open full text was found."
   },
@@ -131,6 +188,24 @@
   "err_no_content": {
     "message": "No article content was found on this page. If it is a sign-in or preview page, check your access and reload."
   },
+  "err_abstract_only": {
+    "message": "This page only shows the abstract, so no file was created. Usually you don't have access to this article: reload it on your campus network or institutional VPN and try again."
+  },
+  "abstractOnlyPublisher": {
+    "message": "Read the full text on the publisher's site:"
+  },
+  "abstractOnlyPdfReady": {
+    "message": "If you have access, use \"Quick PDF parse\" above to get the full text from the PDF."
+  },
+  "abstractOnlyElsevierKey": {
+    "message": "This is an Elsevier article: add an Elsevier API key in Settings to fetch the structured full text from your institution's network."
+  },
+  "btnExportAbstract": {
+    "message": "Export abstract anyway"
+  },
+  "abstractOnlyToastHint": {
+    "message": "If you only need the abstract, open the extension from the toolbar and choose \"Export abstract anyway\"."
+  },
   "err_content_unreachable": {
     "message": "Cannot read this tab. Reload the page and try again."
   },
@@ -175,6 +250,12 @@
   },
   "optPreferJatsHelp": {
     "message": "Try structured full text (JATS XML) first: from Europe PMC for open-access articles, or the publisher's own XML on Frontiers. If that fails or times out, the page itself is used."
+  },
+  "optFindOpenVersions": {
+    "message": "Look for a free version when only the abstract is shown"
+  },
+  "optFindOpenVersionsHelp": {
+    "message": "When a page only shows the abstract, ask Unpaywall and bioRxiv / medRxiv by DOI for a legal free full text (author manuscripts in PMC, preprints). Only the DOI is sent."
   },
   "optSectionLanguage": {
     "message": "General"
@@ -266,8 +347,56 @@
   "pdfButtonTitle": {
     "message": "Send this article's PDF link to {provider} and download the result as a ZIP"
   },
+  "btnPdfFast": {
+    "message": "Quick PDF parse"
+  },
+  "btnPdfFastTitle": {
+    "message": "Download the PDF on this page and convert its text layer to Markdown: takes seconds and sends nothing to any service; formulas, tables and figures may be incomplete"
+  },
+  "pdfFastWorking": {
+    "message": "Reading the PDF's text layer on this page…"
+  },
+  "pdfFastDone": {
+    "message": "Saved {filename} ({pages} pages, from the PDF text layer)."
+  },
+  "pdfFastErr_pdf_http": {
+    "message": "Could not download the PDF: you may not have access to this article."
+  },
+  "pdfFastErr_pdf_not_pdf": {
+    "message": "The download was not a PDF (probably a sign-in or bot-check page). Open the PDF once in the browser, make sure you can see it, then try again."
+  },
+  "pdfFastErr_pdf_too_large": {
+    "message": "The PDF is larger than 80 MB and was not parsed."
+  },
+  "pdfFastErr_pdf_timeout": {
+    "message": "Downloading the PDF timed out."
+  },
+  "pdfFastErr_pdf_network": {
+    "message": "Could not download the PDF (network error, or the PDF is on another site that does not allow it)."
+  },
+  "pdfFastErr_pdf_not_https": {
+    "message": "The PDF address is not https; nothing was downloaded."
+  },
+  "pdfFastErr_pdf_no_text": {
+    "message": "This PDF has no text layer (probably a scan). Quick parse cannot read it; use PaddleOCR instead."
+  },
+  "pdfFastErr_pdf_parse": {
+    "message": "Could not parse the PDF."
+  },
+  "pdfFastErr_download_failed": {
+    "message": "Could not save the file."
+  },
+  "pdfFastErr_content_unreachable": {
+    "message": "Cannot run on this page. Reload it and try again."
+  },
+  "pdfStateDownloading": {
+    "message": "Downloading the PDF in your browser…"
+  },
   "pdfStateSubmitting": {
     "message": "Sending the PDF link to {provider}…"
+  },
+  "pdfStateUploading": {
+    "message": "Uploading the PDF to {provider}…"
   },
   "pdfStateRunning": {
     "message": "{provider} is parsing the PDF ({progress}%). You can close this popup; the result downloads when ready."
@@ -324,7 +453,46 @@
     "message": "PDF parsing"
   },
   "optPdfHelp": {
-    "message": "For pages without usable full text, a third-party service can parse the article PDF with your own key. Once a key is set, the popup shows \"Parse PDF\" on articles that link a PDF. Clicking it sends the PDF link and your key to that service right away, without asking again, so only use it for PDFs you may share with that service."
+    "message": "For pages without usable full text, a third-party service can parse the article PDF with your own key (full layout, slower). For text only, \"Quick PDF parse\" in the popup needs no key and sends nothing to any service. Once a key is set, the popup shows \"Parse PDF\" on articles with a PDF; clicking it sends the PDF and your key to that service right away, without asking again, so only use it for PDFs you may share with that service."
+  },
+  "optSectionPublisher": {
+    "message": "Publisher full-text APIs"
+  },
+  "optPublisherHelp": {
+    "message": "With an Elsevier API key, when a ScienceDirect, Cell or other Elsevier article page shows only the abstract, the structured full text is fetched from Elsevier's full-text API. Elsevier decides by your network: full text comes only from a network your institution subscribes from (campus network, institutional VPN)."
+  },
+  "optElsevierKey": {
+    "message": "Elsevier API key"
+  },
+  "optElsevierKeyHelp": {
+    "message": "Free from the Elsevier Developer Portal. Stored only in this browser and sent only to api.elsevier.com."
+  },
+  "optElsevierNoKey": {
+    "message": "Enter a key first."
+  },
+  "optElsevierOk": {
+    "message": "The key works."
+  },
+  "optElsevierErr_auth": {
+    "message": "The key is invalid or not enabled for the full-text API."
+  },
+  "optElsevierErr_quota": {
+    "message": "Elsevier's rate limit was reached. Try again later."
+  },
+  "optElsevierErr_unavailable": {
+    "message": "Elsevier answered \"Service Unavailable\", which it also does for a wrong key. Check the key; if it is right, the service is temporarily down."
+  },
+  "optElsevierErr_not_found": {
+    "message": "The test article was not found; the key may still work. Try it on an article page."
+  },
+  "optElsevierErr_timeout": {
+    "message": "api.elsevier.com did not respond in time."
+  },
+  "optElsevierErr_network": {
+    "message": "Could not reach api.elsevier.com."
+  },
+  "optElsevierErr_http": {
+    "message": "The Elsevier API returned an error. Try again later."
   },
   "optPdfProvider": {
     "message": "PDF parsing service"
@@ -336,7 +504,7 @@
     "message": "MinerU"
   },
   "optPdfNote_paddleocr": {
-    "message": "PaddleOCR (Baidu AI Studio) receives the PDF link and your key, downloads the PDF itself, and returns text and images from *.bj.bcebos.com. Free daily quota."
+    "message": "PaddleOCR (Baidu AI Studio) receives the PDF file and your key: your browser downloads the PDF first (so subscription articles work), and sends the link instead if that fails. Text and images come back from *.bj.bcebos.com. Free daily quota."
   },
   "optPdfNote_mineru": {
     "message": "MinerU (OpenDataLab) receives the PDF link and your key, downloads the PDF itself, and returns a ZIP from cdn-mineru.openxlab.org.cn."

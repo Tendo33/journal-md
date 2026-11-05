@@ -3,15 +3,17 @@
 //   - PLOS：journals.plos.org/<journal>/article/figure/image?…（图）和 /article/file?type=thumbnail…（公式图）一律 302 到下面这个
 //     Cloudflare R2 存储桶（2026-10-30 实测：plosone / ploscompbiol / plosmedicine，各种 size、download 地址都一样）
 //   - Springer Link / BMC / Nature：图片在 media.springernature.com
-// 其他图片（eLife iiif、PMC CDN、Frontiers、MDPI）不需要额外权限。
+//   - Oxford Academic：图片在 oup.silverchair-cdn.com（2026-11-05 在真实文章页上确认），同样不发 CORS 头
+// 其他图片（eLife iiif、PMC CDN、Frontiers、MDPI、Wiley、Cell）在站点自己的域名下，不需要额外权限。
 
 export const PLOS_IMAGE_ORIGIN = 'https://corpus-prod.f505aadad1e46610c8f8563037eb3c4b.r2.cloudflarestorage.com/*';
 export const SPRINGER_IMAGE_ORIGIN = 'https://media.springernature.com/*';
-export const ZIP_IMAGE_ORIGINS = [PLOS_IMAGE_ORIGIN, SPRINGER_IMAGE_ORIGIN];
+export const OUP_IMAGE_ORIGIN = 'https://oup.silverchair-cdn.com/*';
+export const ZIP_IMAGE_ORIGINS = [PLOS_IMAGE_ORIGIN, SPRINGER_IMAGE_ORIGIN, OUP_IMAGE_ORIGIN];
 
 const R2_HOST = 'corpus-prod.f505aadad1e46610c8f8563037eb3c4b.r2.cloudflarestorage.com';
 
-/** 一个图片地址落在哪个图片 CDN 的主机权限下（match pattern）；不是这两个 CDN 时返回 '' */
+/** 一个图片地址落在哪个图片 CDN 的主机权限下（match pattern）；不在这些 CDN 上时返回 '' */
 export function originNeededFor(url) {
   let u;
   try { u = new URL(url); } catch (_) { return ''; }
@@ -20,5 +22,6 @@ export function originNeededFor(url) {
   if (u.hostname === 'journals.plos.org' && /\/article\/(figure\/image|file)$/.test(u.pathname)) return PLOS_IMAGE_ORIGIN;
   if (u.hostname === R2_HOST) return PLOS_IMAGE_ORIGIN;
   if (u.hostname === 'media.springernature.com') return SPRINGER_IMAGE_ORIGIN;
+  if (u.hostname === 'oup.silverchair-cdn.com') return OUP_IMAGE_ORIGIN;
   return '';
 }

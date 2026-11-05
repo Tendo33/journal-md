@@ -3,6 +3,7 @@
 // 这些站点优先走结构化全文（同站 XML 或 Europe PMC），DOM 只在拿不到时兜底，见 export/pipeline.js。
 import { SOURCE_ROUTES } from '../article-ir';
 import { extractDomArticle } from './dom-article';
+import { textOf } from '../parsers/dom-utils';
 
 // Springer Link（含已迁到 link.springer.com 的 BMC 期刊）和 Nature 是同一套页面（c-article-*）
 const SPRINGER_NATURE = {
@@ -227,6 +228,233 @@ export const ELIFE_CONFIG = {
   },
 };
 
+// Wiley Online Library（Atypon）：正文 section.article-section__content，参考文献 li[data-bib-id]，正文引用 a.bibLink[href=#…-bib-0001]
+// 结构按 2026-11-05 的真实页面写（tests/fixtures/html/wiley-structure.html 只保留结构，文字是占位）
+export const WILEY_CONFIG = {
+  route: SOURCE_ROUTES.DOM_WILEY,
+  root: ['article', 'main'],
+  title: ['h1.citation__title', 'h1'],
+  authors: '.loa-authors .author-name',
+  journal: '',
+  date: '',
+  metaArea: ['.article-citation', '.epub-sections'],
+  doi: 'a[href*="doi.org/10."]',
+  license: '.article-section__content a[rel="license"], .copyright a[href*="creativecommons.org"], head link[rel="license"]',
+  abstract: 'section.article-section__abstract .article-section__content',
+  keywords: '',
+  body: 'section.article-section__full',
+  refList: 'section.article-section__references',
+  refItems: 'section.article-section__references li[data-bib-id]',
+  refId: (li) => li.getAttribute('data-bib-id') || '',
+  refText: '',
+  refLabel: '.bullet',
+  supp: 'section.article-section__supporting tbody tr',
+  suppCaption: 'td + td',
+  remove: ['section.article-section__citedBy', '.figure-extra', '.extra-links', 'section.article-section__supporting', '.article-section__inline-figure .figure__caption__header .figure-extra'],
+  selectors: {
+    figure: 'figure.figure',
+    table: '.article-table-content, div.table',
+    formula: '.display-formula, .disp-formula',
+    label: '.figure__title, .table__title, .table-caption__label',
+    caption: '.figure__caption-text, .figure__caption, .table-caption, header.article-table-caption',
+    tableFoot: '.article-section__table-footnotes, .table-footnotes',
+    cite: 'a.bibLink',
+  },
+  hooks: {
+    citeRid: (el) => String(el.getAttribute('href') || '').replace(/^#/, ''),
+    // 参考文献 li 里作者、刊名、年份、卷、页是并排的 span，没有分隔；DOI 在隐藏的 span.data-doi 里
+    refDoi: (li) => textOf(li.querySelector('.data-doi')),
+    refPrepare: (clone) => {
+      clone.querySelectorAll('.extra-links').forEach((x) => x.remove());
+      const parts = Array.from(clone.querySelectorAll('.author, .articleTitle, .chapterTitle, .bookTitle, .journalTitle, .pubYear, .vol, .citedIssue, .pageFirst'));
+      parts.forEach((x, i) => {
+        if (x.classList.contains('pageFirst')) { const last = clone.querySelector('.pageLast'); if (last) x.after('–'); }
+        if (i < parts.length - 1) x.after(', ');
+      });
+    },
+  },
+};
+
+// Cell Press（cell.com，Atypon 新版）：#bodymatter 正文、#backmatter 文末；正文引用 span.reference-citations 里带着整条参考文献的弹层
+export const CELL_CONFIG = {
+  route: SOURCE_ROUTES.DOM_CELL,
+  root: ['article', 'main'],
+  title: ['h1[property="name"]', 'h1'],
+  authors: '.contributors [property="author"] [property="name"]',
+  journal: '',
+  date: '',
+  metaArea: ['header', '.core-self-citation'],
+  doi: 'a[href*="doi.org/10."]',
+  license: '#core-content-info a[href*="creativecommons.org"], .core-license a[href*="creativecommons.org"], head link[rel="license"]',
+  abstract: '#abstracts section#author-highlights-abstract, #abstracts section#author-abstract',
+  keywords: '',
+  body: '#bodymatter, #backmatter',
+  refList: '#references, #bibliography',
+  refItems: '#bibliography .biblioentry',
+  refText: '.citation-content',
+  refLabel: '.label',
+  supp: '',
+  suppCaption: '',
+  remove: ['#abstracts', '.core-linked-content', '.figure__open__ctrl', '.accordion__control', '.core-table-tools', '.core-table-show-action'],
+  selectors: {
+    figure: 'figure.graphic',
+    table: 'figure.table',
+    formula: '.display-formula, [role="math"].display',
+    label: '.figure__label, .label',
+    caption: 'figcaption',
+    cite: 'span.reference-citations',
+  },
+  hooks: {
+    // 引用里的弹层是整条参考文献（div#sref8 对应文末 div#sref8 所在的条目）：记下 id 后删掉弹层，只留角标文字。
+    // 同一条文献再次被引用时弹层 id 带序号（sref35-1、sref61-2）
+    prepareBody: (body) => {
+      body.querySelectorAll('span.reference-citations').forEach((span) => {
+        const holder = span.querySelector('.dropBlock__holder');
+        if (holder) {
+          span.setAttribute('data-rid', String(holder.getAttribute('id') || '').replace(/-\d+$/, ''));
+          holder.remove();
+        }
+      });
+    },
+    // 要点（Highlights）是 div[role=list] > div[role=listitem]，前面的「•」是单独的 div.label
+    prepareAbstract: (clone) => {
+      const doc = clone.ownerDocument;
+      clone.querySelectorAll('[role="list"]').forEach((list) => {
+        const ul = doc.createElement('ul');
+        list.querySelectorAll(':scope > [role="listitem"]').forEach((item) => {
+          const li = doc.createElement('li');
+          li.textContent = textOf(item.querySelector('.content') || item);
+          ul.append(li);
+        });
+        list.replaceWith(ul);
+      });
+    },
+    refPrepare: (clone) => {
+      clone.querySelectorAll('.external-links').forEach((x) => x.remove());
+      // 作者、标题、出处各是一个 div：拼成一行
+      Array.from(clone.querySelectorAll(':scope > div')).forEach((d) => d.after(' '));
+    },
+    // 页面上是缩略图，外层链接是大图（…_lrg.jpg）
+    imageSrc: (url, img) => {
+      const a = img && img.closest && img.closest('a.icon-full-screen');
+      const href = a && a.getAttribute('href');
+      try { return href ? new URL(href, url).href : url; } catch (_) { return url; }
+    },
+  },
+};
+
+// Oxford Academic（Silverchair）：正文是一串平铺的 h2 / h3 / p.chapter-para；引用 a.xref-bibr[data-open=B1] 对应 [data-legacy-id=B1]
+// 页面声明的 citation_xml_url 对页面内请求返回 403，不走同站 XML
+export const OUP_CONFIG = {
+  route: SOURCE_ROUTES.DOM_OUP,
+  root: ['.article-body', 'article', 'main'],
+  title: ['h1.article-title-main', 'h1'],
+  authors: '.al-authors-list .al-author-name > .linked-name, .al-authors-list .al-author-name',
+  journal: '',
+  date: '',
+  metaArea: ['.ww-citation-primary', '.article-info-wrap'],
+  doi: 'a[href*="doi.org/10."]',
+  license: '.license a[href*="creativecommons.org"], .copyright a[href*="creativecommons.org"], head link[rel="license"]',
+  abstract: 'section.abstract',
+  keywords: '.kwd-group',
+  keywordItems: '.kwd-group .kwd-part',
+  body: '.widget-items',
+  refList: '.ref-list',
+  refItems: '.ref-list .js-splitview-ref-item',
+  refId: (li) => li.getAttribute('data-legacy-id') || '',
+  refText: '.mixed-citation, .citation',
+  refLabel: '.label',
+  supp: '.dataSuppLink, .supplementary-material',
+  suppCaption: '.caption, p',
+  remove: ['h2.abstract-title', '.article-metadata-panel', '.fig-orig', '.figure-button-wrap', '.table-modal', '.table-wrap-title .js-table-modal-trigger', 'h2.backreferences-title', '.copyright', '.license', '.article-metadata-tocSections'],
+  selectors: {
+    figure: '.fig-section',
+    table: '.table-wrap, .table-full-width-wrap',
+    formula: '.disp-formula',
+    label: '.fig-label, .table-wrap-title .label, .label',
+    caption: '.fig-caption, .caption',
+    tableFoot: '.table-wrap-foot, .fn',
+    cite: 'a.xref-bibr',
+  },
+  hooks: {
+    citeRid: (el) => el.getAttribute('data-open') || '',
+    // 图前面的空 h4.figure-title 只是锚点，不能当节标题
+    prepareBody: (body) => body.querySelectorAll('h4.figure-title, h4.table-title').forEach((h) => h.remove()),
+    refPrepare: (clone) => {
+      clone.querySelectorAll('.surname').forEach((s) => s.after(' '));
+    },
+  },
+};
+
+// Taylor & Francis Online（Atypon 旧版）：.hlFld-Fulltext 里 NLM_sec 嵌套；引用 a[data-rid=CIT0001]；表格内容在弹窗里，页面上只有表题
+export const TANDF_CONFIG = {
+  route: SOURCE_ROUTES.DOM_TANDF,
+  root: ['article', '.hlFld-Fulltext', 'main'],
+  title: ['h1 .NLM_article-title', 'h1'],
+  authors: '.literatumAuthors .author',
+  journal: '',
+  date: '',
+  metaArea: ['.itemPageRangeHistory', '.tocHeading', '.literatumArticleToolsWidget'],
+  doi: 'a[href*="doi.org/10."]',
+  license: '.accessIconLocation a[href*="creativecommons.org"], .copyrightStatement a[href*="creativecommons.org"], head link[rel="license"]',
+  abstract: '.hlFld-Abstract',
+  keywords: '',
+  keywordItems: '.abstractKeywords .kwd-btn',
+  body: '.hlFld-Fulltext',
+  refList: 'ul.references',
+  refItems: 'ul.references > li',
+  refText: '',
+  refLabel: '',
+  supp: '',
+  suppCaption: '',
+  remove: ['.hlFld-Abstract', '.abstractKeywords', '.tableDownloadOption', '.show-full-size', '.figureDownloadOptions'],
+  // 页面没有 citation_pdf_url
+  pdfLink: 'a[href*="/doi/pdf/"]',
+  selectors: {
+    figure: '.figureView',
+    table: '.tableView',
+    formula: '.disp-formula, .NLM_disp-formula',
+    label: '.captionLabel, .tableCaption b',
+    caption: '.captionText, .tableCaption',
+    cite: 'span.ref-lnk a[data-rid]',
+  },
+  hooks: {
+    // 引用链接里有给读屏用的「Citation」：只留编号；「Table 1」「Figure 1」这类跳转是按钮，换成普通文字
+    prepareBody: (body) => {
+      body.querySelectorAll('span.ref-lnk .off-screen').forEach((x) => x.remove());
+      body.querySelectorAll('button.show-table-fig-ref').forEach((b) => b.replaceWith(b.textContent));
+    },
+    refPrepare: (clone) => clone.querySelectorAll('.extra-links').forEach((x) => x.remove()),
+  },
+};
+
+// ScienceDirect：只取 citation_* 题录和摘要（页面有人机验证，正文结构没法照着真实页面核对）；
+// 正文走 Elsevier 全文接口（pipeline 里的 elsevierFullText）
+export const SCIENCEDIRECT_CONFIG = {
+  route: SOURCE_ROUTES.DOM_SCIENCEDIRECT,
+  root: ['article', 'main', '#mathjax-container'],
+  title: ['h1 .title-text', 'h1'],
+  authors: '#author-group .react-xocs-alternative-link, .author-group .author .content',
+  journal: '.publication-title-link, .publication-title',
+  date: '',
+  metaArea: ['#article-identifier-links', '.article-identifier-links', '.ArticleIdentifierLinks'],
+  doi: 'a.doi, a[href*="doi.org/10."]',
+  license: '.license-info a[href*="creativecommons.org"], head link[rel="license"]',
+  abstract: '#abstracts .abstract.author, .Abstracts .abstract.author',
+  keywords: '.Keywords, .keywords-section',
+  keywordItems: '.keywords-section .keyword span',
+  // 正文容器只认 id="body"；拿不到就当只有摘要（交给 Elsevier 接口和免费版本）
+  body: '#body',
+  refList: '.Bibliography, #references',
+  refItems: '.Bibliography .reference, .bibliography .reference',
+  refText: '',
+  refLabel: '.label',
+  supp: '',
+  suppCaption: '',
+  remove: [],
+  selectors: {},
+};
+
 export const PUBLISHER_CONFIGS = {
   springer: SPRINGER_CONFIG,
   nature: NATURE_CONFIG,
@@ -234,6 +462,11 @@ export const PUBLISHER_CONFIGS = {
   mdpi: MDPI_CONFIG,
   plos: PLOS_CONFIG,
   elife: ELIFE_CONFIG,
+  wiley: WILEY_CONFIG,
+  cell: CELL_CONFIG,
+  oup: OUP_CONFIG,
+  tandf: TANDF_CONFIG,
+  sciencedirect: SCIENCEDIRECT_CONFIG,
 };
 
 export const PUBLISHER_ADAPTERS = Object.fromEntries(Object.entries(PUBLISHER_CONFIGS)

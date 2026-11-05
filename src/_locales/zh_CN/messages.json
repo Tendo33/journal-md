@@ -80,6 +80,63 @@
   "routeUsedDom": {
     "message": "来源：当前页面。"
   },
+  "routeUsedElsevier": {
+    "message": "来源：Elsevier 全文接口（结构化全文）。"
+  },
+  "noticeElsevierFulltext": {
+    "message": "本页只有摘要，全文来自 Elsevier 全文接口（你的 Key 和机构网络）。"
+  },
+  "noticeElsevier_not_entitled": {
+    "message": "Elsevier 接口只给了摘要：当前网络没有这篇文章的订阅。"
+  },
+  "noticeElsevier_auth": {
+    "message": "Elsevier API Key 无效，请在设置里检查。"
+  },
+  "noticeElsevier_quota": {
+    "message": "超过 Elsevier 的调用额度。"
+  },
+  "noticeElsevier_unavailable": {
+    "message": "Elsevier 全文接口不可用（也可能是 API Key 不对）。"
+  },
+  "noticeElsevier_other": {
+    "message": "Elsevier 全文接口没有返回全文。"
+  },
+  "routeUsedPreprint": {
+    "message": "来源：bioRxiv / medRxiv 预印本（结构化全文）。"
+  },
+  "noticeOpenPreprint": {
+    "message": "本页只有摘要，全文来自 {server} 预印本{version}，可能与正式发表的版本不同。"
+  },
+  "noticeOpenPmc": {
+    "message": "本页只有摘要，全文来自 PubMed Central 上的免费版本。"
+  },
+  "noticeOpenPmcAccepted": {
+    "message": "本页只有摘要，全文来自 PubMed Central 上的作者接收稿，可能与正式发表的版本有出入。"
+  },
+  "openLink": {
+    "message": "{where}（{version}）："
+  },
+  "openLinkArxiv": {
+    "message": "arXiv 预印本：用 arXiv to Markdown 导出"
+  },
+  "openVersion_submittedVersion": {
+    "message": "预印本"
+  },
+  "openVersion_acceptedVersion": {
+    "message": "作者接收稿"
+  },
+  "openVersion_publishedVersion": {
+    "message": "正式版"
+  },
+  "openVersionsTitle": {
+    "message": "找到这些免费版本："
+  },
+  "openLinkOpen": {
+    "message": "打开"
+  },
+  "btnParseThisPdf": {
+    "message": "解析这个 PDF"
+  },
   "noticeAbstractOnly": {
     "message": "仅摘要：没有找到可公开获取的全文。"
   },
@@ -131,6 +188,24 @@
   "err_no_content": {
     "message": "此页面上没有找到文章内容。如果是登录页或预览页，请确认访问权限后刷新。"
   },
+  "err_abstract_only": {
+    "message": "这个页面上只有摘要，没有生成文件。通常是没有这篇文章的访问权限：请在校园网或机构 VPN 里刷新后再试。"
+  },
+  "abstractOnlyPublisher": {
+    "message": "在出版商页面查看全文："
+  },
+  "abstractOnlyPdfReady": {
+    "message": "有访问权限时，可以用上面的「快速解析 PDF」直接从 PDF 取全文。"
+  },
+  "abstractOnlyElsevierKey": {
+    "message": "这是 Elsevier 的文章：在设置里填 Elsevier API Key 后，在机构网络里可以直接取结构化全文。"
+  },
+  "btnExportAbstract": {
+    "message": "仍导出摘要"
+  },
+  "abstractOnlyToastHint": {
+    "message": "只需要摘要的话，点工具栏里的扩展图标，选「仍导出摘要」。"
+  },
   "err_content_unreachable": {
     "message": "无法读取此标签页。请刷新页面后重试。"
   },
@@ -175,6 +250,12 @@
   },
   "optPreferJatsHelp": {
     "message": "先尝试结构化全文（JATS XML）：开放获取文章从 Europe PMC 获取，Frontiers 用出版商自己的 XML。失败或超时则改用当前页面。"
+  },
+  "optFindOpenVersions": {
+    "message": "只有摘要时查找免费版本"
+  },
+  "optFindOpenVersionsHelp": {
+    "message": "页面上只有摘要时，按 DOI 向 Unpaywall 和 bioRxiv / medRxiv 查询合法的免费全文（PMC 上的作者稿、预印本）。只发送 DOI。"
   },
   "optSectionLanguage": {
     "message": "通用"
@@ -266,8 +347,56 @@
   "pdfButtonTitle": {
     "message": "把这篇文章的 PDF 链接发给 {provider} 解析，结果下载为 ZIP"
   },
+  "btnPdfFast": {
+    "message": "快速解析 PDF"
+  },
+  "btnPdfFastTitle": {
+    "message": "在本页下载 PDF，读取文字层转成 Markdown：几秒完成，不发给任何服务；公式、表格、图片可能不完整"
+  },
+  "pdfFastWorking": {
+    "message": "正在本页读取 PDF 文字层…"
+  },
+  "pdfFastDone": {
+    "message": "已保存 {filename}（{pages} 页，来自 PDF 文字层）。"
+  },
+  "pdfFastErr_pdf_http": {
+    "message": "下载 PDF 失败：可能没有这篇文章的访问权限。"
+  },
+  "pdfFastErr_pdf_not_pdf": {
+    "message": "拿到的不是 PDF（可能是登录页或人机验证页）。请先在浏览器里打开一次 PDF，确认能看到再试。"
+  },
+  "pdfFastErr_pdf_too_large": {
+    "message": "PDF 超过 80 MB，没有解析。"
+  },
+  "pdfFastErr_pdf_timeout": {
+    "message": "下载 PDF 超时。"
+  },
+  "pdfFastErr_pdf_network": {
+    "message": "下载 PDF 失败（网络错误，或 PDF 在别的网站上、对方不允许读取）。"
+  },
+  "pdfFastErr_pdf_not_https": {
+    "message": "PDF 地址不是 https，没有下载。"
+  },
+  "pdfFastErr_pdf_no_text": {
+    "message": "这个 PDF 没有文字层（多半是扫描版），快速解析读不出内容，请用 PaddleOCR 解析。"
+  },
+  "pdfFastErr_pdf_parse": {
+    "message": "PDF 解析失败。"
+  },
+  "pdfFastErr_download_failed": {
+    "message": "保存文件失败。"
+  },
+  "pdfFastErr_content_unreachable": {
+    "message": "无法在本页运行，请刷新页面后再试。"
+  },
+  "pdfStateDownloading": {
+    "message": "正在用你的浏览器下载 PDF…"
+  },
   "pdfStateSubmitting": {
     "message": "正在把 PDF 链接发给 {provider}…"
+  },
+  "pdfStateUploading": {
+    "message": "正在把 PDF 上传给 {provider}…"
   },
   "pdfStateRunning": {
     "message": "{provider} 正在解析 PDF（{progress}%）。可以关闭弹窗，完成后会自动下载。"
@@ -324,7 +453,46 @@
     "message": "PDF 解析"
   },
   "optPdfHelp": {
-    "message": "页面没有可用全文时，可以用你自己的 Key 让第三方服务解析文章 PDF。填好 Key 后，弹窗会在带 PDF 链接的文章页显示「解析 PDF」。点击后会直接把 PDF 链接和 Key 发给所选服务，不再确认，所以只用于你有权分享给该服务的 PDF。"
+    "message": "页面没有可用全文时，可以用你自己的 Key 让第三方服务解析文章 PDF（排版完整，较慢）；只要文字的话，弹窗里的「快速解析 PDF」不需要 Key、不发给任何服务。填好 Key 后，弹窗会在带 PDF 的文章页显示「解析 PDF」，点击后直接把 PDF 和 Key 发给所选服务，不再确认，所以只用于你有权分享给该服务的 PDF。"
+  },
+  "optSectionPublisher": {
+    "message": "出版商全文接口"
+  },
+  "optPublisherHelp": {
+    "message": "填了 Elsevier API Key 后，ScienceDirect、Cell 等 Elsevier 文章页面上只有摘要时，会从 Elsevier 全文接口取结构化全文。是否给全文由 Elsevier 按你的网络判断：在订阅了的机构网络里（校园网、机构 VPN）才有全文。"
+  },
+  "optElsevierKey": {
+    "message": "Elsevier API Key"
+  },
+  "optElsevierKeyHelp": {
+    "message": "在 Elsevier 开发者网站免费申请。Key 只存在本浏览器，只发给 api.elsevier.com。"
+  },
+  "optElsevierNoKey": {
+    "message": "请先填写 Key。"
+  },
+  "optElsevierOk": {
+    "message": "Key 可用。"
+  },
+  "optElsevierErr_auth": {
+    "message": "Key 无效或没有开通全文接口。"
+  },
+  "optElsevierErr_quota": {
+    "message": "超过 Elsevier 的调用额度，请稍后再试。"
+  },
+  "optElsevierErr_unavailable": {
+    "message": "Elsevier 返回「服务不可用」：Key 不对时也是这个回答。请检查 Key；Key 没问题的话就是服务暂时不可用。"
+  },
+  "optElsevierErr_not_found": {
+    "message": "测试文章没找到，Key 可能可用，请在文章页上试一次。"
+  },
+  "optElsevierErr_timeout": {
+    "message": "连接 api.elsevier.com 超时。"
+  },
+  "optElsevierErr_network": {
+    "message": "连接 api.elsevier.com 失败。"
+  },
+  "optElsevierErr_http": {
+    "message": "Elsevier 接口返回错误，请稍后再试。"
   },
   "optPdfProvider": {
     "message": "PDF 解析服务"
@@ -336,7 +504,7 @@
     "message": "MinerU"
   },
   "optPdfNote_paddleocr": {
-    "message": "PaddleOCR（百度飞桨星河社区）会收到 PDF 链接和你的 Key，由它自己下载 PDF，结果文字和图片来自 *.bj.bcebos.com。有每日免费额度。"
+    "message": "PaddleOCR（百度飞桨星河社区）会收到 PDF 文件和你的 Key：PDF 先由你的浏览器下载（订阅文章也能用），下载不成功时改发 PDF 链接。结果文字和图片来自 *.bj.bcebos.com。有每日免费额度。"
   },
   "optPdfNote_mineru": {
     "message": "MinerU（OpenDataLab）会收到 PDF 链接和你的 Key，由它自己下载 PDF，结果 ZIP 来自 cdn-mineru.openxlab.org.cn。"

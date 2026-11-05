@@ -127,13 +127,70 @@ export const SITES = [
     },
     routes: ['jats', 'dom'],
   },
+  // 订阅出版商（2026-11-05 加入）：没有 Europe PMC 全文时用当前页面（有订阅权限时页面上就是全文）
+  {
+    id: 'wiley',
+    name: 'Wiley Online Library',
+    status: SITE_STATUS.SUPPORTED,
+    publisher: true,
+    // 学会期刊在子域名上（agupubs.onlinelibrary.wiley.com 等），页面结构相同
+    hosts: ['onlinelibrary.wiley.com', '*.onlinelibrary.wiley.com'],
+    // /doi/full/10.1002/x、/doi/10.1002/x、/doi/abs/10.1002/x；/doi/pdf、/doi/epdf 是 PDF 阅读器
+    article: (u) => {
+      const m = u.pathname.match(/^\/doi\/(?:(full|abs|abstract)\/)?(10\.\d{4,9}\/[^?#]+?)\/?$/);
+      return m ? { doi: normalizeDoi(m[2]) } : null;
+    },
+    routes: ['jats', 'dom'],
+  },
+  {
+    id: 'cell',
+    name: 'Cell Press',
+    status: SITE_STATUS.SUPPORTED,
+    publisher: true,
+    hosts: ['www.cell.com'],
+    // /cell/fulltext/S0092-8674(20)30229-4；DOI 不在地址里
+    article: (u) => (/^\/[\w-]+\/(?:fulltext|abstract)\/S[\dX-]+\(\d{2}\)[\dX-]+\/?$/i.test(decodeURIComponent(u.pathname)) ? {} : null),
+    routes: ['jats', 'dom'],
+  },
+  {
+    id: 'oup',
+    name: 'Oxford Academic',
+    status: SITE_STATUS.SUPPORTED,
+    publisher: true,
+    hosts: ['academic.oup.com'],
+    // /nar/article/49/D1/D480/6006196；/article-pdf/ 是 PDF
+    article: (u) => (/^\/[\w-]+\/article\/(?:[^/]+\/){1,6}\d+\/?$/.test(u.pathname) ? {} : null),
+    routes: ['jats', 'dom'],
+  },
+  {
+    id: 'tandf',
+    name: 'Taylor & Francis Online',
+    status: SITE_STATUS.SUPPORTED,
+    publisher: true,
+    hosts: ['www.tandfonline.com'],
+    article: (u) => {
+      const m = u.pathname.match(/^\/doi\/(?:(full|abs)\/)?(10\.\d{4,9}\/[^?#]+?)\/?$/);
+      return m ? { doi: normalizeDoi(m[2]) } : null;
+    },
+    routes: ['jats', 'dom'],
+  },
   // PRD §1.1 P1：只用来在弹窗里说明「计划支持」，不申请任何权限（识别靠点击图标时的 activeTab）
   { id: 'biorxiv', name: 'bioRxiv / medRxiv', status: SITE_STATUS.PLANNED, hosts: ['www.biorxiv.org', 'www.medrxiv.org'] },
-  { id: 'sciencedirect', name: 'ScienceDirect', status: SITE_STATUS.PLANNED, hosts: ['www.sciencedirect.com'] },
-  { id: 'cell', name: 'Cell Press', status: SITE_STATUS.PLANNED, hosts: ['www.cell.com'] },
-  { id: 'wiley', name: 'Wiley', status: SITE_STATUS.PLANNED, hosts: ['onlinelibrary.wiley.com'] },
-  { id: 'oup', name: 'Oxford Academic', status: SITE_STATUS.PLANNED, hosts: ['academic.oup.com'] },
-  { id: 'tandf', name: 'Taylor & Francis', status: SITE_STATUS.PLANNED, hosts: ['www.tandfonline.com'] },
+  // ScienceDirect：页面有人机验证，没法照着真实页面写正文适配器。只读题录（citation_*）和地址里的 PII，
+  // 正文来自 Elsevier 全文接口（用户填了 Key、在订阅的机构网络里）；没有 Key 时按「只有摘要」去找免费版本
+  {
+    id: 'sciencedirect',
+    name: 'ScienceDirect',
+    status: SITE_STATUS.SUPPORTED,
+    publisher: true,
+    hosts: ['www.sciencedirect.com'],
+    // /science/article/pii/S0092867420302294、/science/article/abs/pii/S…
+    article: (u) => {
+      const m = u.pathname.match(/^\/science\/article\/(?:abs\/)?pii\/(S?[\dX]{15,17})\/?$/i);
+      return m ? { pii: m[1].toUpperCase() } : null;
+    },
+    routes: ['jats', 'dom'],
+  },
 ];
 
 export const SUPPORTED_SITE_IDS = SITES.filter((s) => s.status === SITE_STATUS.SUPPORTED).map((s) => s.id);
@@ -193,4 +250,11 @@ export const SUPPORTED_PAGE_PATTERNS = [
   'https://www.mdpi.com/*',
   'https://journals.plos.org/*',
   'https://elifesciences.org/articles/*',
+  'https://onlinelibrary.wiley.com/doi/*',
+  'https://*.onlinelibrary.wiley.com/doi/*',
+  'https://www.cell.com/*/fulltext/*',
+  'https://www.cell.com/*/abstract/*',
+  'https://academic.oup.com/*',
+  'https://www.tandfonline.com/doi/*',
+  'https://www.sciencedirect.com/science/article/*',
 ];

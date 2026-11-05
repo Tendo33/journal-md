@@ -2,6 +2,8 @@
 // 职责：代 content script 请求 Europe PMC（跨域 + 超时）、下载 .md / ZIP、右键菜单和快捷键、安装后打开引导页、
 // PDF 解析任务（L3，默认关闭）。
 import { createJatsService, createDoiLookupService } from '../core/europepmc/client';
+import { createOpenVersionService } from '../core/oa/open-version';
+import { fetchElsevierXml, loadPublisherKeys, testElsevierKey } from '../core/elsevier/client';
 import { loadSettings, SETTINGS_KEY } from '../config/settings';
 import { resolveLanguage } from '../config/i18n';
 import { errorText } from '../ui/shared/result-text';
@@ -13,6 +15,7 @@ import { createActionRunner } from './run-action';
 import { isTrustedSender, isExtensionPageSender } from './message-guards';
 import { createPdfRunner } from './pdf-task';
 import { createPdfRegistry } from '../pdf/providers';
+import { downloadPagePdf } from '../pdf/page-pdf';
 import { saveDeliverable } from '@pdf-core/output/save.js';
 import { requirePaddleOriginRule, installPaddleOriginRuleListeners } from './paddle-origin-rule';
 import { scheduleReloadWhenIdle } from './dnr-reinit';
@@ -21,6 +24,8 @@ const log = (...args) => console.warn('[journal-md]', ...args);
 
 const jats = createJatsService({ fetchImpl: (...args) => fetch(...args) });
 const doiLookup = createDoiLookupService({ fetchImpl: (...args) => fetch(...args) });
+// 页面上只有摘要时找合法的免费全文（Unpaywall、bioRxiv / medRxiv）；PMC 版本复用上面的 JATS 服务和缓存
+const openVersions = createOpenVersionService({ fetchImpl: (...args) => fetch(...args), fetchJats: (pmcid) => jats.get(pmcid) });
 const getLanguage = async () => resolveLanguage((await loadSettings()).language);
 const menus = createMenuBuilder({ menus: chrome.contextMenus, runtime: chrome.runtime, getLanguage, log });
 const runner = createActionRunner({
@@ -63,6 +68,8 @@ const pdf = createPdfRunner({
       throw e;
     }
   },
+  // 订阅文章：用用户自己的网络和登录状态先下载 PDF 再上传
+  downloadPdf: (url) => downloadPagePdf(url),
   badge: pdfBadge,
   log,
   getFilenameTemplate: async () => (await loadSettings()).filenameTemplate,
@@ -76,6 +83,12 @@ export function handleMessage(message, sender) {
     return jats.get(message.pmcid);
   case MSG.LOOKUP_DOI:
     return doiLookup.get(message.doi);
+  case MSG.FIND_OPEN_VERSION:
+    return openVersions.get(message.doi);
+  case MSG.FETCH_ELSEVIER:
+    return loadPublisherKeys().then((keys) => fetchElsevierXml({ doi: message.doi, pii: message.pii }, keys.elsevier, { fetchImpl: (...args) => fetch(...args) }));
+  case MSG.ELSEVIER_TEST:
+    return isExtensionPageSender(sender, chrome.runtime.id) ? testElsevierKey(message.key, { fetchImpl: (...args) => fetch(...args) }) : null;
   case MSG.DOWNLOAD:
     return downloadMarkdown({ markdown: message.markdown, filename: message.filename });
   case MSG.DOWNLOAD_ZIP:

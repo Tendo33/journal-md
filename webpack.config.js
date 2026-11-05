@@ -15,6 +15,8 @@ module.exports = (env, argv) => {
     entry: {
       background: './src/background/index.js',
       content: './src/content/index.js',
+      // PDF 快速解析：只在用户点按钮时注入（pdf.js 约 1 MB）
+      'pdf-fast': './src/content/pdf-fast.js',
       popup: './src/ui/popup/popup.js',
       options: './src/ui/options/options.js',
     },
@@ -40,6 +42,20 @@ module.exports = (env, argv) => {
     },
     performance: { hints: false },
     plugins: [
+      // 第三方库（pdf.js）里自带的 sourceMappingURL 注释指向不存在的 .map：去掉（verify:dist 不允许）
+      {
+        apply: (compiler) => compiler.hooks.thisCompilation.tap('StripSourceMapComments', (compilation) => {
+          compilation.hooks.processAssets.tap({ name: 'StripSourceMapComments', stage: webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE }, (assets) => {
+            for (const name of Object.keys(assets)) {
+              if (!name.endsWith('.js')) continue;
+              const src = assets[name].source().toString();
+              if (/[#@]\s*sourceMappingURL=/.test(src)) {
+                compilation.updateAsset(name, new webpack.sources.RawSource(src.replace(/^\s*\/\/[#@]\s*sourceMappingURL=.*$/gm, '')));
+              }
+            }
+          });
+        }),
+      },
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(mode),
         __BUILD_TARGET__: JSON.stringify(target),

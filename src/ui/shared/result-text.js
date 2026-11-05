@@ -7,6 +7,25 @@ export function errorText(lang, error, extra = {}) {
   return text === key ? t(lang, 'err_unknown') : text;
 }
 
+/** 全文来自别处的免费版本：哪个版本、可能和正式发表版本不同 */
+export function openVersionText(lang, n) {
+  if (n.kind === 'preprint') {
+    return t(lang, 'noticeOpenPreprint', { server: n.server === 'medrxiv' ? 'medRxiv' : 'bioRxiv', version: n.version ? ` v${n.version}` : '' });
+  }
+  return t(lang, n.version === 'acceptedVersion' ? 'noticeOpenPmcAccepted' : 'noticeOpenPmc');
+}
+
+/** 弹窗里列出的免费版本链接文字 */
+export function openLinkText(lang, l) {
+  const where = l.kind === 'arxiv' ? 'arXiv' : l.kind === 'preprint' ? (l.repository || 'bioRxiv') : (l.repository || hostOf(l.url));
+  const version = t(lang, `openVersion_${l.version || 'unknown'}`);
+  return t(lang, l.kind === 'arxiv' ? 'openLinkArxiv' : 'openLink', { where, version: version.startsWith('openVersion_') ? '' : version });
+}
+
+function hostOf(u) {
+  try { return new URL(u).hostname.replace(/^www\./, ''); } catch (_) { return ''; }
+}
+
 /** @returns {{status:string, notes:string[], route?:string}} */
 export function describeResult(result, lang, action) {
   if (!result || !result.ok) return { status: errorText(lang, result && result.error, result || {}), notes: [] };
@@ -28,12 +47,20 @@ export function describeResult(result, lang, action) {
       notes.push(t(lang, 'noticePubmedFulltext', { pmcid: (result.meta && result.meta.pmcid) || '' }));
     } else if (n.code === 'equation_image') {
       notes.push(t(lang, 'noticeEquationImage'));
+    } else if (n.code === 'elsevier_fulltext') {
+      notes.push(t(lang, 'noticeElsevierFulltext'));
+    } else if (n.code === 'elsevier_fallback') {
+      notes.push(t(lang, ['not_entitled', 'auth', 'quota', 'unavailable'].includes(n.reason) ? `noticeElsevier_${n.reason}` : 'noticeElsevier_other'));
+    } else if (n.code === 'open_version') {
+      notes.push(openVersionText(lang, n));
     } else if (n.code === 'abstract_only') {
       notes.push(t(lang, 'noticeAbstractOnly'));
     }
   }
   let route = t(lang, 'routeUsedDom');
-  if (result.route === 'jats-europepmc') route = t(lang, 'routeUsedJats');
+  if (result.route === 'jats-preprint') route = t(lang, 'routeUsedPreprint');
+  else if (result.route === 'xml-elsevier') route = t(lang, 'routeUsedElsevier');
+  else if (result.route === 'jats-europepmc') route = t(lang, 'routeUsedJats');
   else if (/^jats-/.test(result.route || '')) route = t(lang, 'routeUsedSiteXml');
   return { status, notes, route };
 }

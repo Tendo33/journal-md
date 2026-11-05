@@ -22,8 +22,19 @@ export function pdfStatusText(lang, task) {
   if (!task || !task.state) return '';
   const p = { provider: providerLabel(task.provider) };
   switch (task.state) {
+  case 'downloading':
+    return t(lang, 'pdfStateDownloading', p);
+  case 'fast':
+    return t(lang, 'pdfFastWorking');
+  case 'fast_done':
+    return t(lang, 'pdfFastDone', { filename: task.filename || '', pages: task.pages || 0 });
+  case 'fast_failed': {
+    const key = `pdfFastErr_${task.error}`;
+    const text = t(lang, key);
+    return text === key ? t(lang, 'pdfFastErr_pdf_parse') : text;
+  }
   case 'checking': case 'submitting':
-    return t(lang, 'pdfStateSubmitting', p);
+    return t(lang, task.uploaded ? 'pdfStateUploading' : 'pdfStateSubmitting', p);
   case 'running':
     return t(lang, 'pdfStateRunning', { ...p, progress: Math.max(10, Math.min(99, Number(task.progress) || 10)) });
   case 'done':
