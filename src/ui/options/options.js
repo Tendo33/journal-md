@@ -131,6 +131,7 @@ async function main() {
   $('filename').value = settings.filenameTemplate;
   $('includeImages').checked = settings.includeImages;
   $('preferJats').checked = settings.preferJats;
+  $('findOpenVersions').checked = settings.findOpenVersions;
   $('showFab').checked = settings.showFab;
   document.querySelectorAll('input[name="language"]').forEach((r) => { r.checked = r.value === settings.language; });
   render();
@@ -143,6 +144,7 @@ async function main() {
   });
   $('includeImages').addEventListener('change', (e) => update({ includeImages: e.target.checked }));
   $('preferJats').addEventListener('change', (e) => update({ preferJats: e.target.checked }));
+  $('findOpenVersions').addEventListener('change', (e) => update({ findOpenVersions: e.target.checked }));
   $('showFab').addEventListener('change', (e) => update({ showFab: e.target.checked }));
   document.querySelectorAll('input[name="pdfProvider"]').forEach((r) => r.addEventListener('change', onPdfProvider));
   let tokenTimer = null;

@@ -51,7 +51,7 @@
 
 只转换你本来就能看到的页面：不绕过付费墙，不批量抓取。订阅文章在你有权限时也能从当前页面导出。
 
-页面上只有摘要时（通常是没有访问权限）默认不生成文件，弹窗会给出全文链接和 PDF 解析入口；只需要题录和摘要时，点「仍导出摘要」（导出的文件标记 `abstract_only`）。
+页面上只有摘要时（通常是没有访问权限），插件会按 DOI 向 **Unpaywall** 和 **bioRxiv / medRxiv** 查合法的免费版本：PMC 上的作者稿、bioRxiv / medRxiv 预印本能取到结构化全文，直接导出（题录仍用期刊页的，文件开头注明全文来自哪个版本）；其他免费版本（arXiv 预印本、机构知识库的 PDF）在弹窗里列出链接，PDF 可以一键解析，arXiv 预印本请用 [arXiv to Markdown](https://github.com/Tendo33/arxiv-md) 导出。都没有时不生成文件；只需要题录和摘要，点「仍导出摘要」（导出的文件标记 `abstract_only`）。不使用 Sci-Hub、LibGen 一类的影子图书馆。
 
 ## 安装
 
@@ -84,6 +84,7 @@
 | 包含图片 | 关闭后只保留图注 | 开启 |
 | 在文章页显示 Markdown 按钮 | 右下角 M↓ 按钮 | 开启 |
 | 优先使用结构化全文 | 先取 Europe PMC JATS（Frontiers 用自己的 XML），失败或超时用当前页面 | 开启 |
+| 只有摘要时查找免费版本 | 按 DOI 查 Unpaywall 和 bioRxiv / medRxiv（只发 DOI） | 开启 |
 | 界面语言 | 跟随浏览器 / 中文 / English | 跟随浏览器 |
 | PDF 解析 | 选择 PaddleOCR（默认）或 MinerU，填写并测试 Key；Key 只存在本浏览器 | PaddleOCR，未填 Key |
 | 站点 | 逐个关闭不想导出的站点 | 全部开启 |
@@ -96,7 +97,7 @@
 
 ## 隐私
 
-打开弹窗、加载页面时不发任何请求。导出时才会向 Europe PMC 请求开放获取全文（只发 PMCID 或 DOI，不带 Cookie 和页面地址）。PDF 解析只在你填了 Key 并点击解析时发生，只发给你选的那一个服务。所有权限都在安装时授予，使用中不会再弹出权限请求。详见 [PRIVACY.md](./PRIVACY.md)，权限说明见 [docs/permissions.md](./docs/permissions.md)。
+打开弹窗、加载页面时不发任何请求。导出时才会向 Europe PMC 请求开放获取全文（只发 PMCID 或 DOI，不带 Cookie 和页面地址）；页面上只有摘要时，再按 DOI 查 Unpaywall 和 bioRxiv / medRxiv。PDF 解析只在你填了 Key 并点击解析时发生，只发给你选的那一个服务。所有权限都在安装时授予，使用中不会再弹出权限请求。详见 [PRIVACY.md](./PRIVACY.md)，权限说明见 [docs/permissions.md](./docs/permissions.md)。
 
 ## 已知限制
 

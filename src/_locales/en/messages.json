@@ -80,6 +80,42 @@
   "routeUsedDom": {
     "message": "Source: this page."
   },
+  "routeUsedPreprint": {
+    "message": "Source: bioRxiv / medRxiv preprint (structured full text)."
+  },
+  "noticeOpenPreprint": {
+    "message": "This page only shows the abstract; the full text comes from the {server} preprint{version} and may differ from the published version."
+  },
+  "noticeOpenPmc": {
+    "message": "This page only shows the abstract; the full text comes from a free copy in PubMed Central."
+  },
+  "noticeOpenPmcAccepted": {
+    "message": "This page only shows the abstract; the full text comes from the author manuscript in PubMed Central and may differ from the published version."
+  },
+  "openLink": {
+    "message": "{where} ({version}):"
+  },
+  "openLinkArxiv": {
+    "message": "arXiv preprint: export it with arXiv to Markdown"
+  },
+  "openVersion_submittedVersion": {
+    "message": "preprint"
+  },
+  "openVersion_acceptedVersion": {
+    "message": "accepted manuscript"
+  },
+  "openVersion_publishedVersion": {
+    "message": "published version"
+  },
+  "openVersionsTitle": {
+    "message": "Free versions found:"
+  },
+  "openLinkOpen": {
+    "message": "Open"
+  },
+  "btnParseThisPdf": {
+    "message": "Parse this PDF"
+  },
   "noticeAbstractOnly": {
     "message": "Abstract only: no open full text was found."
   },
@@ -193,6 +229,12 @@
   },
   "optPreferJatsHelp": {
     "message": "Try structured full text (JATS XML) first: from Europe PMC for open-access articles, or the publisher's own XML on Frontiers. If that fails or times out, the page itself is used."
+  },
+  "optFindOpenVersions": {
+    "message": "Look for a free version when only the abstract is shown"
+  },
+  "optFindOpenVersionsHelp": {
+    "message": "When a page only shows the abstract, ask Unpaywall and bioRxiv / medRxiv by DOI for a legal free full text (author manuscripts in PMC, preprints). Only the DOI is sent."
   },
   "optSectionLanguage": {
     "message": "General"

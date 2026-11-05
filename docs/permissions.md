@@ -7,7 +7,7 @@
 所有权限都在安装时授予，Chrome / Edge 包和 Firefox 包相同。**没有 `optional_permissions`、`optional_host_permissions`**，扩展在使用中从不调用 `permissions.request`（单测扫描 `src/`：没有 `permissions.request`，也不引用 vendored 内核里的权限申请函数；e2e 记录弹窗里的调用次数为 0）。
 
 - permissions：`activeTab`、`storage`、`downloads`、`contextMenus`、`clipboardWrite`、`scripting`、`declarativeNetRequestWithHostAccess`
-- host_permissions（18 个）：
+- host_permissions（22 个）：
 
 | host | 用途 |
 |---|---|
@@ -21,6 +21,9 @@
 | `https://www.mdpi.com/*` | MDPI 文章页 |
 | `https://journals.plos.org/*` | PLOS 文章页 |
 | `https://elifesciences.org/*` | eLife 文章页 |
+| `https://api.unpaywall.org/*` | 页面上只有摘要时按 DOI 查合法的免费版本（PMC、预印本、机构知识库）。只发 DOI 和 Unpaywall 要求的联系邮箱，不带 Cookie 和页面地址；设置里可关 |
+| `https://api.biorxiv.org/*` | 同上：期刊 DOI → bioRxiv / medRxiv 预印本 DOI 和全文 XML 地址 |
+| `https://www.biorxiv.org/*`、`https://www.medrxiv.org/*` | 下载预印本的 JATS XML（`/content/early/….source.xml`）。这两个站点还没有页面适配器，不注入 content script |
 | `https://paddleocr.aistudio-app.com/*` | PDF 解析（PaddleOCR）：提交任务、轮询。只在选了 PaddleOCR、填了 Token 并点「解析 PDF」时请求 |
 | `https://*.bj.bcebos.com/*` | 下载 PaddleOCR 的结果 JSONL 和图片 |
 | `https://mineru.net/*` | PDF 解析（MinerU）：提交任务、轮询 |

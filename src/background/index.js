@@ -2,6 +2,7 @@
 // 职责：代 content script 请求 Europe PMC（跨域 + 超时）、下载 .md / ZIP、右键菜单和快捷键、安装后打开引导页、
 // PDF 解析任务（L3，默认关闭）。
 import { createJatsService, createDoiLookupService } from '../core/europepmc/client';
+import { createOpenVersionService } from '../core/oa/open-version';
 import { loadSettings, SETTINGS_KEY } from '../config/settings';
 import { resolveLanguage } from '../config/i18n';
 import { errorText } from '../ui/shared/result-text';
@@ -22,6 +23,8 @@ const log = (...args) => console.warn('[journal-md]', ...args);
 
 const jats = createJatsService({ fetchImpl: (...args) => fetch(...args) });
 const doiLookup = createDoiLookupService({ fetchImpl: (...args) => fetch(...args) });
+// 页面上只有摘要时找合法的免费全文（Unpaywall、bioRxiv / medRxiv）；PMC 版本复用上面的 JATS 服务和缓存
+const openVersions = createOpenVersionService({ fetchImpl: (...args) => fetch(...args), fetchJats: (pmcid) => jats.get(pmcid) });
 const getLanguage = async () => resolveLanguage((await loadSettings()).language);
 const menus = createMenuBuilder({ menus: chrome.contextMenus, runtime: chrome.runtime, getLanguage, log });
 const runner = createActionRunner({
@@ -79,6 +82,8 @@ export function handleMessage(message, sender) {
     return jats.get(message.pmcid);
   case MSG.LOOKUP_DOI:
     return doiLookup.get(message.doi);
+  case MSG.FIND_OPEN_VERSION:
+    return openVersions.get(message.doi);
   case MSG.DOWNLOAD:
     return downloadMarkdown({ markdown: message.markdown, filename: message.filename });
   case MSG.DOWNLOAD_ZIP:

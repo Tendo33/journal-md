@@ -80,6 +80,42 @@
   "routeUsedDom": {
     "message": "来源：当前页面。"
   },
+  "routeUsedPreprint": {
+    "message": "来源：bioRxiv / medRxiv 预印本（结构化全文）。"
+  },
+  "noticeOpenPreprint": {
+    "message": "本页只有摘要，全文来自 {server} 预印本{version}，可能与正式发表的版本不同。"
+  },
+  "noticeOpenPmc": {
+    "message": "本页只有摘要，全文来自 PubMed Central 上的免费版本。"
+  },
+  "noticeOpenPmcAccepted": {
+    "message": "本页只有摘要，全文来自 PubMed Central 上的作者接收稿，可能与正式发表的版本有出入。"
+  },
+  "openLink": {
+    "message": "{where}（{version}）："
+  },
+  "openLinkArxiv": {
+    "message": "arXiv 预印本：用 arXiv to Markdown 导出"
+  },
+  "openVersion_submittedVersion": {
+    "message": "预印本"
+  },
+  "openVersion_acceptedVersion": {
+    "message": "作者接收稿"
+  },
+  "openVersion_publishedVersion": {
+    "message": "正式版"
+  },
+  "openVersionsTitle": {
+    "message": "找到这些免费版本："
+  },
+  "openLinkOpen": {
+    "message": "打开"
+  },
+  "btnParseThisPdf": {
+    "message": "解析这个 PDF"
+  },
   "noticeAbstractOnly": {
     "message": "仅摘要：没有找到可公开获取的全文。"
   },
@@ -193,6 +229,12 @@
   },
   "optPreferJatsHelp": {
     "message": "先尝试结构化全文（JATS XML）：开放获取文章从 Europe PMC 获取，Frontiers 用出版商自己的 XML。失败或超时则改用当前页面。"
+  },
+  "optFindOpenVersions": {
+    "message": "只有摘要时查找免费版本"
+  },
+  "optFindOpenVersionsHelp": {
+    "message": "页面上只有摘要时，按 DOI 向 Unpaywall 和 bioRxiv / medRxiv 查询合法的免费全文（PMC 上的作者稿、预印本）。只发送 DOI。"
   },
   "optSectionLanguage": {
     "message": "通用"

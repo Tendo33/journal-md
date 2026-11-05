@@ -31,10 +31,12 @@ Nothing is requested when a page loads or when you open the popup. The in-page b
 | `https://www.ebi.ac.uk/europepmc/` | On Springer/BMC, Nature, Frontiers, MDPI, PLOS and eLife pages, when "Prefer structured full text" is on (default) | The article's DOI, to look up its PMCID; then the PMCID if the article is open access |
 | `https://www.frontiersin.org/` | On Frontiers pages, when "Prefer structured full text" is on | A request for the article's own XML file, made from the page itself like any other request the page makes |
 | `https://www.mdpi.com/` | On MDPI pages | One request for the article page you are viewing (same address), made from the page itself like a reload, because the site re-renders its formulas after loading; nothing else is sent |
+| `https://api.unpaywall.org/` (Unpaywall, OurResearch) | Only when the page shows just the abstract and "Look for a free version" is on (default) | The article's DOI and the extension's contact address (`Tendo33@users.noreply.github.com`, required by Unpaywall), to find legal free copies (PMC, preprints, institutional repositories) |
+| `https://api.biorxiv.org/`, `https://www.biorxiv.org/`, `https://www.medrxiv.org/` (Cold Spring Harbor Laboratory) | Same as above | The article's DOI, to find its bioRxiv / medRxiv preprint; then a request for that preprint's full-text XML |
 | The sites hosting the article's images | Only for "Download ZIP" with images included | Requests for the images shown on the page, without cookies. Images on hosts the extension has access to (the supported sites and the two image servers below) may be fetched by the extension's background page when the image server does not allow it otherwise |
 | `media.springernature.com`, PLOS's image storage (`corpus-prod.…r2.cloudflarestorage.com`) | Only for "Download ZIP" on Springer / BMC / Nature / PLOS articles | Requests for the article's images, without cookies. Access to these two hosts is granted when you install the extension; nothing is asked when you export. If an image still cannot be downloaded, the ZIP is saved anyway, that image keeps its web link in article.md, and a message names the host |
 
-Requests to Europe PMC carry no cookies and no page address. When Europe PMC cannot be reached, is slow, or has no open-access copy, the extension uses the page you are viewing instead. Turning off "Prefer structured full text" stops all Europe PMC requests except the PubMed full-text lookup for articles that show a PMCID.
+Requests to Europe PMC carry no cookies and no page address. When Europe PMC cannot be reached, is slow, or has no open-access copy, the extension uses the page you are viewing instead. Turning off "Prefer structured full text" stops all Europe PMC requests except the PubMed full-text lookup for articles that show a PMCID. Requests to Unpaywall and bioRxiv / medRxiv carry no cookies and no page address; turn off "Look for a free version" to stop them. Links to free versions found this way are shown in the popup; the extension opens or parses them only when you click.
 
 ### PDF parsing (optional, used only when you set it up)
 
@@ -53,7 +55,8 @@ With MinerU, a PDF that needs a login or a subscription usually cannot be downlo
 
 - No project server, no analytics, no tracking, no account.
 - Its script runs only on the supported sites listed below and reads a page only when you export, copy or parse it (the in-page button only looks at the page address). It does not follow links to fetch paywalled content.
-- It does not send your browsing history, cookies or page addresses to Europe PMC or to the PDF services.
+- It does not send your browsing history, cookies or page addresses to Europe PMC, Unpaywall, bioRxiv / medRxiv or the PDF services.
+- It does not use shadow libraries (Sci-Hub, Library Genesis, Anna's Archive and the like); free versions come only from legal open-access sources.
 - It does not include anyone's API keys; PDF parsing uses only the key you enter.
 
 ## Permissions
@@ -67,6 +70,7 @@ With MinerU, a PDF that needs a login or a subscription usually cannot be downlo
 | `clipboardWrite` | Copy Markdown |
 | `https://pmc.ncbi.nlm.nih.gov/*`, `https://pubmed.ncbi.nlm.nih.gov/*`, `https://europepmc.org/*`, `https://link.springer.com/*`, `https://*.biomedcentral.com/*`, `https://*.springeropen.com/*`, `https://www.nature.com/*`, `https://www.frontiersin.org/*`, `https://www.mdpi.com/*`, `https://journals.plos.org/*`, `https://elifesciences.org/*` | Run the converter on article pages of these sites (and fetch images from them for ZIP files) |
 | `https://www.ebi.ac.uk/europepmc/*` | Europe PMC REST API (full text and DOI lookup), only on export |
+| `https://api.unpaywall.org/*`, `https://api.biorxiv.org/*`, `https://www.biorxiv.org/*`, `https://www.medrxiv.org/*` | Look for a legal free version (Unpaywall; bioRxiv / medRxiv preprint and its full-text XML), only when you export a page that shows just the abstract |
 | `https://paddleocr.aistudio-app.com/*`, `https://*.bj.bcebos.com/*` | PDF parsing with PaddleOCR. Contacted only when you click "Parse PDF" with PaddleOCR selected and a key entered |
 | `https://mineru.net/*`, `https://cdn-mineru.openxlab.org.cn/*` | PDF parsing with MinerU. Contacted only when you click "Parse PDF" with MinerU selected and a key entered |
 | `https://media.springernature.com/*` | Download the images of Springer Link / BMC / Nature articles into the ZIP (this image server does not allow web pages to download them). Contacted only for "Download ZIP" |

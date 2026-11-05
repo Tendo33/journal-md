@@ -1,5 +1,5 @@
 import { quickCheck, emptyText, routeItems, shortcutText, exportShortcut } from '@/ui/popup/popup-view';
-import { describeResult, errorText } from '@/ui/shared/result-text';
+import { describeResult, errorText, openLinkText } from '@/ui/shared/result-text';
 import { t, resolveLanguage, MESSAGES } from '@config/i18n';
 import { normalizeSettings, saveSettings, loadSettings, DEFAULT_SETTINGS } from '@config/settings';
 
@@ -83,6 +83,14 @@ describe('describeResult', () => {
     const a = describeResult({ ok: true, abstractOnly: true, markdown: 'abc', route: 'dom-pubmed', notices: [{ code: 'jats_fallback', reason: 'not_available' }, { code: 'abstract_only' }] }, 'zh', 'copy');
     expect(a.status).toBe('已复制 3 个字符。');
     expect(a.notes).toEqual(['Europe PMC 上没有这篇文章的开放获取全文。', '仅摘要：没有找到可公开获取的全文。']);
+  });
+  test('full text from a free version elsewhere', () => {
+    const r = describeResult({ ok: true, filename: 'a.md', route: 'jats-preprint', notices: [{ code: 'open_version', kind: 'preprint', server: 'medrxiv', version: '3' }] }, 'zh', 'download');
+    expect(r.route).toBe('来源：bioRxiv / medRxiv 预印本（结构化全文）。');
+    expect(r.notes).toEqual(['本页只有摘要，全文来自 medRxiv 预印本 v3，可能与正式发表的版本不同。']);
+    expect(describeResult({ ok: true, filename: 'a.md', route: 'jats-europepmc', notices: [{ code: 'open_version', kind: 'pmc', version: 'acceptedVersion' }] }, 'en', 'download').notes[0]).toContain('author manuscript in PubMed Central');
+    expect(openLinkText('zh', { kind: 'pdf', url: 'https://www.repo.example.edu/x.pdf', version: 'acceptedVersion', repository: '' })).toBe('repo.example.edu（作者接收稿）：');
+    expect(openLinkText('en', { kind: 'arxiv', url: 'https://arxiv.org/abs/1' })).toBe('arXiv preprint: export it with arXiv to Markdown');
   });
   test('errors', () => {
     expect(describeResult({ ok: false, error: 'download_failed' }, 'en', 'download').status).toBe(t('en', 'err_download_failed'));

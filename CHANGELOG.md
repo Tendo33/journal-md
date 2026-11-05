@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+- When a page only shows the abstract, look up a legal free version by DOI: Unpaywall (PMC copies, repositories, arXiv) and bioRxiv / medRxiv (preprint of the published article). PMC copies and bioRxiv / medRxiv preprints are exported as structured full text, with the journal page's citation and a note naming the version (`fulltext_source`, `fulltext_version` in the front matter, `source_route: jats-preprint` for preprints). Other free versions are listed in the popup; repository PDFs can be parsed with one click, arXiv preprints link to arXiv to Markdown. New setting "Look for a free version when only the abstract is shown" (on by default). New host permissions: `api.unpaywall.org`, `api.biorxiv.org`, `www.biorxiv.org`, `www.medrxiv.org`.
+
 ### Changed
 - A page that only shows the abstract (usually an article you don't have access to) no longer produces a file silently. The popup says why and links to the full text and to PDF parsing; "Export abstract anyway" still exports the abstract (marked `abstract_only`). The in-page button and shortcut show the same message.
 - PDF parsing with PaddleOCR downloads the article PDF in your browser first and uploads the file, so subscription PDFs you have access to (campus network, institutional sign-in) can be parsed; the service could not download them from the link. If the download fails, the link is sent as before. MinerU is unchanged (link only).

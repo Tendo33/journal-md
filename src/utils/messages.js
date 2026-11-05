@@ -5,6 +5,7 @@ export const MSG = Object.freeze({
   EXPORT: 'JMD_EXPORT', // popup / background → content：导出；action: none | download | copy
   FETCH_JATS: 'JMD_FETCH_JATS', // content → background：取 Europe PMC fullTextXML
   LOOKUP_DOI: 'JMD_LOOKUP_DOI', // content → background：出版商页面按 DOI 查 Europe PMC 的 PMCID（只在导出时）
+  FIND_OPEN_VERSION: 'JMD_FIND_OPEN_VERSION', // content → background：本页只有摘要，按 DOI 找合法的免费全文（Unpaywall、bioRxiv / medRxiv）
   DOWNLOAD: 'JMD_DOWNLOAD', // content → background：下载 .md
   DOWNLOAD_ZIP: 'JMD_DOWNLOAD_ZIP', // content → background：下载 ZIP（base64）
   PDF_START: 'JMD_PDF_START', // popup → background：开始 PDF 解析（带本次的 OA 确认）

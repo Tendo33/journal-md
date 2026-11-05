@@ -25,6 +25,11 @@ const ALLOWED_HOST_PERMISSIONS = [
   'https://www.mdpi.com/*',
   'https://journals.plos.org/*',
   'https://elifesciences.org/*',
+  // 页面上只有摘要时找合法的免费全文（Simon 2026-11-05：安装时授予）：Unpaywall 查询，bioRxiv / medRxiv 对应关系和预印本 JATS
+  'https://api.unpaywall.org/*',
+  'https://api.biorxiv.org/*',
+  'https://www.biorxiv.org/*',
+  'https://www.medrxiv.org/*',
   'https://paddleocr.aistudio-app.com/*', // PaddleOCR（星河社区）任务接口
   'https://*.bj.bcebos.com/*', // PaddleOCR 结果 JSONL 和图片
   'https://mineru.net/*', // MinerU 任务接口

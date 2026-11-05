@@ -1,7 +1,7 @@
 import { loadSettings } from '../../config/settings';
 import { applyI18n, resolveLanguage, t } from '../../config/i18n';
 import { MSG, ACTIONS } from '../../utils/messages';
-import { describeResult, errorText } from '../shared/result-text';
+import { describeResult, errorText, openLinkText } from '../shared/result-text';
 import { quickCheck, emptyText, routeItems, shortcutText, exportShortcut } from './popup-view';
 import { loadPdfSettings, pdfReady, PDF_TASK_KEY } from '../../pdf/settings';
 import { pdfStatusText, providerLabel } from '../shared/pdf-text';
@@ -42,7 +42,7 @@ function setStatus(lines) {
   statusFrame = requestAnimationFrame(() => {
     if (seq !== statusSeq) return;
     el.textContent = '';
-    for (const { text, cls, href, button } of lines) {
+    for (const { text, cls, href, linkText, button } of lines) {
       if (!text && !button) continue;
       const p = document.createElement('p');
       p.className = cls;
@@ -53,7 +53,7 @@ function setStatus(lines) {
         a.href = href;
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
-        a.textContent = t(lang, 'noticeFullTextLink');
+        a.textContent = linkText || t(lang, 'noticeFullTextLink');
         p.append(a);
       }
       if (button) {
@@ -136,22 +136,26 @@ function setPdfStatus(task) {
 async function setupPdf() {
   pdfSettings = await loadPdfSettings();
   const pdf = pageInfo && pageInfo.pdf;
-  if (!pdfReady(pdfSettings) || !pdf || !pdf.url) return;
+  if (!pdfReady(pdfSettings)) return;
   const name = providerLabel(pdfSettings.provider);
   $('pdf').textContent = t(lang, 'pdfButton', { provider: name });
   $('pdf').title = t(lang, 'pdfButtonTitle', { provider: name });
-  show('pdf-row', true);
+  // 本页没有 PDF 时不显示按钮；解析别处免费版本的 PDF 时只显示状态行
+  $('pdf').hidden = !(pdf && pdf.url);
   // 弹窗重新打开时显示这一页上次任务的状态
   const got = await chrome.storage.local.get(PDF_TASK_KEY);
   const task = got && got[PDF_TASK_KEY];
+  show('pdf-row', !$('pdf').hidden || !!(task && task.pageUrl === tab.url));
   if (task && task.pageUrl === tab.url) setPdfStatus(task);
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local' && changes[PDF_TASK_KEY] && changes[PDF_TASK_KEY].newValue && changes[PDF_TASK_KEY].newValue.pageUrl === tab.url) setPdfStatus(changes[PDF_TASK_KEY].newValue);
   });
 }
 
-async function startPdf() {
-  const pdf = pageInfo.pdf;
+/** pdfUrl：别处免费版本的 PDF（默认解析本页的 PDF） */
+async function startPdf(pdfUrl) {
+  const pdf = typeof pdfUrl === 'string' ? { url: pdfUrl, license: '' } : pageInfo.pdf;
+  show('pdf-row', true);
   $('pdf').setAttribute('aria-disabled', 'true');
   setPdfStatus({ state: 'checking', provider: pdfSettings.provider });
   let r;
@@ -181,6 +185,13 @@ function onPdfClick() {
 function abstractOnlyLines(result, action) {
   const lines = [{ text: errorText(lang, 'abstract_only'), cls: 'alert err' }];
   if (result.fullTextUrl) lines.push({ text: t(lang, 'abstractOnlyPublisher'), cls: 'note', href: result.fullTextUrl });
+  // 别处的免费版本（Unpaywall、bioRxiv / medRxiv）：链接；PDF 在填了 Key 时可以直接解析
+  const open = (result.openVersions || []).slice(0, 4);
+  if (open.length) lines.push({ text: t(lang, 'openVersionsTitle'), cls: 'note' });
+  for (const l of open) {
+    const canParse = l.pdfUrl && pdfSettings && pdfReady(pdfSettings);
+    lines.push({ text: openLinkText(lang, l), cls: 'note', href: l.url, linkText: t(lang, 'openLinkOpen'), button: canParse ? { label: t(lang, 'btnParseThisPdf'), onClick: () => startPdf(l.pdfUrl) } : null });
+  }
   if (pageInfo && pageInfo.pdf && pageInfo.pdf.url) {
     lines.push({ text: t(lang, pdfSettings && pdfReady(pdfSettings) ? 'abstractOnlyPdfReady' : 'abstractOnlyPdfSetup'), cls: 'note' });
   }

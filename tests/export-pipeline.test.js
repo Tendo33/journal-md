@@ -247,3 +247,44 @@ test('QA JM-M2-06: a placeholder "undefined" author name from the page is droppe
   expect(r.markdown).toMatch(/^authors: \[Lagae L, .*Ceulemans B\]$/m);
   expect(r.markdown).not.toContain('undefined');
 });
+
+describe('only an abstract on the page → legal free version elsewhere', () => {
+  const PREPRINT = fs.readFileSync(path.join(__dirname, 'fixtures/jats/preprint-synthetic.xml'), 'utf8');
+  const source = { kind: 'preprint', server: 'biorxiv', doi: '10.1101/2024.01.01.000001', url: 'https://www.biorxiv.org/content/10.1101/2024.01.01.000001v2', version: '2', date: '2024-02-01' };
+
+  test('PubMed page: bioRxiv preprint JATS becomes the body; citation stays the published article', async () => {
+    const findOpenVersion = jest.fn(async () => ({ ok: true, xml: PREPRINT, route: 'jats-preprint', source, links: [] }));
+    const r = await exportArticle({ doc: html('pubmed-with-pmcid.html'), url: PUBMED_URL, fetchJats: notOa, services: { findOpenVersion }, now: NOW });
+    expect(findOpenVersion).toHaveBeenCalledWith('10.1186/s12711-025-00001-2');
+    expect(r).toMatchObject({ ok: true, route: 'jats-preprint', abstractOnly: false, meta: { doi: '10.1186/s12711-025-00001-2' } });
+    expect(r.notices).toContainEqual({ code: 'open_version', ...source });
+    expect(r.markdown).toContain('fulltext_source: "https://www.biorxiv.org/content/10.1101/2024.01.01.000001v2"');
+    expect(r.markdown).toContain('> **Full text from another version / 全文来自其他版本** — bioRxiv preprint v2 (2024-02-01)');
+    expect(r.markdown).toContain('## Methods');
+    expect(r.markdown).not.toMatch(/^abstract_only:/m);
+    expect(r.markdown).not.toContain('000001v1_fig1.tif');
+  });
+
+  test('a PMC copy must be the same article (DOI)', async () => {
+    const other = JATS.replace('10.1186/s12711-025-00001-2', '10.1/someone-else');
+    const findOpenVersion = jest.fn(async () => ({ ok: true, xml: other, route: 'jats-europepmc', source: { kind: 'pmc', pmcid: 'PMC9', url: 'https://x', version: 'acceptedVersion' }, links: [] }));
+    const r = await exportArticle({ doc: html('pubmed-with-pmcid.html'), url: PUBMED_URL, fetchJats: notOa, services: { findOpenVersion }, now: NOW });
+    expect(r).toMatchObject({ ok: false, error: 'abstract_only' });
+  });
+
+  test('links only → abstract-only failure carries them for the popup', async () => {
+    const links = [{ kind: 'arxiv', url: 'https://arxiv.org/abs/2401.01234', pdfUrl: '', version: 'submittedVersion', repository: '', license: '' }];
+    const findOpenVersion = jest.fn(async () => ({ ok: false, reason: 'links_only', links }));
+    const doc = html('europepmc-article.html');
+    doc.getElementById('fulltextcontent').remove();
+    const r = await exportArticle({ doc, url: 'https://europepmc.org/article/MED/33900001', fetchJats: notOa, services: { findOpenVersion }, now: NOW });
+    expect(r).toMatchObject({ ok: false, error: 'abstract_only', openVersions: links });
+  });
+
+  test('turned off in settings, or exporting the abstract on purpose: no lookup', async () => {
+    const findOpenVersion = jest.fn();
+    await exportArticle({ doc: html('pubmed-with-pmcid.html'), url: PUBMED_URL, fetchJats: notOa, services: { findOpenVersion }, settings: { findOpenVersions: false }, now: NOW });
+    await exportArticle({ doc: html('pubmed-with-pmcid.html'), url: PUBMED_URL, fetchJats: notOa, services: { findOpenVersion }, now: NOW, allowAbstract: true });
+    expect(findOpenVersion).not.toHaveBeenCalled();
+  });
+});

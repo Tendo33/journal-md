@@ -51,7 +51,7 @@ Export a full-text article page from PubMed Central, Nature, Frontiers and other
 
 It converts only pages you can already read: no paywall bypassing, no bulk crawling. Subscription articles you have access to can be exported from the page.
 
-When a page only shows the abstract (usually because you don't have access), no file is created by default: the popup links to the full text and to PDF parsing, and "Export abstract anyway" exports the abstract (marked `abstract_only`).
+When a page only shows the abstract (usually because you don't have access), the extension asks **Unpaywall** and **bioRxiv / medRxiv** by DOI for a legal free version. Author manuscripts in PMC and bioRxiv / medRxiv preprints have structured full text and are exported directly (citation from the journal page; the file says which version the text comes from). Other free versions (arXiv preprints, repository PDFs) are listed in the popup; a PDF can be parsed with one click, and arXiv preprints are best exported with [arXiv to Markdown](https://github.com/Tendo33/arxiv-md). If nothing is found, no file is created; "Export abstract anyway" exports the abstract (marked `abstract_only`). Shadow libraries such as Sci-Hub or LibGen are never used.
 
 ## Install
 

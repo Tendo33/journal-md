@@ -19,6 +19,7 @@ export const NOTICE = Object.freeze({
   ABSTRACT_ONLY: 'abstract_only',
   PUBMED_FULLTEXT: 'pubmed_fulltext', // PubMed 页通过 Europe PMC 拿到了全文
   EQUATION_IMAGE: 'equation_image',
+  OPEN_VERSION: 'open_version', // 本页只有摘要，全文来自别处的免费版本；kind / version / server / url
 });
 
 export function errorCode(e) {

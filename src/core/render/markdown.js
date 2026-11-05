@@ -5,6 +5,8 @@ import { renderInlines, escapeLineStart, texForMarkdown, unwrapFootnoteGroups, e
 import { renderTableBody } from './table';
 
 export const ABSTRACT_ONLY_MARKER = 'Abstract only / 仅摘要';
+export const OTHER_VERSION_MARKER = 'Full text from another version / 全文来自其他版本';
+const VERSION_TEXT = { submittedVersion: 'preprint', acceptedVersion: 'accepted manuscript', publishedVersion: 'published version' };
 
 const HEADINGS = {
   abstract: 'Abstract',
@@ -161,6 +163,14 @@ class Renderer {
     if (m.abstractOnly) {
       const link = m.fullTextUrl ? `Full text: <${m.fullTextUrl}>` : 'No full-text link was found on this page.';
       parts.push(`> **${ABSTRACT_ONLY_MARKER}** — ${link}`);
+    }
+    const src = m.fullTextSource;
+    if (src && src.url) {
+      // 全文不是本页的版本：预印本、作者接收稿可能和正式发表版本不同
+      const what = src.kind === 'preprint'
+        ? `${src.server === 'medrxiv' ? 'medRxiv' : 'bioRxiv'} preprint${src.version ? ` v${src.version}` : ''}${src.date ? ` (${src.date})` : ''}`
+        : `PubMed Central${VERSION_TEXT[src.version] ? ` (${VERSION_TEXT[src.version]})` : ''}`;
+      parts.push(`> **${OTHER_VERSION_MARKER}** — ${what}: <${src.url}>. It may differ from the published article.`);
     }
     parts.push(heading(1, oneLine(this.inl([{ t: 'text', v: m.title || 'Untitled' }]))));
     if (m.authors.length) parts.push(`**Authors:** ${this.inl([{ t: 'text', v: m.authors.map((a) => a.name).join(', ') }])}`);

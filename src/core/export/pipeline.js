@@ -3,9 +3,10 @@
 //   PubMed 页：DOM 取题录和摘要；有 PMCID → Europe PMC 全文；否则「仅摘要」
 //   出版商页（Springer/BMC、Nature、Frontiers、MDPI、PLOS、eLife），开启「优先结构化来源」时：
 //     同站 XML（目前只有 Frontiers 的 citation_xml_url）→ 按 DOI 查 Europe PMC，开放获取就取 fullTextXML → 当前页 DOM
+// 只剩摘要、开启了「查找免费版本」时：按 DOI 查 Unpaywall 和 bioRxiv / medRxiv（后台），取 PMC 或预印本的 JATS（见 core/oa/open-version.js）
 // 最后只剩摘要时默认不导出（返回 ERR.ABSTRACT_ONLY，带全文 / PDF 链接），用户在弹窗里选「仍导出摘要」才传 allowAbstract
 // 纯函数 + 注入依赖（fetchJats、services），content script 和测试共用。
-import { hasBody, hasContent } from '../article-ir';
+import { hasBody, hasContent, SOURCE_ROUTES } from '../article-ir';
 import { parseJats } from '../parsers/jats';
 import { extractPmc } from '../adapters/pmc';
 import { extractEuropePmc } from '../adapters/europepmc';
@@ -250,15 +251,40 @@ async function publisherJats({ det, dom, doc, url, fetchJats, services, notices 
   return tryJats(look.pmcid, url, fetchJats, notices, (jatsMeta) => !!jatsMeta.doi && same(jatsMeta.doi, dom.meta.doi));
 }
 
-/** 只有摘要、用户没说要摘要：不生成文件，告诉调用方去哪里找全文 */
-function abstractOnlyFailure(ir, notices) {
+/** 只有摘要、用户没说要摘要：不生成文件，告诉调用方去哪里找全文（openVersions：别处的免费版本链接） */
+function abstractOnlyFailure(ir, notices, openVersions = []) {
   const m = ir.meta;
-  return fail(ERR.ABSTRACT_ONLY, { notices, fullTextUrl: m.fullTextUrl || '', pdfUrl: m.pdfUrl || '', meta: { title: m.title, doi: m.doi, pmid: m.pmid, pmcid: m.pmcid } });
+  return fail(ERR.ABSTRACT_ONLY, { notices, fullTextUrl: m.fullTextUrl || '', pdfUrl: m.pdfUrl || '', openVersions, meta: { title: m.title, doi: m.doi, pmid: m.pmid, pmcid: m.pmcid } });
+}
+
+/**
+ * 本页只有摘要：找别处的免费全文。拿到 JATS 就返回 IR（题录用本页的，全文版本记在 meta.fullTextSource），
+ * 否则返回链接。PMC 版本的 JATS 必须是同一篇（DOI 一致）；预印本的对应关系来自 bioRxiv 自己，DOI 本来就不同。
+ */
+async function openVersion(dom, url, services, notices) {
+  if (!dom.meta.doi || !services.findOpenVersion) return { ir: null, links: [] };
+  const res = await callService(services.findOpenVersion, dom.meta.doi);
+  const links = Array.isArray(res.links) ? res.links : [];
+  if (!res.ok || !res.xml) return { ir: null, links };
+  try {
+    const ir = parseJats(res.xml, { url, sourceRoute: res.route, assetUrl: res.route === SOURCE_ROUTES.JATS_PREPRINT ? () => '' : undefined });
+    if (!hasBody(ir)) return { ir: null, links };
+    if (res.route !== SOURCE_ROUTES.JATS_PREPRINT && !(ir.meta.doi && same(ir.meta.doi, dom.meta.doi))) return { ir: null, links };
+    const page = dom.meta;
+    // 题录以本页（正式发表版本）为准，正文来自免费版本
+    ir.meta = { ...ir.meta, title: page.title || ir.meta.title, authors: page.authors.length ? page.authors : ir.meta.authors, journal: page.journal || ir.meta.journal, year: page.year || ir.meta.year, doi: page.doi, pmid: page.pmid || ir.meta.pmid, license: res.route === SOURCE_ROUTES.JATS_PREPRINT ? '' : ir.meta.license, url, keywords: ir.meta.keywords.length ? ir.meta.keywords : page.keywords, mesh: page.mesh || [], abstractOnly: false, fullTextSource: res.source };
+    if (res.route === SOURCE_ROUTES.JATS_PREPRINT) ir.meta.pmcid = page.pmcid || '';
+    notices.push({ code: NOTICE.OPEN_VERSION, ...res.source });
+    return { ir, links };
+  } catch (_) {
+    return { ir: null, links };
+  }
 }
 
 /**
  * @param {{ doc:Document, url:string, settings?:object, fetchJats:(pmcid:string)=>Promise<object>, now?:Date,
- *   services?:{ lookupDoi?:(doi:string)=>Promise<object>, fetchSiteXml?:(url:string)=>Promise<object>, fetchPageHtml?:(url:string)=>Promise<object> },
+ *   services?:{ lookupDoi?:(doi:string)=>Promise<object>, fetchSiteXml?:(url:string)=>Promise<object>, fetchPageHtml?:(url:string)=>Promise<object>,
+ *     findOpenVersion?:(doi:string)=>Promise<object> },
  *   format?:'md'|'zip', allowAbstract?:boolean }} args
  */
 export async function exportArticle({ doc, url, settings: rawSettings, fetchJats, services = {}, now, format = 'md', allowAbstract = false }) {
@@ -292,8 +318,10 @@ export async function exportArticle({ doc, url, settings: rawSettings, fetchJats
       }
     }
     if (!dom.meta.title) return fail(ERR.NO_CONTENT);
-    if (!allowAbstract) return abstractOnlyFailure(dom, notices);
-    return finish(dom, settings, notices, now, format);
+    if (allowAbstract) return finish(dom, settings, notices, now, format);
+    const open = settings.findOpenVersions ? await openVersion(dom, url, services, notices) : { ir: null, links: [] };
+    if (open.ir) return finish(open.ir, settings, notices, now, format);
+    return abstractOnlyFailure(dom, notices, open.links);
   }
 
   if (det.site.publisher && settings.preferJats) {
@@ -318,7 +346,11 @@ export async function exportArticle({ doc, url, settings: rawSettings, fetchJats
     if (!(dom.abstract || []).length) return fail(ERR.NO_CONTENT);
     dom.meta.abstractOnly = true;
     dom.meta.fullTextUrl = dom.meta.doi ? `https://doi.org/${dom.meta.doi}` : '';
-    if (!allowAbstract) return abstractOnlyFailure(dom, notices);
+    if (!allowAbstract) {
+      const open = settings.findOpenVersions ? await openVersion(dom, url, services, notices) : { ir: null, links: [] };
+      if (open.ir) return finish(open.ir, settings, notices, now, format);
+      return abstractOnlyFailure(dom, notices, open.links);
+    }
   }
   return finish(dom, settings, notices, now, format);
 }

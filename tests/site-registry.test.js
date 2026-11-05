@@ -62,12 +62,15 @@ describe('detectSite', () => {
 
   test('supported sites are covered by host permissions; planned sites request none', () => {
     const hostPerms = manifest.host_permissions.map((h) => h.replace(/^https:\/\//, '').replace(/\/.*$/, ''));
+    // bioRxiv / medRxiv 还没有页面适配器，但后台要从这两个域名取预印本 JATS（core/oa/biorxiv.js）
+    const grantedForOtherUse = ['www.biorxiv.org', 'www.medrxiv.org'];
     for (const s of SITES) {
       for (const h of s.hosts) {
         if (s.status === 'supported') expect(hostPerms).toContain(h);
-        else expect(hostPerms).not.toContain(h);
+        else if (!grantedForOtherUse.includes(h)) expect(hostPerms).not.toContain(h);
       }
     }
+    expect(manifest.content_scripts[0].matches.some((m) => /biorxiv|medrxiv/.test(m))).toBe(false);
   });
 
   test('content scripts only run on supported sites', () => {
