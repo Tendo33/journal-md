@@ -35,6 +35,7 @@
 | `https://mineru.net/*` | PDF 解析（MinerU）：提交任务、轮询 |
 | `https://cdn-mineru.openxlab.org.cn/*` | MinerU 结果 ZIP 所在域名 |
 | `https://media.springernature.com/*` | ZIP 打包 Springer Link / BMC / Nature 的图片（这个 CDN 不发 CORS 头，页面里取不到，由后台代取） |
+| `https://oup.silverchair-cdn.com/*` | ZIP 打包 Oxford Academic 的图片（同上，由后台代取） |
 | `https://corpus-prod.f505aadad1e46610c8f8563037eb3c4b.r2.cloudflarestorage.com/*` | ZIP 打包 PLOS 的图片：`/article/figure/image` 和 `/article/file?type=thumbnail` 一律 302 到这个 R2 存储桶，它不发 CORS 头。只用这个确切主机，不用 `*.r2.cloudflarestorage.com` |
 
 `scripting` 另一个用途：点「快速解析 PDF」时把 `pdf-fast.js`（pdf.js，扩展包内文件）注入当前文章页，在页面里读 PDF 文字层，不发任何第三方请求。

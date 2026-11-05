@@ -95,7 +95,14 @@ class ElsevierParser {
     const anchors = [];
     for (const n of Array.from(el.childNodes)) {
       const name = n.nodeType === 1 ? ln(n) : '';
-      if (name === 'display') { flushText(); blocks.push(...this.display(n)); } else if (name === 'list') { flushText(); blocks.push(this.list(n)); } else {
+      const type = n.nodeType === 3 ? 'text' : name;
+      // 公式 / 列表把段落切成几块：前面的半句话要保留下来，否则「…如图 1 所示：」这类文字会丢
+      if (type === 'display' || type === 'list' || type === 'figure' || type === 'table') {
+        flushText();
+        if (type === 'display') blocks.push(...this.display(n));
+        else if (type === 'list') blocks.push(this.list(n));
+        else { const id = attr(n, 'id'); const kind = this.floatIds.get(id); if (kind && !this.placed.has(id)) { this.placed.add(id); blocks.push({ type: kind === 'fig' ? 'figure' : 'table', id }); } }
+      } else {
         if (name === 'float-anchor') anchors.push(attr(n, 'refid'));
         else if (n.nodeType === 1) anchors.push(...findAll(n, 'float-anchor').map((a) => attr(a, 'refid')));
         buf.push(...this.inline(n));

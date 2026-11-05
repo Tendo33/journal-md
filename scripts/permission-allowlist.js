@@ -46,6 +46,7 @@ const ALLOWED_HOST_PERMISSIONS = [
   // ZIP 打包图片：PLOS 的图片地址都 302 到这一个 R2 存储桶（只取这个确切主机），Springer / BMC / Nature 的图片 CDN；两者都不发 CORS 头
   'https://corpus-prod.f505aadad1e46610c8f8563037eb3c4b.r2.cloudflarestorage.com/*',
   'https://media.springernature.com/*',
+  'https://oup.silverchair-cdn.com/*', // Oxford Academic 的图片 CDN（不发 CORS 头，ZIP 由后台代取）
 ];
 
 // Firefox 数据收集声明（data_collection_permissions.required）：读文章内容；用户填了 PDF 服务 Token 时会把它发给该服务

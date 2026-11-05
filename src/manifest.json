@@ -51,7 +51,8 @@
     "https://mineru.net/*",
     "https://cdn-mineru.openxlab.org.cn/*",
     "https://corpus-prod.f505aadad1e46610c8f8563037eb3c4b.r2.cloudflarestorage.com/*",
-    "https://media.springernature.com/*"
+    "https://media.springernature.com/*",
+    "https://oup.silverchair-cdn.com/*"
   ],
   "background": {
     "service_worker": "background.js",

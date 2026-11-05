@@ -51,6 +51,15 @@ describe('Elsevier XML → Markdown', () => {
     expect(md).toContain('[^2]: C. Placeholder, Crease notes, unpublished, 2020.');
   });
 
+  test('text before an inline display formula is kept, as separate paragraphs', () => {
+    const para = '<ce:para>The crease count is given by: <ce:display><ce:formula><mml:math display="block"><mml:mi>x</mml:mi></mml:math></ce:formula></ce:display> and was checked twice.</ce:para>';
+    const xml = XML.replace(/<ce:para id="p1">[\s\S]*?<\/ce:para>/, para);
+    const out = renderMarkdown(parseElsevier(xml, { url: SD_URL }), { includeImages: true, now: NOW });
+    expect(out).toContain('The crease count is given by:');
+    expect(out).toContain('$$\nx\n$$');
+    expect(out).toContain('and was checked twice.');
+  });
+
   test('image address built from the PII when objects are missing', () => {
     const noObjects = XML.replace(/<objects>[\s\S]*?<\/objects>/, '');
     expect(parseElsevier(noObjects, { url: SD_URL }).figures[0].src).toBe('https://ars.els-cdn.com/content/image/1-s2.0-S000000002100001X-gr1.jpg');
