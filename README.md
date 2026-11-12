@@ -122,8 +122,10 @@ npm ci
 npm run lint && npm test          # 单元测试只用 tests/fixtures，不访问网络
 npm run build                     # Chrome / Edge → dist/
 npm run build:firefox             # Firefox → dist-firefox/
-npm run verify:dist               # 权限白名单、gecko id、locales、无 source map / Key
-npm run package                   # build/*.zip
+npm run verify:dist:chrome        # 权限白名单、locales、无 source map / Key
+npm run verify:dist:firefox       # 另加 gecko id
+npm run check:keys
+npm run package                   # build/*-chrome.zip、*-firefox.zip、SHA256SUMS.txt
 ```
 
 端到端冒烟见 `scripts/e2e-smoke.js`（Playwright 装在仓库外，经 `E2E_PLAYWRIGHT_DIR` 传入）。PDF 解析内核来自 arxiv-md，见 `vendor/pdf-parse-core/README.md`。

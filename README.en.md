@@ -120,8 +120,10 @@ npm ci
 npm run lint && npm test          # unit tests use tests/fixtures only, no network
 npm run build                     # Chrome / Edge → dist/
 npm run build:firefox             # Firefox → dist-firefox/
-npm run verify:dist               # permission allowlist, gecko id, locales, no source maps / keys
-npm run package                   # build/*.zip
+npm run verify:dist:chrome        # permission allowlist, locales, no source maps / keys
+npm run verify:dist:firefox       # plus the gecko id
+npm run check:keys
+npm run package                   # build/*-chrome.zip, *-firefox.zip, SHA256SUMS.txt
 ```
 
 End-to-end smoke test: `scripts/e2e-smoke.js` (Playwright is installed outside the repo and passed in through `E2E_PLAYWRIGHT_DIR`). The PDF parsing core comes from arxiv-md, see `vendor/pdf-parse-core/README.md`.

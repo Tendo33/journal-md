@@ -1,5 +1,6 @@
 // 按目标浏览器调整构建产物里的 manifest（移植自 arxiv-md scripts/manifest-target.js）。
-// Chrome 对 MV3 的 background.scripts 报错，所以 Chrome/Edge 包去掉 scripts；Firefox 不支持 service_worker，保留 scripts。
+// Chrome 对 MV3 的 background.scripts 报错，所以 Chrome/Edge 包去掉 scripts 和 browser_specific_settings。
+// Firefox 包只用 background.scripts，并保留 gecko 设置。
 // browser_specific_settings 只给 Firefox 包（Chrome 会提示未知字段），见 cross-browser-plan §2。
 const TARGETS = ['chrome', 'firefox'];
 // 以前（arxiv-md FF-01 方案 A）：Firefox 包把可选的 DNR 改成必需。Simon 2026-10-30 18:06 起两个浏览器都在安装时授予，
@@ -63,7 +64,8 @@ function verifyBackground(manifest, target) {
   const errors = [];
   const scripts = manifest.background && manifest.background.scripts;
   if (t === 'firefox') {
-    if (!Array.isArray(scripts) || !scripts.length) errors.push('Firefox build is missing background.scripts (Firefox has no service_worker)');
+    if (!Array.isArray(scripts) || !scripts.length) errors.push('Firefox build is missing background.scripts (the Firefox package uses background.scripts)');
+    if (manifest.background && manifest.background.service_worker) errors.push('Firefox build must not include background.service_worker (the Firefox package uses background.scripts)');
   } else {
     if (scripts !== undefined) errors.push('Chrome/Edge build must not have background.scripts (Chrome rejects it in MV3)');
     if (!(manifest.background && manifest.background.service_worker)) errors.push('Chrome/Edge build is missing background.service_worker');

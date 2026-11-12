@@ -56,6 +56,8 @@ describe('manifestForTarget', () => {
     expect(m.background).toEqual({ scripts: ['background.js'] });
     expect(m.browser_specific_settings.gecko).toMatchObject({ id: 'journal-md@tendo33', data_collection_permissions: { required: ['websiteContent', 'authenticationInfo'] } });
     expect(verifyBackground(m, 'firefox')).toEqual([]);
+    expect(verifyBackground({ background: { scripts: ['background.js'], service_worker: 'background.js' } }, 'firefox'))
+      .toEqual(['Firefox build must not include background.service_worker (the Firefox package uses background.scripts)']);
     expect(verifyBrowserSettings(m, 'firefox')).toEqual([]);
   });
   test('target parsing', () => {

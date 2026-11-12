@@ -10,28 +10,32 @@ permissions:
   contents: read
 
 jobs:
+  # 三个 to Markdown 插件共用这一段：lint → 双端构建 → 双端校验 → test → check:keys → zip。
+  # test 放在 build 之后，与 arxiv-md 相同（那边 CI=true 时要检查 dist/_locales）。
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - run: npm run lint
-      - run: npm test
-      # Chrome/Edge 包（dist/）和 Firefox 包（dist-firefox/）
       - run: npm run build
       - run: npm run build:firefox
-      # 权限白名单、background 字段、gecko id、locales、source map、字面量 Key
-      - run: npm run verify:dist
+      - run: npm run verify:dist:chrome
+      - run: npm run verify:dist:firefox
+      - run: npm test
       - run: npm run check:keys
       - run: node scripts/package.js
       - uses: actions/upload-artifact@v4
         with:
           name: journal-md-packages
-          path: build/*.zip
+          path: |
+            build/*-chrome.zip
+            build/*-firefox.zip
+            build/SHA256SUMS.txt
           if-no-files-found: error
 
   # 扩展冒烟（有界面的 Chromium + xvfb，网络全部 route 到 tests/fixtures）。
@@ -41,9 +45,11 @@ jobs:
     needs: build
     env:
       PLAYWRIGHT_VERSION: 1.60.0
+      E2E_SCRIPTS: |
+        scripts/e2e-smoke.js
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -57,7 +63,15 @@ jobs:
           npx playwright install --with-deps chromium
           sudo apt-get install -y xvfb fonts-noto-core
           echo "E2E_PLAYWRIGHT_DIR=$RUNNER_TEMP/e2e-tools" >> "$GITHUB_ENV"
+          echo "CHROME_PATH=$(node -p "require('playwright').chromium.executablePath()")" >> "$GITHUB_ENV"
       - run: npm run build
-      - run: xvfb-run -a node scripts/e2e-smoke.js
+      - name: Run e2e scripts
+        run: |
+          set -e
+          for s in $E2E_SCRIPTS; do
+            echo "::group::$s"
+            xvfb-run -a node "$s"
+            echo "::endgroup::"
+          done
         env:
           FONTCONFIG_FILE: ${{ github.workspace }}/scripts/e2e-fonts.conf

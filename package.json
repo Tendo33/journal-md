@@ -22,7 +22,7 @@
     "verify:dist:firefox": "node scripts/verify-dist.js dist-firefox --target=firefox",
     "lint": "eslint \"src/**/*.js\" \"scripts/**/*.js\" \"tests/**/*.js\" \"vendor/**/*.js\" webpack.config.js jest.config.js",
     "test": "jest --runInBand",
-    "package": "npm run build && npm run build:firefox && npm run verify:dist && node scripts/package.js",
+    "package": "npm run build && npm run build:firefox && npm run verify:dist:chrome && npm run verify:dist:firefox && node scripts/package.js",
     "check:keys": "node scripts/check-no-keys.js",
     "test:e2e": "npm run build && node scripts/e2e-smoke.js"
   },
