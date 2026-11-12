@@ -9,7 +9,7 @@ const HIDE_MS = 6000;
 
 const STYLE = `
 :host { all: initial; }
-.toast { --surface: #fff; --text: #1b1f24; --text-2: #5b6270; --border: #dde1e6; --success: #0f7a3d; --danger: #b42318;
+.toast { --surface: #fff; --text: #17181c; --text-2: #5c6370; --border: #e8e8ec; --success: #0f7a3d; --danger: #b42318;
   --focus: #0969da; --state-hover: rgb(0 0 0 / .05);
   position: fixed; right: 24px; bottom: 24px; z-index: 2147483647; max-width: min(280px, calc(100vw - 48px));
   box-sizing: border-box; display: flex; gap: 4px; align-items: flex-start; padding: 6px 4px 6px 10px; border-radius: 6px;

@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+### Changed
+- Refreshed UI, same visual language as arXiv to Markdown and Zhihu to Markdown: popup is a single white surface with a tinted current-article panel and a hairline task container; secondary buttons are borderless light fills, the primary button is flat, and switches, segmented controls and fields share 8–14px radii. Settings groups are hairline containers and radio cards show selection with a single tinted outline. In-page FAB menu and toast use the same neutral tokens and softer popover. Light and dark both re-checked for text and control contrast.
+- Firefox packages are rejected by `verify:dist` when they still contain `background.service_worker`. Chrome packages already omit `browser_specific_settings`. Same split as arXiv to Markdown and Zhihu to Markdown.
+- Packaging and release now match arXiv to Markdown and Zhihu to Markdown: `npm run package` builds both browsers, verifies each dist, and writes `build/journal-md-v<version>-chrome.zip`, `-firefox.zip`, and `SHA256SUMS.txt`. CI and the tag-only Release workflow use the same steps.
+
 ### Added
 - Elsevier full-text API: with your own Elsevier API key (Settings → Publisher full-text APIs, with a key test), an Elsevier article page that shows only the abstract — ScienceDirect, Cell, or any `10.1016/` article opened on PubMed or Europe PMC — gets its structured full text from api.elsevier.com, which grants it when your network is subscribed. New parser for Elsevier's XML (sections, highlights, MathML, CALS tables, figures with ScienceDirect images, structured references); `source_route: xml-elsevier`. Tried before free versions. ScienceDirect becomes a supported site (citation and abstract from the page, body from the API). New host permissions: `www.sciencedirect.com`, `api.elsevier.com`.
 - "Quick PDF parse" in the popup: downloads the article PDF on the page (with your sign-in) and converts its text layer to Markdown with pdf.js — two-column reading order, running headers and page numbers removed, headings by size and numbering, hyphenation joined, captions and references. Seconds instead of minutes, no key, nothing sent to any service (`source_route: pdf-text`). `pdf-fast.js` (pdf.js, Apache-2.0) is injected only when used. Checked on a single-column PLOS article and a two-column conference paper.

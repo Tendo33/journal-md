@@ -5,10 +5,10 @@
 
 /* 分段选择 .segmented 在 series.css */
 .token-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--sp-2)}
-.pdf-status{margin-top:var(--sp-1);padding:10px 12px;border-radius:var(--r-md);font-size:var(--fs-sm);line-height:1.45;background:var(--surface-2);color:var(--text-2);box-shadow:inset 0 0 0 1px var(--border)}
+.pdf-status{margin-top:var(--sp-1);padding:10px 12px;border-radius:var(--r-md);font-size:var(--fs-sm);line-height:1.45;background:var(--surface-2);color:var(--text-2)}
 .pdf-status:empty{display:none}
-.pdf-status[data-state="ok"]{background:var(--success-bg);color:var(--success);box-shadow:inset 0 0 0 1px color-mix(in srgb,currentColor 16%,transparent)}
-.pdf-status[data-state="err"]{background:var(--danger-bg);color:var(--danger);box-shadow:inset 0 0 0 1px color-mix(in srgb,currentColor 16%,transparent)}
+.pdf-status[data-state="ok"]{background:var(--success-bg);color:var(--success)}
+.pdf-status[data-state="err"]{background:var(--danger-bg);color:var(--danger)}
 
 .sites{list-style:none;margin:0;padding:0}
 .sites li{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4);min-height:44px;padding:6px var(--sp-5);border-top:1px solid var(--border);font-size:var(--fs-md)}

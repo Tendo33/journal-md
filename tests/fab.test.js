@@ -131,8 +131,8 @@ test('series ui-v2: ball geometry and shadow as zhihu-md, menu per audit §4.2',
   expect(css).toContain('width: 44px; height: 44px; border-radius: 50%');
   expect(css).toContain('--ball-shadow: 0 4px 12px rgba(0, 0, 0, .12)');
   expect(css).toContain('--ball-shadow-hover: 0 12px 32px rgba(0, 0, 0, .2), 0 4px 12px rgba(0, 0, 0, .1)');
-  expect(css).toMatch(/\.menu \{[^}]*border-radius: 8px/);
-  expect(css).toMatch(/\.item \{[^}]*min-height: 32px; padding: 6px 12px; border-radius: 6px/);
+  expect(css).toMatch(/\.menu \{[^}]*border-radius: 12px/);
+  expect(css).toMatch(/\.item \{[^}]*min-height: 32px; padding: 6px 10px; border-radius: 8px/);
   f.remove();
 });
 

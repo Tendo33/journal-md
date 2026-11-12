@@ -225,8 +225,9 @@ async function main() {
       bodyBg: cs('body', 'backgroundColor'), cardBg: cs('.card', 'backgroundColor'), cardImg: cs('.card', 'backgroundImage'), font: cs('#export', 'fontFamily'),
       focus: getComputedStyle(document.documentElement).getPropertyValue('--focus').trim() };
   });
-  check('series ui: popup 360 wide, 48px header, 36px footer, 12px cards', geo.w === 360 && Math.round(geo.hd) === 48 && Math.round(geo.ft) === 36 && geo.card === '12px', JSON.stringify(geo));
-  check('series ui: page grey, cards white (surface hierarchy)', geo.bodyBg === 'rgb(244, 245, 247)' && (geo.cardBg === 'rgb(255, 255, 255)' || /gradient/.test(geo.cardImg)), JSON.stringify(geo));
+  // 系列视觉 v3：弹窗是一张白纸，当前页是一块浅色面板（--surface-2），圆角 14（ui-v2 --r-lg）
+  check('series ui: popup 360 wide, 48px header, 36px footer, 14px cards', geo.w === 360 && Math.round(geo.hd) === 48 && Math.round(geo.ft) === 36 && geo.card === '14px', JSON.stringify(geo));
+  check('series ui: white page, tinted current-page panel', geo.bodyBg === 'rgb(255, 255, 255)' && geo.cardBg === 'rgb(244, 244, 246)' && !/gradient/.test(geo.cardImg), JSON.stringify(geo));
   check('series ui: neutral focus colour #0969da, buttons use the system font', geo.focus === '#0969da' && /system-ui/.test(geo.font), JSON.stringify(geo));
   check('series ui: primary button is the full-width 40px row (ui-v2 .acts)', Math.abs(btnBoxes[0].height - 40) < 0.5 && btnBoxes[0].width > btnBoxes[1].width * 1.8, JSON.stringify(btnBoxes[0]));
 
