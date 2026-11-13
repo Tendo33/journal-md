@@ -1,6 +1,6 @@
 {
   "name": "journal-md",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "private": true,
   "description": "Journal to Markdown — browser extension that saves open-access journal articles as clean Markdown.",
   "author": "SimonSun",

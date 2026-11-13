@@ -85,6 +85,20 @@ async function main() {
       searchHits.push(url);
       return route.fulfill({ status: 200, contentType: 'application/json', body: NO_HITS });
     }
+    // 只有摘要时会查免费版本。这里回「没有」，避免打到 Unpaywall / bioRxiv / Elsevier。
+    if (url.startsWith('https://api.unpaywall.org/')) {
+      return route.fulfill({ status: 404, contentType: 'application/json', body: '{"HTTP_status_code":404,"error":"e2e mock: not found"}' });
+    }
+    if (url.startsWith('https://api.biorxiv.org/')) {
+      return route.fulfill({ status: 200, contentType: 'application/json', body: '{"messages":[{"status":"ok"}],"collection":[]}' });
+    }
+    if (url.startsWith('https://api.elsevier.com/')) {
+      return route.fulfill({ status: 401, contentType: 'application/json', body: '{"service-error":{"status":{"statusCode":"AUTHENTICATION_ERROR"}}}' });
+    }
+    // PaddleOCR 会先在浏览器里下载文章 PDF。fixture 的 Nature PDF 用一段最小 PDF 顶上。
+    if (url.startsWith('https://www.nature.com/articles/') && /\.pdf(?:$|\?)/i.test(url)) {
+      return route.fulfill({ status: 200, contentType: 'application/pdf', body: Buffer.from('%PDF-1.1\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n') });
+    }
     if (url.startsWith('https://iiif.elifesciences.org/') && ['fetch', 'xhr'].includes(route.request().resourceType())) {
       return route.fulfill({ status: 200, contentType: 'image/png', headers: { 'Access-Control-Allow-Origin': '*' }, body: PNG });
     }
@@ -158,10 +172,11 @@ async function main() {
 
   // 不支持的页面：popup 直接给出原因；按钮同 arxiv-md / zhihu-md 留在原位置灰（系列统一），不能被 Tab 聚焦（MF1 / JM-04）
   const p2 = await ctx.newPage();
-  await p2.addInitScript(() => { chrome.tabs.query = async () => [{ id: -1, url: 'https://www.sciencedirect.com/science/article/pii/S0032579120300001' }]; });
+  // ScienceDirect 已支持。仍计划中的站点用 bioRxiv，弹窗应直接说明，而不是去读一个不存在的标签页。
+  await p2.addInitScript(() => { chrome.tabs.query = async () => [{ id: -1, url: 'https://www.biorxiv.org/content/10.1101/2020.01.01.123456v1' }]; });
   await p2.goto(`chrome-extension://${extId}/popup.html`);
   await p2.waitForSelector('#empty:not([hidden])');
-  check('popup explains planned site', (await p2.textContent('#empty')).includes('ScienceDirect'), await p2.textContent('#empty'));
+  check('popup explains planned site', (await p2.textContent('#empty')).includes('bioRxiv'), await p2.textContent('#empty'));
   check('MF1: export/copy disabled on unsupported page', await p2.isDisabled('#export') && await p2.isDisabled('#copy') && await p2.isDisabled('#zip'));
   const focusIds = [];
   for (let i = 0; i < 6; i += 1) {
@@ -176,7 +191,9 @@ async function main() {
   await pub.waitForTimeout(500);
   const pubTab = await sw.evaluate(async (url) => (await chrome.tabs.query({ url }))[0].id, PUBMED_URL);
   const pr = await sw.evaluate((id) => chrome.tabs.sendMessage(id, { type: 'JMD_EXPORT', action: 'none' }), pubTab);
-  check('PubMed abstract-only export', pr && pr.ok && pr.abstractOnly && pr.markdown.includes('Abstract only / 仅摘要'));
+  check('PubMed abstract-only export asks before saving', pr && pr.ok === false && pr.error === 'abstract_only', JSON.stringify(pr && { ok: pr.ok, error: pr.error }));
+  const prAbs = await sw.evaluate((id) => chrome.tabs.sendMessage(id, { type: 'JMD_EXPORT', action: 'none', allowAbstract: true }), pubTab);
+  check('PubMed abstract-only export still saves when asked', prAbs && prAbs.ok && prAbs.abstractOnly && prAbs.markdown.includes('Abstract only / 仅摘要'), JSON.stringify(prAbs && { ok: prAbs.ok, abstractOnly: prAbs.abstractOnly, error: prAbs.error }));
 
   // options：语言切换即时生效，设置写入 storage
   const opt = await ctx.newPage();

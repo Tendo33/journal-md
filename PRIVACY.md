@@ -1,10 +1,10 @@
 # Privacy Policy
 
-**Last updated: 2026-11-03 (wording: "token" is now "key"; no change to what is collected or sent)** · applies to Journal to Markdown 1.1.1
+**Last updated: 2026-11-13** · applies to Journal to Markdown 1.2.0
 
 ## Overview
 
-`Journal to Markdown` is a browser extension that turns the journal article you are reading (PubMed Central, Europe PMC, PubMed, Springer Link / BMC / SpringerOpen, Nature, Frontiers, MDPI, PLOS, eLife) into Markdown. The project runs no server of its own. Conversion happens inside your browser; the extension only contacts the services listed below, and only when you export, copy or parse an article.
+`Journal to Markdown` is a browser extension that turns the journal article you are reading (PubMed Central, Europe PMC, PubMed, Springer Link / BMC / SpringerOpen, Nature, Frontiers, MDPI, PLOS, eLife, Wiley, Cell Press, Oxford Academic, Taylor & Francis, ScienceDirect) into Markdown. The project runs no server of its own. Conversion happens inside your browser; the extension only contacts the services listed below, and only when you export, copy or parse an article.
 
 ## What the extension stores
 
