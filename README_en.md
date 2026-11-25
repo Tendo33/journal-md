@@ -6,11 +6,18 @@
 
 **Save the journal article you are reading as clean Markdown in one click.**
 
-[![GitHub Release](https://img.shields.io/github/v/release/Tendo33/journal-md?style=flat-square&label=Release&color=0f766e)](https://github.com/Tendo33/journal-md/releases)
-[![License: MIT](https://img.shields.io/badge/License-MIT-black?style=flat-square)](./LICENSE)
-[![Manifest V3](https://img.shields.io/badge/Manifest-V3-4285F4?style=flat-square&logo=googlechrome&logoColor=white)](./src/manifest.json)
+[![Chrome](https://img.shields.io/badge/Chrome-121%2B-4285F4?style=flat-square&logo=googlechrome&logoColor=white)](https://github.com/Tendo33/journal-md/releases)
+[![Firefox](https://img.shields.io/badge/Firefox-140%2B-FF7139?style=flat-square&logo=firefoxbrowser&logoColor=white)](https://github.com/Tendo33/journal-md/releases)
+[![Manifest V3](https://img.shields.io/badge/Manifest-V3-4285F4?style=flat-square&logo=googlechrome&logoColor=white)](src/manifest.json)
+[![pdf.js](https://img.shields.io/badge/pdf.js-text_layer-E23F3F?style=flat-square&logo=mozilla&logoColor=white)](vendor/pdf-parse-core)
 
-[Install](#install) · [中文说明](./README.md) · [Permissions](./docs/permissions.md) · [Privacy](./PRIVACY.md) · [Changelog](./CHANGELOG.md)
+[![Release](https://img.shields.io/github/v/release/Tendo33/journal-md?style=flat-square&label=Release&color=0f766e)](https://github.com/Tendo33/journal-md/releases)
+[![License](https://img.shields.io/badge/License-MIT-2EA043?style=flat-square)](LICENSE)
+[![Privacy](https://img.shields.io/badge/Privacy-no_server-10B981?style=flat-square)](PRIVACY.md)
+
+[Install](#install) · [Usage](#usage) · [Export flow](#how-an-export-runs) · [Supported sites](#supported-sites) · [Settings](#settings)
+
+<sub>[中文](README.md) · English</sub>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/hero-dark.png">
@@ -80,6 +87,41 @@ When a page only shows the abstract (usually because you don't have access), the
 
 <img src="docs/screenshots/popup.png" width="300" alt="Toolbar popup">
 
+## How an export runs
+
+Whichever entry point starts it, an export looks for structured full text first, falls back to the page, and only then considers a PDF.
+
+```mermaid
+flowchart LR
+    A[Journal article page<br/>M↓ button, popup, context menu, shortcut] --> B{Which full text does this site prefer?}
+    B -->|Europe PMC / JATS| C[Fetch structured text<br/>by PMCID or DOI]
+    B -->|Frontiers / Elsevier| D[Frontiers XML<br/>or the Elsevier API]
+    B -->|Other| E[Parse the current page DOM]
+    C --> F{Full text found?}
+    D --> F
+    F -->|Yes| G[Convert to Markdown<br/>front matter, math, tables, footnotes]
+    F -->|No, abstract only| H[Look up Unpaywall by DOI<br/>bioRxiv / medRxiv]
+    H -->|PMC author manuscript or preprint| G
+    H -->|Only free PDF links| I[Popup lists versions<br/>PDF parsing on demand]
+    F -->|No, use the page| G
+    G --> J{Output}
+    J -->|.md| K[Single Markdown file]
+    J -->|ZIP| L[article.md + images/]
+    J -->|Copy| M[Clipboard]
+
+    classDef client fill:#3B82F6,stroke:#2563EB,color:#fff,stroke-width:2px
+    classDef service fill:#10B981,stroke:#059669,color:#fff,stroke-width:2px
+    classDef data fill:#8B5CF6,stroke:#7C3AED,color:#fff,stroke-width:2px
+    classDef choice fill:#F59E0B,stroke:#D97706,color:#fff,stroke-width:2px
+    classDef external fill:#F43F5E,stroke:#E11D48,color:#fff,stroke-width:2px
+
+    class A client
+    class C,D,E,G service
+    class K,L,M data
+    class B,F,J choice
+    class H,I external
+```
+
 ## Settings
 
 <img src="docs/screenshots/settings.png" width="720" alt="Settings page">
@@ -90,6 +132,8 @@ When a page only shows the abstract (usually because you don't have access), the
 | Include images | When off, only figure captions are kept | On |
 | Show the Markdown button on article pages | The M↓ button at the bottom right | On |
 | Prefer structured full text | Try Europe PMC JATS first (Frontiers: its own XML); fall back to the page on failure or timeout | On |
+| Look up free versions when abstract only | Query Unpaywall and bioRxiv / medRxiv by DOI (the DOI is the only thing sent) | On |
+| Elsevier API key | With a key, Elsevier articles (ScienceDirect, Cell, The Lancet, DOIs starting `10.1016/`, including when opened on PubMed) that show only an abstract are fetched as structured full text from the Elsevier API; Elsevier judges your subscription by your network. Request one free at the [Elsevier developer portal](https://dev.elsevier.com/apikey/manage). Stored in this browser only and sent only to api.elsevier.com | Not set |
 | Language | Follow browser / 中文 / English | Follow browser |
 | PDF parsing | Choose PaddleOCR (default) or MinerU, enter and test a key; keys stay in this browser | PaddleOCR, no key |
 | Sites | Turn off sites you don't want to export from | All on |

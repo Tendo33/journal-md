@@ -6,11 +6,18 @@
 
 **把正在阅读的期刊论文全文一键存为干净的 Markdown。**
 
-[![GitHub Release](https://img.shields.io/github/v/release/Tendo33/journal-md?style=flat-square&label=Release&color=0f766e)](https://github.com/Tendo33/journal-md/releases)
-[![License: MIT](https://img.shields.io/badge/License-MIT-black?style=flat-square)](./LICENSE)
-[![Manifest V3](https://img.shields.io/badge/Manifest-V3-4285F4?style=flat-square&logo=googlechrome&logoColor=white)](./src/manifest.json)
+[![Chrome](https://img.shields.io/badge/Chrome-121%2B-4285F4?style=flat-square&logo=googlechrome&logoColor=white)](https://github.com/Tendo33/journal-md/releases)
+[![Firefox](https://img.shields.io/badge/Firefox-140%2B-FF7139?style=flat-square&logo=firefoxbrowser&logoColor=white)](https://github.com/Tendo33/journal-md/releases)
+[![Manifest V3](https://img.shields.io/badge/Manifest-V3-4285F4?style=flat-square&logo=googlechrome&logoColor=white)](src/manifest.json)
+[![pdf.js](https://img.shields.io/badge/pdf.js-text_layer-E23F3F?style=flat-square&logo=mozilla&logoColor=white)](vendor/pdf-parse-core)
 
-[安装](#安装) · [English](./README.en.md) · [权限说明](./docs/permissions.md) · [隐私说明](./PRIVACY.md) · [更新日志](./CHANGELOG.md)
+[![Release](https://img.shields.io/github/v/release/Tendo33/journal-md?style=flat-square&label=Release&color=0f766e)](https://github.com/Tendo33/journal-md/releases)
+[![License](https://img.shields.io/badge/License-MIT-2EA043?style=flat-square)](LICENSE)
+[![Privacy](https://img.shields.io/badge/Privacy-no_server-10B981?style=flat-square)](PRIVACY.md)
+
+[安装](#安装) · [使用](#使用) · [导出流程](#导出是怎么走的) · [支持的网站](#支持的网站) · [设置](#设置)
+
+<sub>中文 · [English](README_en.md)</sub>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/hero-dark.png">
@@ -79,6 +86,41 @@
 | 右键菜单 | 「导出本页为 Markdown」「复制本页为 Markdown」 |
 
 <img src="docs/screenshots/popup.png" width="300" alt="工具栏弹窗">
+
+## 导出是怎么走的
+
+不管从哪个入口开始，导出的核心都是「先找结构化全文，找不到再退到页面，最后才考虑 PDF」。
+
+```mermaid
+flowchart LR
+    A[期刊文章页<br/>M↓ 按钮、弹窗、右键、快捷键] --> B{本站点先用哪种全文?}
+    B -->|Europe PMC / JATS| C[按 PMCID 或 DOI<br/>请求结构化全文]
+    B -->|Frontiers / Elsevier| D[Frontiers XML<br/>或 Elsevier 全文接口]
+    B -->|其他| E[解析当前页面 DOM]
+    C --> F{拿到全文?}
+    D --> F
+    F -->|是| G[转 Markdown<br/>front matter、公式、表格、脚注]
+    F -->|否，只有摘要| H[按 DOI 查 Unpaywall<br/>bioRxiv / medRxiv]
+    H -->|找到 PMC 作者稿 / 预印本| G
+    H -->|只有免费 PDF 链接| I[弹窗列出版本<br/>可一键解析 PDF]
+    F -->|否，直接用页面| G
+    G --> J{下载方式}
+    J -->|.md| K[单个 Markdown 文件]
+    J -->|ZIP| L[article.md + images/]
+    J -->|复制| M[写入剪贴板]
+
+    classDef client fill:#3B82F6,stroke:#2563EB,color:#fff,stroke-width:2px
+    classDef service fill:#10B981,stroke:#059669,color:#fff,stroke-width:2px
+    classDef data fill:#8B5CF6,stroke:#7C3AED,color:#fff,stroke-width:2px
+    classDef choice fill:#F59E0B,stroke:#D97706,color:#fff,stroke-width:2px
+    classDef external fill:#F43F5E,stroke:#E11D48,color:#fff,stroke-width:2px
+
+    class A client
+    class C,D,E,G service
+    class K,L,M data
+    class B,F,J choice
+    class H,I external
+```
 
 ## 设置
 
