@@ -142,7 +142,7 @@ Changes save automatically.
 
 ## Permissions
 
-All permissions are granted at install; the extension never asks for one while you use it. See [docs/permissions.md](./docs/permissions.md) for what each one is for.
+All permissions are granted at install; the extension never asks for one while you use it. See [docs/permissions.md](./docs/permissions.md) for what each one is for, and [docs/store-listing.md](./docs/store-listing.md) for the store copy.
 
 ## Privacy
 

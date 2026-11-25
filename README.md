@@ -142,7 +142,7 @@ flowchart LR
 
 ## 权限说明
 
-所有权限都在安装时授予，使用中不会再弹出权限请求。逐项用途见 [docs/permissions.md](./docs/permissions.md)。
+所有权限都在安装时授予，使用中不会再弹出权限请求。逐项用途见 [docs/permissions.md](./docs/permissions.md)，商店上架文案见 [docs/store-listing.md](./docs/store-listing.md)。
 
 ## 隐私
 
